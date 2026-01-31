@@ -1,0 +1,20 @@
+# LaTeX build files
+**/*.aux
+**/*.log
+**/*.out
+**/*.toc
+**/*.synctex.gz
+**/*.fls
+**/*.fdb_latexmk
+**/*.bbl
+**/*.bcf
+**/*.blg
+**/*.run.xml
+**/*.nav
+**/*.snm
+**/*.vrb
+**/_minted*
+
+# Optional: PDFs
+# **/*.pdf
+
