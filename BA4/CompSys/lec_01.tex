@@ -4,19 +4,16 @@
 \lecture{1}{2026-02-16}{}{}
 
 \section{Introduction, Part I}
-Qu'est ce qu'il se passe quand on clique sur une vidéo ? Comment c'est possible qu'une vidéo provenant de l'autre côté du monde apparaîsse sur mon écran? C'est ce que va étudier pendant ce semestre.
+What happens when you click on a video? How is it possible that a video from the other side of the world appears on my screen? That's what we'll be studying this semester.
 \subsection{End-systems, packet switches, links}%
 \label{sub:End-systems, packet switches, links}
 
-\begin{definition}[End-systems]
-  All the devices that use internet to communicate (laptop, smarthphone, connected oven, pacemakers, servers streaming/cloud/gaming \ldots).
-\end{definition}
-\begin{definition}[Packet-switches]  
-  Network devices that enable the end-systems to communicate with one another.
-\end{definition}
-\begin{definition}[Network link]
-  A physical medium that connects two devices. 
-\end{definition}
+\textbf{End-system:} All the devices that use internet to communicate (laptop, smarthphone, connected oven, pacemakers, servers streaming/cloud/gaming \ldots).
+\\
+\textbf{Packet switch:} A network device that enable the end-systems to communicate with one another.
+\\
+\textbf{Network link:} A physical medium that connects two devices. 
+
 \subsection{Programs, processes, threads}%
 \label{sub:Programs, processes, threads}
 
@@ -32,4 +29,28 @@ ex: I invoked a browser program on my laptop, which created a browser process in
 
 \subsection{Communication Protocol}%
 \label{sub:Communication Protocol}
-A specification of \textbf{all possible message sequences} that may be exchanged between the communicating paties 
+\begin{itemize}
+\item A specification of \textbf{all possible message sequences} that may be exchanged between the communicating parties.
+  \item The \textbf{interface} between the communicating parties. 
+  \item It provides an \textbf{abstraction} of the server process (vice versa): one computer can comunicate with other computers without knowing anything about them.
+\end{itemize}
+
+\subsection{System calls (syscalls)}%
+\label{sub:System calls (syscalls}
+\begin{itemize}
+  \item Special calls that a process make to access \textbf{computer resources} like storage and network. 
+  \item Then \textbf{text} between processes and computer resources.
+  \item An \textbf{abstraction} of computer resources presented to processes. 
+\end{itemize}
+\subsection{Interface & Layers}%
+\label{sub:Interface & Layers}
+
+An \textbf{agreement} between two parties about how they will interact. This concept of interfaces inherently create layers.\\ 
+\textbf{Layers}:
+\begin{itemize}
+  \item A collection of entities that conceptuallay play the \textbf{same role}.
+  \item Each entity communicates with the \textbf{layer below/above} through a well-defined \textbf{interface}.
+\end{itemize}
+Interface and layers provide \textbf{abstraction}, which enables \textbf{separation of concerns}. They improve the \textbf{simplicity} and \textbf{flexibiliy}. But, in principle, they do not improve performance.
+
+
