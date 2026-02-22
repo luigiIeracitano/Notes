@@ -1,6 +1,6 @@
 % style.sty
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{style}[2026/02/22 Notes style: boxed theorems + parag + code]
+\ProvidesPackage{style}[2026/02/22 Notes style (cleaned, report ToC fixed)]
 
 % ---------------------------
 % Engine (LuaLaTeX expected)
@@ -20,107 +20,6 @@
 \RequirePackage{graphicx}
 \RequirePackage[hyphens]{url}
 \RequirePackage[breaklinks,hidelinks]{hyperref}
-
-\hypersetup{pdftitle={Notes}}
-
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{3pt}
-
-% ---------------------------
-% Math
-% ---------------------------
-\RequirePackage{amsmath}
-\RequirePackage{amssymb}
-\RequirePackage{mathtools}
-\RequirePackage{bm}
-\RequirePackage{dsfont}
-\RequirePackage{esint}
-\RequirePackage{centernot}
-
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\C}{\mathbb{C}}
-\newcommand{\N}{\mathbb{N}}
-\newcommand{\Z}{\mathbb{Z}}
-
-\newcommand{\exval}{\mathbb{E}}
-\newcommand{\prob}{\mathbb{P}}
-
-\DeclareMathOperator{\Span}{span}
-\DeclareMathOperator{\rank}{rank}
-\DeclareMathOperator{\Tr}{Tr}
-\DeclareMathOperator*{\argmin}{argmin}
-\DeclareMathOperator*{\argmax}{argmax}
-
-% ---------------------------
-% Lists
-% ---------------------------
-\RequirePackage{enumitem}
-\setlist{left=15pt, noitemsep, topsep=2pt}
-\AtBeginDocument{\def\labelitemi{$\bullet$}}
-
-% ---------------------------
-% TikZ / plots (keep if needed)
-% ---------------------------
-\RequirePackage{tikz}
-\RequirePackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\RequirePackage{tikz-cd}
-\usetikzlibrary{arrows.meta,patterns,decorations.pathmorphing}
-
-% ---------------------------
-% Code (listings)
-% ---------------------------
-\RequirePackage{listings}
-
-\definecolor{bg}{rgb}{0.95,0.95,0.95}
-\definecolor{kw}{rgb}{0.00,0.30,0.55}
-\definecolor{com}{rgb}{0.30,0.50,0.10}
-\definecolor{str}{rgb}{0.80,0.20,0.55}
-
-\lstdefinestyle{notes}{
-  backgroundcolor=\color{bg},
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\bfseries\color{kw},
-  commentstyle=\color{com},
-  stringstyle=\color{str},
-  breaklines=true,
-  breakatwhitespace=false,
-  showstringspaces=false,
-  frame=none,
-  tabsize=2
-}
-\lstset{style=notes}
-
-% ---------------------------
-% Boxes + theorem boxing (ROBUST WAY)
-% ---------------------------
-\RequirePackage{amsthm}
-\RequirePackage[most]{tcolorbox}
-\RequirePackage{xparse}
-
-% style.sty
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{style}[2026/02/22 Notes style: boxed theorems + parag + code]
-
-% ---------------------------
-% Engine (LuaLaTeX expected)
-% ---------------------------
-\RequirePackage{iftex}
-\ifLuaTeX\else
-  \PackageWarning{style}{This style is intended for LuaLaTeX (fontspec).}
-\fi
-
-% ---------------------------
-% Core / layout
-% ---------------------------
-\RequirePackage{fontspec}
-\RequirePackage[bottom=2.5cm,top=2.5cm]{geometry}
-\RequirePackage{microtype}
-\RequirePackage{xcolor}
-\RequirePackage{graphicx}
-\RequirePackage[hyphens]{url}
-\RequirePackage[breaklinks,hidelinks]{hyperref}
-
 \hypersetup{pdftitle={Notes}}
 
 \setlength{\parindent}{0pt}
@@ -226,7 +125,7 @@
 \theoremstyle{definition}
 \newtheorem{exemple}{Exemple}
 
-% --- Now: BOX them automatically (this is the key) ---
+% --- Now: BOX them automatically ---
 \tcolorboxenvironment{definition}{basebox,colback=green!10,colframe=green!25}
 \tcolorboxenvironment{theoreme}{basebox,colback=blue!7,colframe=blue!25}
 \tcolorboxenvironment{proposition}{basebox,colback=blue!2,colframe=blue!20}
@@ -236,27 +135,16 @@
 \tcolorboxenvironment{resume1}{basebox,colback=gray!7,colframe=black!20}
 \tcolorboxenvironment{savoir}{basebox,colback=orange!7,colframe=orange!20}
 
-% Keep your old env names as wrappers if you want:
-\NewDocumentEnvironment{framedremark}{}{%
-  \begin{remark}
-}{%
-  \end{remark}
-}
-\NewDocumentEnvironment{resume}{}{%
-  \begin{resume1}
-}{%
-  \end{resume1}
-}
-\NewDocumentEnvironment{truc}{}{%
-  \begin{savoir}
-}{%
-  \end{savoir}
-}
+% Wrappers (kept)
+\NewDocumentEnvironment{framedremark}{}{\begin{remark}}{\end{remark}}
+\NewDocumentEnvironment{resume}{}{\begin{resume1}}{\end{resume1}}
+\NewDocumentEnvironment{truc}{}{\begin{savoir}}{\end{savoir}}
 
-% --- Theorem (EN name) ---
+% Optional: also support \begin{theorem} ... \end{theorem}
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \tcolorboxenvironment{theorem}{basebox,colback=blue!7,colframe=blue!25}
+
 % ---------------------------
 % parag + code INSIDE
 % ---------------------------
@@ -284,81 +172,82 @@
   \par\medskip
 }
 
-% =========================================================
-% Pretty headers: Lecture + Chapter
-% =========================================================
-
-% Palette (tu peux changer)
-\definecolor{maincolour}{HTML}{004A7F} % bleu EPFL-ish
-\definecolor{lightframe}{HTML}{D9E2EC}
-
-% ---------------------------------------------------------
-% Minimal lecture header
-% Usage: \lecture{<no>}{<YYYY-MM-DD>}{<title>}
-% ---------------------------------------------------------
-
+% ---------------------------
+% Lecture header (same look, but avoids ugly line break after ":")
+% ---------------------------
+\RequirePackage{needspace}
 \newcommand{\lecture}[3]{%
   \par\bigskip
-\needspace{\baselineskip} % garantit place pour chapter juste après
-  {\large\bfseries Lecture~#1\enspace—\enspace #2:\enspace #3\par}
-  \vspace{0.4em}\hrule height 0.4pt\vspace{0.8em}
+  \needspace{8\baselineskip}%
+  {\large\bfseries
+    Lecture~#1\enspace—\enspace #2:\nobreak\hspace{0.4em}#3\par
+  }%
+  \vspace{0.4em}\hrule height 0.4pt\vspace{0.8em}%
 }
-% ---------------------------------------------------------
-% Chapter styling (no "Chapter" word, minimalist)
-% ---------------------------------------------------------
+
+% ---------------------------
+% Chapter styling (keep your old visual style)
+% IMPORTANT: no fake \chapter mapping; no tocloft; report ToC will work.
+% ---------------------------
 \RequirePackage[nobottomtitles]{titlesec}
 
-% If \chapter doesn't exist (article), map it to \section to keep your source compatible
-\providecommand{\chapter}{\section}
-\providecommand{\chapter*}{\section*}
-
-% Title format: just big text + thin rule
 \titleformat{\chapter}
   {\normalfont\Huge\bfseries}
   {}{0pt}{}
   [\vspace{0.6em}\titlerule]
 
-% Spacing: (left, before, after)
 \titlespacing*{\chapter}{0pt}{0.0em}{1.0em}
 
-% Unnumbered chapters too (same look)
 \titleformat{name=\chapter,numberless}
   {\normalfont\Huge\bfseries}
   {}{0pt}{}
   [\vspace{0.6em}\titlerule]
 
-% ---------------------------------------------------------
-% Do NOT force a page break before \chapter (report/book)
-% ---------------------------------------------------------
+% =========================================================
+% In report/book: keep \lecture + following \chapter together
+% (without changing your notation: \lecture ... \chapter ...)
+% =========================================================
 \RequirePackage{etoolbox}
+
+% 1) A simple flag
+\newif\ifafterlecture
+\afterlecturefalse
+
+% 2) When \lecture is called, set the flag + reserve enough space
+\pretocmd{\lecture}{\global\afterlecturetrue\Needspace{18\baselineskip}}{}{}
+
+% 3) Wrap \chapter so that ONLY the chapter right after a lecture
+%    does NOT force a page break.
 \makeatletter
-% Remove \clearpage (report) and also the openright logic (book)
-\patchcmd{\chapter}
-  {\if@openright\cleardoublepage\else\clearpage\fi}
-  {\par\bigskip}
-  {}{}
-\patchcmd{\chapter}
-  {\clearpage}
-  {\par\bigskip}
-  {}{}
+\let\style@origchapter\chapter
+\renewcommand{\chapter}{\@ifstar\style@chapter@star\style@chapter@nostar}
+
+\newcommand{\style@chapter@nostar}[1]{%
+  \ifafterlecture
+    \begingroup
+      \let\clearpage\relax
+      \let\cleardoublepage\relax
+      \style@origchapter{#1}%
+    \endgroup
+    \global\afterlecturefalse
+  \else
+    \style@origchapter{#1}%
+  \fi
+}
+
+\newcommand{\style@chapter@star}[1]{%
+  \ifafterlecture
+    \begingroup
+      \let\clearpage\relax
+      \let\cleardoublepage\relax
+      \style@origchapter*{#1}%
+    \endgroup
+    \global\afterlecturefalse
+  \else
+    \style@origchapter*{#1}%
+  \fi
+}
 \makeatother
-% ---------------------------------------------------------
-% TOC formatting for custom \chapter in article
-% (prevents "ChapterTitlePage" glued together)
-% ---------------------------------------------------------
-\RequirePackage{tocloft}
-
-% Give chapter entries proper spacing/number width
-\setlength{\cftchapindent}{0pt}
-\setlength{\cftchapnumwidth}{2.6em}
-
-% Dots and page separation (optional but usually nice)
-\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-\setlength{\cftbeforechapskip}{0.4em}
-
-% Make chapter title in ToC a bit more prominent (optional)
-\renewcommand{\cftchappagefont}{\bfseries}
-\renewcommand{\cftchapfont}{\bfseries}
 % ---------------------------
 % Algorithms (optional)
 % ---------------------------
