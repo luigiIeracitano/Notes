@@ -1,0 +1,1152 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+\chapter{Basics - 1}%
+\label{cha:Basics - 1}
+
+\section{C01a — Introduction, langage C et compilation}
+
+\subsection{Objectif du bootcamp C}
+
+Le langage C est introduit dans le cours de \textit{Computer Systems} comme un langage situé entre :
+
+\begin{itemize}
+    \item les langages haut niveau (Java, Scala)
+    \item l’assembleur, très proche du processeur
+\end{itemize}
+
+Le C peut être vu comme un \textbf{assembleur structuré}, permettant :
+
+\begin{itemize}
+    \item une programmation proche de la machine
+    \item un contrôle fin de la mémoire
+    \item des programmes très efficaces
+\end{itemize}
+
+L’objectif du bootcamp est d’acquérir les bases du C, qui seront ensuite approfondies par les exercices et le projet du semestre.
+
+\subsection{Public visé et avertissement important}
+
+Le cours s’adresse à des étudiants sachant déjà programmer (typiquement en Java).
+
+La syntaxe du C ressemble au Java car Java a été inspiré du C.
+Cependant, la philosophie du langage est très différente.
+
+\textbf{Attention :}
+\begin{itemize}
+    \item connaître Java ne signifie pas savoir programmer en C
+    \item les tableaux se comportent différemment
+    \item les chaînes ne sont pas des objets
+    \item la gestion mémoire est manuelle
+\end{itemize}
+
+La pratique est donc indispensable pour maîtriser le langage.
+
+\subsection{Nature du langage C}
+
+Le C est :
+
+\begin{itemize}
+    \item un langage impératif
+    \item non orienté objet
+    \item compilé directement en code machine
+    \item faiblement vérifié par le compilateur
+    \item très ancien mais toujours très utilisé
+\end{itemize}
+
+Cette compilation directe en code machine permet d’obtenir des programmes très performants.
+
+\subsection{Différences importantes avec Java}
+
+\begin{itemize}
+    \item pas d’orienté objet
+    \item compilation en code machine (pas en bytecode)
+    \item allocation mémoire explicite
+    \item pas de garbage collector automatique
+    \item accès direct à la mémoire via les pointeurs
+    \item moins de vérifications du compilateur
+\end{itemize}
+
+Conséquences :
+
+\begin{itemize}
+    \item plus de contrôle
+    \item plus de flexibilité
+    \item mais plus de responsabilités
+    \item et plus de bugs potentiels
+\end{itemize}
+
+\subsection{Structure générale d’un programme C}
+
+Organisation typique :
+
+\begin{enumerate}
+    \item inclusions de bibliothèques
+    \item variables globales (à éviter)
+    \item fonctions auxiliaires
+    \item fonction \texttt{main()}
+\end{enumerate}
+
+\subsection{La fonction \texttt{main}}
+
+La fonction \texttt{main} est le point d’entrée du programme.
+
+\begin{lstlisting}[language=C]
+int main(void) {
+    return 0;
+}
+\end{lstlisting}
+
+\begin{itemize}
+    \item retourne un entier au système d’exploitation
+    \item 0 signifie succès
+    \item une autre valeur représente un code d’erreur
+\end{itemize}
+
+\subsection{Exemple de programme}
+
+Exemple : résolution d’une équation du second degré.
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#include <math.h>
+
+int main(void) {
+    double b, c;
+    printf("Enter b: ");
+    scanf("%lf", &b);
+
+    printf("Enter c: ");
+    scanf("%lf", &c);
+
+    double delta = b*b - 4*c;
+
+    if (delta < 0) {
+        puts("No real solution");
+    } else if (delta == 0) {
+        printf("One solution: %lf\n", -b/2);
+    } else {
+        printf("Two solutions\n");
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Normes du langage C}
+
+Versions importantes :
+
+\begin{itemize}
+    \item C89 : standard historique
+    \item C99 : évolution majeure
+    \item C11 / C17 : standards modernes
+\end{itemize}
+
+\subsubsection{Différences C89 vs C99}
+
+\textbf{Commentaires}
+
+C89 :
+\begin{lstlisting}[language=C]
+/* commentaire */
+\end{lstlisting}
+
+C99 :
+\begin{lstlisting}[language=C]
+// commentaire ligne unique
+\end{lstlisting}
+
+\textbf{Déclaration des variables}
+
+C89 : toutes les variables doivent être déclarées au début du bloc.
+
+C99 :
+\begin{lstlisting}[language=C]
+int a = 5;
+printf("%d", a);
+int b = 3;   // autorisé
+\end{lstlisting}
+
+Pour le cours, il est recommandé d’utiliser un standard récent :
+
+\begin{lstlisting}[language=bash]
+gcc -std=c17 program.c
+\end{lstlisting}
+
+\subsection{Compilation d’un programme}
+
+Commande simple :
+
+\begin{lstlisting}[language=bash]
+gcc program.c -o program
+\end{lstlisting}
+
+Exécution :
+
+\begin{lstlisting}[language=bash]
+./program
+\end{lstlisting}
+
+\subsection{Étapes réelles de la compilation}
+
+La compilation comporte plusieurs étapes :
+
+\begin{enumerate}
+    \item préprocesseur
+    \item compilation en assembleur
+    \item assemblage en fichier objet
+    \item édition de liens (linking)
+\end{enumerate}
+
+\subsubsection{Options utiles}
+
+\begin{itemize}
+    \item \texttt{-E} : arrêt après préprocesseur
+    \item \texttt{-S} : produire l’assembleur
+    \item \texttt{-c} : produire fichier objet seulement
+    \item \texttt{-o} : nom de l’exécutable
+\end{itemize}
+
+\subsection{Lien avec des bibliothèques}
+
+Exemple avec la bibliothèque mathématique :
+
+\begin{lstlisting}[language=bash]
+gcc program.c -o program -lm
+\end{lstlisting}
+
+Sans \texttt{-lm}, le linker produit une erreur :
+
+\begin{lstlisting}
+undefined reference to sqrt
+\end{lstlisting}
+
+\subsection{Compile vs Build}
+
+\begin{itemize}
+    \item \textbf{Compile} : produit un fichier objet
+    \item \textbf{Build} : compile + link = exécutable final
+\end{itemize}
+
+Pour les exercices : utiliser toujours le build complet.
+
+\section{C01a — Basics 2 : Variables et types}
+
+\subsection{Déclaration des variables}
+
+En C, les variables ressemblent à Java syntaxiquement, mais :
+
+\begin{itemize}
+    \item ce ne sont pas des objets
+    \item ce sont simplement des données en mémoire
+\end{itemize}
+
+Comme en Java, il est recommandé d’utiliser des noms explicites.
+
+\subsubsection{Conventions de nommage}
+
+Le C n’impose pas de convention stricte. Les plus courantes sont :
+
+\begin{itemize}
+    \item \textbf{camelCase} : \texttt{totalCount}
+    \item \textbf{snake\_case} : \texttt{total\_count}
+\end{itemize}
+
+La convention dépend généralement du projet ou de l’équipe.
+
+\subsection{Initialisation des variables}
+
+\textbf{Point très important :}
+
+En C, une variable n’est \textbf{pas initialisée par défaut}.
+
+Une variable non initialisée possède une valeur indéterminée :
+\[
+\text{undefined behavior}
+\]
+
+\textbf{Règle : toujours initialiser les variables.}
+
+\begin{lstlisting}[language=C]
+int x;        // dangereux
+int y = 0;    // correct
+\end{lstlisting}
+
+\subsection{Types disponibles}
+
+Il y a moins de types qu’en Java et moins de bibliothèques standards.
+
+\begin{itemize}
+    \item pas de type \texttt{String}
+    \item les chaînes seront traitées autrement
+    \item pas de booléen en C89
+\end{itemize}
+
+Depuis C99, on peut utiliser :
+
+\begin{lstlisting}[language=C]
+#include <stdbool.h>
+bool flag = true;
+\end{lstlisting}
+
+\subsection{Le mot-clé \texttt{const}}
+
+\textbf{Important :} \texttt{const} ne signifie pas vraiment “constant”.
+
+Il signifie :
+\[
+\text{read-only via this name}
+\]
+
+Autrement dit :
+
+\begin{itemize}
+    \item la variable ne peut pas être modifiée via ce nom
+    \item mais sa valeur peut changer indirectement via la mémoire
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+const int a = 5;
+a = 6;   // erreur compilation
+\end{lstlisting}
+
+Il est recommandé d’utiliser \texttt{const} chaque fois qu’une variable ne doit pas être modifiée.
+
+\subsection{Sémantique de l’affectation}
+
+\textbf{Différence fondamentale avec Java.}
+
+\subsubsection{En Java (objets)}
+
+\begin{lstlisting}[language=Java]
+A a = new A();
+A b = a;
+b.x = 5;
+\end{lstlisting}
+
+Ici, \texttt{a} et \texttt{b} référencent le même objet.
+
+Modifier \texttt{b} modifie aussi \texttt{a}.
+
+C’est une \textbf{sémantique de référence}.
+
+\subsubsection{En C}
+
+\begin{lstlisting}[language=C]
+int a = 5;
+int b = a;
+b = 10;
+\end{lstlisting}
+
+Ici :
+
+\begin{itemize}
+    \item \texttt{b} reçoit une copie de la valeur
+    \item modifier \texttt{b} ne modifie pas \texttt{a}
+\end{itemize}
+
+C’est une \textbf{sémantique de valeur}.
+
+\[
+a = b \quad \Rightarrow \quad \text{copie mémoire}
+\]
+
+\subsection{Modificateurs de types}
+
+On peut modifier les types de base :
+
+\begin{itemize}
+    \item \texttt{short}
+    \item \texttt{long}
+    \item \texttt{signed}
+    \item \texttt{unsigned}
+\end{itemize}
+
+Exemples :
+
+\begin{lstlisting}[language=C]
+short int a;
+long int b;
+unsigned int c;
+unsigned long int d;
+\end{lstlisting}
+
+Depuis C99 :
+
+\begin{lstlisting}[language=C]
+long long int x;
+\end{lstlisting}
+
+\subsection{Attention : tailles non fixées par la norme}
+
+La norme C ne fixe pas la taille exacte des types.
+
+Elle garantit seulement :
+
+\[
+\texttt{sizeof(char)} \leq \texttt{sizeof(short)} \leq \texttt{sizeof(int)} \leq \texttt{sizeof(long)}
+\]
+
+Donc :
+
+\begin{itemize}
+    \item ne jamais supposer qu’un \texttt{int} fait 32 bits
+    \item attention à la portabilité
+\end{itemize}
+
+\subsection{Limites numériques}
+
+Les limites des types sont définies dans :
+
+\begin{lstlisting}[language=C]
+#include <limits.h>
+#include <float.h>
+\end{lstlisting}
+
+Exemples :
+
+\begin{lstlisting}[language=C]
+INT_MAX
+LONG_MAX
+ULONG_MAX
+DBL_MAX
+DBL_MIN
+DBL_EPSILON
+\end{lstlisting}
+
+\subsection{Types à taille fixe (C99)}
+
+Pour garantir un nombre exact de bits :
+
+\begin{lstlisting}[language=C]
+#include <stdint.h>
+\end{lstlisting}
+
+On peut utiliser :
+
+\begin{lstlisting}[language=C]
+int8_t
+int16_t
+int32_t
+int64_t
+
+uint8_t
+uint16_t
+uint32_t
+uint64_t
+\end{lstlisting}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+uint8_t x = 255;   // exactement 8 bits
+\end{lstlisting}
+
+Ces types sont essentiels pour :
+
+\begin{itemize}
+    \item programmation système
+    \item fichiers binaires
+    \item réseau
+    \item portabilité
+\end{itemize}
+
+\section{C01a — Basics 3 : Opérateurs et expressions}
+
+\subsection{Remarque générale}
+
+La plupart des opérateurs en C sont identiques à ceux de Java :
+
+\begin{itemize}
+    \item opérateurs arithmétiques
+    \item opérateurs de comparaison
+    \item opérateurs logiques
+    \item priorités d’opérateurs
+\end{itemize}
+
+Cependant, quelques différences importantes doivent être retenues.
+
+\subsection{Pas de concaténation de chaînes}
+
+En C, il n’existe pas de type \texttt{String}.
+
+Donc :
+
+\begin{itemize}
+    \item l’opérateur \texttt{+} ne concatène pas de chaînes
+    \item les opérateurs arithmétiques sont strictement numériques
+\end{itemize}
+
+\subsection{Division entière vs division réelle}
+
+Comme en Java, il existe deux types de division :
+
+\begin{itemize}
+    \item division entière : résultat entier
+    \item division réelle : résultat flottant
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+int a = 3/2;      // vaut 1
+double b = 3/2;   // vaut 1.0
+double c = 3.0/2; // vaut 1.5
+\end{lstlisting}
+
+\textbf{Erreur classique :} calculer une moyenne avec des entiers.
+
+\subsection{Toute expression a une valeur}
+
+En C, toute expression :
+
+\begin{itemize}
+    \item produit un effet
+    \item retourne une valeur
+\end{itemize}
+
+Par exemple :
+
+\begin{lstlisting}[language=C]
+x = 3;
+\end{lstlisting}
+
+Cette expression :
+
+\begin{itemize}
+    \item affecte 3 à \texttt{x}
+    \item retourne la valeur 3
+\end{itemize}
+
+\subsection{Erreur classique : affectation dans un if}
+
+Le code suivant compile :
+
+\begin{lstlisting}[language=C]
+if (x = 3) {
+    ...
+}
+\end{lstlisting}
+
+Pourquoi ?
+
+\begin{itemize}
+    \item \texttt{x = 3} vaut 3
+    \item 3 est différent de 0
+    \item donc la condition est toujours vraie
+\end{itemize}
+
+\textbf{C’est une erreur très fréquente en C.}
+
+\subsubsection{Rappel}
+
+\begin{itemize}
+    \item \texttt{==} teste l’égalité
+    \item \texttt{=} affecte une valeur
+\end{itemize}
+
+\subsubsection{Astuce pour éviter l’erreur}
+
+Écrire les constantes à gauche :
+
+\begin{lstlisting}[language=C]
+if (3 == x)   // correct
+\end{lstlisting}
+
+Car :
+
+\begin{lstlisting}[language=C]
+if (3 = x)    // erreur compilation
+\end{lstlisting}
+
+\subsection{Valeurs de vérité en C}
+
+En C :
+
+\begin{itemize}
+    \item toute valeur non nulle est vraie
+    \item seule la valeur 0 est fausse
+\end{itemize}
+
+Donc :
+
+\begin{lstlisting}[language=C]
+if (5)      // vrai
+if (-2.4)   // vrai
+if (0)      // faux
+\end{lstlisting}
+
+\subsection{Expressions logiques}
+
+Toute expression peut être utilisée comme condition.
+
+\begin{lstlisting}[language=C]
+int x = 10;
+if (x) { ... }     // vrai car x ≠ 0
+\end{lstlisting}
+
+\subsection{Opérateur virgule (avancé)}
+
+Le C possède un opérateur absent en Java : l’opérateur virgule.
+
+Syntaxe :
+
+\[
+E_1 , E_2
+\]
+
+Effet :
+
+\begin{itemize}
+    \item évalue d’abord \(E_1\)
+    \item puis évalue \(E_2\)
+    \item la valeur de l’expression est celle de \(E_2\)
+\end{itemize}
+
+\subsubsection{Exemple simple}
+
+\begin{lstlisting}[language=C]
+x = (3,4);
+\end{lstlisting}
+
+\begin{itemize}
+    \item 3 est évalué
+    \item 4 est évalué
+    \item l’expression vaut 4
+\end{itemize}
+
+Donc :
+
+\[
+x = 4
+\]
+
+\subsubsection{Exemple avec affectation}
+
+\begin{lstlisting}[language=C]
+x = (a = b, 3*a);
+\end{lstlisting}
+
+Étapes :
+
+\begin{enumerate}
+    \item on copie \texttt{b} dans \texttt{a}
+    \item on calcule \texttt{3*a}
+    \item cette valeur est affectée à \texttt{x}
+\end{enumerate}
+
+C’est équivalent à :
+
+\begin{lstlisting}[language=C]
+a = b;
+x = 3*a;
+\end{lstlisting}
+
+\subsubsection{Priorité avec l’affectation}
+
+Attention :
+
+\begin{lstlisting}[language=C]
+x = 3,4; // pas pour la déclaration !
+\end{lstlisting}
+
+est interprété comme :
+
+\begin{lstlisting}[language=C]
+(x = 3), 4;
+\end{lstlisting}
+
+Donc :
+
+\begin{itemize}
+    \item \texttt{x} reçoit 3
+    \item l’expression complète vaut 4
+\end{itemize}
+
+\subsection{Conseil de style}
+
+L’opérateur virgule rend le code difficile à lire.
+
+\textbf{Recommandation :}
+\begin{itemize}
+    \item éviter de l’utiliser
+    \item mais savoir le lire
+\end{itemize}
+
+\subsection{Opérateurs bit à bit}
+
+Les opérateurs bit à bit sont les mêmes qu’en Java :
+
+\begin{itemize}
+    \item \texttt{\&} AND
+    \item \texttt{|} OR
+    \item \texttt{\^} XOR
+    \item \texttt{\textasciitilde} NOT
+    \item \texttt{<<} décalage gauche
+    \item \texttt{>>} décalage droite
+\end{itemize}
+
+Ils sont importants pour la programmation système.
+
+\section{C01a — Basics 4 : Structures de contrôle}
+
+\subsection{Rôle des structures de contrôle}
+
+Les structures de contrôle permettent de modifier l’exécution linéaire d’un programme :
+
+\begin{itemize}
+    \item branchements conditionnels : \texttt{if}
+    \item boucles conditionnelles : \texttt{while}, \texttt{do while}
+    \item itérations : \texttt{for}
+\end{itemize}
+
+Elles contrôlent toujours un \textbf{bloc d’instructions}, défini par des accolades :
+
+\begin{lstlisting}[language=C]
+if (cond) {
+    ...
+}
+\end{lstlisting}
+
+Un bloc peut contenir ses propres variables locales.
+
+\subsection{Portée des variables}
+
+La portée d’une variable correspond à la zone du programme où elle est accessible.
+
+On distingue :
+
+\begin{itemize}
+    \item \textbf{portée locale} : variable définie dans un bloc
+    \item \textbf{portée globale} : variable définie hors de tout bloc
+\end{itemize}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+if (cond) {
+    int y = 3;
+}
+// y n’existe plus ici
+\end{lstlisting}
+
+\subsection{Masquage de variables}
+
+Contrairement à Java, le C autorise de redéclarer une variable dans un bloc interne.
+
+\begin{lstlisting}[language=C]
+int y = 10;
+
+{
+    int y = 1;   // masque la variable extérieure
+    printf("%d", y);   // affiche 1
+}
+
+printf("%d", y);       // affiche 10
+\end{lstlisting}
+
+La règle est :
+
+\[
+\textbf{on utilise toujours la variable de portée la plus proche}
+\]
+
+Conseil : éviter de réutiliser les mêmes noms.
+
+\subsection{Variables globales}
+
+Une variable globale est définie hors de toute fonction.
+
+\begin{lstlisting}[language=C]
+int max = 5;
+\end{lstlisting}
+
+Problèmes :
+
+\begin{itemize}
+    \item accessible depuis tout le programme
+    \item difficile à contrôler
+    \item effets de bord possibles
+\end{itemize}
+
+\textbf{Conseil : éviter les variables globales}
+(sauf constantes globales).
+
+\subsection{Le if}
+
+Identique à Java :
+
+\begin{lstlisting}[language=C]
+if (cond) {
+    ...
+} else {
+    ...
+}
+\end{lstlisting}
+
+\subsubsection{Conseil important}
+
+Toujours mettre des accolades, même pour une seule instruction.
+
+\begin{lstlisting}[language=C]
+if (cond)
+    do_something();   // dangereux
+\end{lstlisting}
+
+Si on ajoute une ligne ensuite, elle ne sera pas dans le bloc.
+
+Cette erreur a déjà causé des bugs industriels majeurs.
+
+\subsection{else if}
+
+Il n’existe pas réellement en C :  
+c’est simplement un \texttt{if} dans un \texttt{else}.
+
+\begin{lstlisting}[language=C]
+if (a==1) { ... }
+else if (a==2) { ... }
+else { ... }
+\end{lstlisting}
+
+\subsection{switch}
+
+Utilisé pour tester plusieurs valeurs possibles :
+
+\begin{lstlisting}[language=C]
+switch(x) {
+    case 1:
+        ...
+        break;
+    case 2:
+        ...
+        break;
+    default:
+        ...
+}
+\end{lstlisting}
+
+\subsection{Boucle while}
+
+Boucle conditionnelle a priori :
+
+\begin{lstlisting}[language=C]
+while (cond) {
+    ...
+}
+\end{lstlisting}
+
+\subsection{Boucle do while}
+
+Boucle conditionnelle a posteriori  
+(le bloc s’exécute au moins une fois).
+
+\begin{lstlisting}[language=C]
+do {
+    ...
+} while (cond);
+
+\end{lstlisting}
+
+\subsection{Boucle for}
+
+Forme générale :
+
+\begin{lstlisting}[language=C]
+for (initialisation ; condition ; mise_a_jour) {
+    ...
+}
+\end{lstlisting}
+
+Équivalent à :
+
+\begin{lstlisting}[language=C]
+initialisation;
+while (condition) {
+    ...
+    mise_a_jour;
+}
+\end{lstlisting}
+
+\subsubsection{Portée}
+
+Les variables déclarées dans le \texttt{for} sont locales à la boucle :
+
+\begin{lstlisting}[language=C]
+for (int i=0; i<5; i++) { ... }
+// i n’existe plus ici
+\end{lstlisting}
+
+\subsubsection{Conseil}
+
+Utiliser \texttt{for} pour les itérations connues :
+
+\begin{itemize}
+    \item plus lisible
+    \item plus compact
+    \item plus clair
+\end{itemize}
+
+\subsection{Initialisation multiple dans for}
+
+On peut déclarer plusieurs variables :
+
+\begin{lstlisting}[language=C]
+for (int i=0, s=0; i<5; i++) {
+    s += i;
+}
+\end{lstlisting}
+
+\subsection{Mise à jour complexe}
+
+On peut utiliser l’opérateur virgule :
+
+\begin{lstlisting}[language=C]
+for (int i=0, s=0; i<5; i++, s+=i) {
+    ...
+}
+\end{lstlisting}
+
+Mais ce style est peu lisible.
+
+\textbf{Conseil : éviter ce genre d’écriture.}
+
+\subsection{break et continue}
+
+Toutes les structures de contrôle peuvent être interrompues par :
+
+\begin{itemize}
+    \item \texttt{break} : sortie de la boucle
+    \item \texttt{continue} : passe à l’itération suivante
+\end{itemize}
+
+\subsubsection{Conseil}
+
+Éviter leur usage excessif :
+
+\begin{itemize}
+    \item rend le code difficile à suivre
+    \item peut introduire des bugs subtils
+    \item donne un style dit \textit{spaghetti code}
+\end{itemize}
+
+Préférer écrire une condition claire plutôt que d’utiliser
+\texttt{break} ou \texttt{continue}.
+
+\section{C01a — Basics 5 : Fonctions}
+
+\subsection{Pourquoi utiliser des fonctions}
+
+Les fonctions servent principalement à deux choses :
+
+\begin{itemize}
+    \item mettre en évidence un traitement important
+    \item réutiliser du code sans duplication
+\end{itemize}
+
+\textbf{Règle fondamentale : ne jamais copier-coller du code.}
+
+Si une modification conceptuelle nécessite plusieurs modifications dans le code,
+cela signifie qu’il y a duplication.
+
+La solution consiste à factoriser ce traitement dans une fonction.
+
+\subsection{Fonctions en C}
+
+Les fonctions en C ressemblent à celles de Java, mais :
+
+\begin{itemize}
+    \item il n’y a pas d’objets
+    \item il n’y a pas de méthodes
+    \item toutes les fonctions sont globales
+\end{itemize}
+
+\subsection{Prototype d’une fonction}
+
+Le C introduit une notion absente de Java : le \textbf{prototype}.
+
+Le prototype correspond à l’en-tête de la fonction terminé par un point-virgule.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+double moyenne(double a, double b);
+\end{lstlisting}
+
+Le prototype sert à annoncer l’existence de la fonction avant son utilisation.
+
+\textbf{Règle : une fonction doit être déclarée avant d’être appelée.}
+
+\subsection{Prototype vs définition}
+
+La définition contient déjà le prototype :
+
+\begin{lstlisting}[language=C]
+double moyenne(double a, double b) {
+    return (a+b)/2;
+}
+\end{lstlisting}
+
+Donc :
+
+\begin{itemize}
+    \item soit on met le prototype avant
+    \item soit on met directement la définition avant
+\end{itemize}
+
+Dans les programmes simples à un fichier, on peut simplement placer les
+définitions avant \texttt{main}.
+
+Les prototypes deviennent essentiels dans les projets multi-fichiers.
+
+\subsection{Arguments dans les prototypes}
+
+Dans un prototype, seuls sont nécessaires :
+
+\begin{itemize}
+    \item le type de retour
+    \item le nom de la fonction
+    \item les types des arguments
+\end{itemize}
+
+Les noms des arguments ne sont pas obligatoires :
+
+\begin{lstlisting}[language=C]
+double moyenne(double, double);
+\end{lstlisting}
+
+Cependant, il est recommandé d’indiquer des noms pour la lisibilité.
+
+\subsection{Fonctions sans arguments}
+
+En C, une fonction sans argument doit explicitement indiquer \texttt{void} :
+
+\begin{lstlisting}[language=C]
+int f(void);
+\end{lstlisting}
+
+Contrairement à Java :
+
+\begin{lstlisting}[language=Java]
+int f()    // OK en Java
+\end{lstlisting}
+
+En C, écrire :
+
+\begin{lstlisting}[language=C]
+int f()
+\end{lstlisting}
+
+correspond à un ancien style et ne doit pas être utilisé.
+
+\subsection{Fonctions sans valeur de retour}
+
+On utilise le type \texttt{void} :
+
+\begin{lstlisting}[language=C]
+void afficher(int x) {
+    printf("%d", x);
+}
+\end{lstlisting}
+
+\subsection{Fonctions qui ne retournent jamais}
+
+Depuis C11, on peut utiliser :
+
+\begin{lstlisting}[language=C]
+_Noreturn void f(void);
+\end{lstlisting}
+
+Ces fonctions quittent le programme définitivement (usage système).
+
+\subsection{Passage des arguments}
+
+En programmation, il existe deux modèles :
+
+\begin{itemize}
+    \item passage par valeur
+    \item passage par référence
+\end{itemize}
+
+\subsection{Passage par valeur en C}
+
+Le C ne possède que le passage par valeur.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+void f(int x) {
+    x++;
+}
+
+int main(void) {
+    int val = 1;
+    f(val);
+    printf("%d", val);
+}
+\end{lstlisting}
+
+Résultat :
+
+\[
+val = 1
+\]
+
+Car \texttt{x} est une copie.
+
+\subsection{Simuler un passage par référence}
+
+Pour modifier une variable appelante, on utilise un pointeur.
+
+Conceptuellement :
+
+\begin{itemize}
+    \item on passe la valeur de l’adresse
+    \item donc un pointeur
+\end{itemize}
+
+Deux choses à faire :
+
+\begin{enumerate}
+    \item utiliser \texttt{*} dans la fonction \textrightarrow crée un pointeur
+    \item utiliser \texttt{\&} à l’appel = adresse de 
+\end{enumerate}
+
+\subsubsection{Exemple}
+
+\begin{lstlisting}[language=C]
+void f(int *x) {
+    (*x)++;
+}
+
+int main(void) {
+    int val = 1;
+    f(&val);
+    printf("%d", val);
+}
+\end{lstlisting}
+
+Résultat :
+
+\[
+val = 2
+\]
+
+On parle couramment de passage par référence,
+mais techncquement c’est un passage par valeur de pointeur.
+
+\subsection{Surcharge des fonctions}
+
+Contrairement à Java, le C ne supporte pas la surcharge.
+
+Impossible d’écrire :
+
+\begin{lstlisting}[language=C]
+void affiche(int x);
+void affiche(double x);
+\end{lstlisting}
+
+Il faut utiliser des noms différents :
+
+\begin{lstlisting}[language=C]
+void affiche_int(int x);
+void affiche_double(double x);
+\end{lstlisting}
+
