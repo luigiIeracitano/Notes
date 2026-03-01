@@ -1,0 +1,605 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+% =========================
+% Résumé complet — C01 (EPFL CS-202)
+% =========================
+\section{C01 — C Basics (résumé complet)}
+
+\subsection{Objectifs du cours}
+\begin{itemize}
+  \item Apprendre à programmer \textbf{plus proche du système}, entre Java et l’assembleur.
+  \item Savoir écrire des programmes C qui \textbf{manipulent la mémoire}, \textbf{utilisent des fichiers} et \textbf{les arguments de la ligne de commande}. 
+  \item Ce cours vise des personnes qui savent déjà programmer (souvent Java) et insiste sur les différences/subtilités.
+\end{itemize}
+
+\subsection{Le langage C (positionnement général)}
+\begin{itemize}
+  \item C est un langage \textbf{typé}, \textbf{impératif}, \textbf{compilé}, \textbf{proche de la machine}.
+  \item Différences fréquentes avec Java : pas de GC, moins de garde-fous (accès mémoire), beaucoup plus de responsabilité côté programmeur.
+\end{itemize}
+
+\subsection{Structure d’un programme C}
+Structure typique :
+\begin{itemize}
+  \item \texttt{\#include} (bibliothèques)
+  \item (éviter) variables globales
+  \item prototypes
+  \item \texttt{main}
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+int main(void) {
+  printf("Hello\n");
+  return 0;
+}
+\end{lstlisting}
+
+\subsection{Variables et initialisation}
+\begin{itemize}
+  \item En C, une variable est \textbf{modifiable par défaut}.
+  \item \textbf{Très important : pas d’initialisation automatique} (contrairement à Java) → \textbf{toujours initialiser}.
+  \item Initialisation lors de la déclaration : \texttt{type ident = valeur;}
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+int val = 2;
+double pi = 3.1415;
+char c = 'a';
+\end{lstlisting}
+
+Valeurs littérales/échappements utiles (caractères) : \texttt{\textbackslash 0}, \texttt{\textbackslash n}, \texttt{\textbackslash \textbackslash}, \texttt{\textbackslash '} 
+
+\subsection{Const (donnée non modifiable via ce nom)}
+\begin{itemize}
+  \item \texttt{const} signifie « \textit{read-only via ce nom} », pas « immuable pour toujours » (un pointeur peut modifier la zone mémoire). 
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+int const couple = 2;
+double const g = 9.81;
+\end{lstlisting}
+
+\subsection{Types et modificateurs (portabilité)}
+Types de base : \texttt{int}, \texttt{double}, \texttt{char}.  
+Types « avancés » via modificateurs : \texttt{short}, \texttt{long}, \texttt{unsigned}, \texttt{long long}.
+
+\begin{itemize}
+  \item Depuis C99 : \texttt{bool} (\texttt{stdbool.h}), entiers \texttt{int8\_t}… (\texttt{stdint.h}), \texttt{long long}, \texttt{double complex} (\texttt{complex.h}). 
+  \item La norme ne fixe pas les tailles exactes : seulement des inégalités comme
+  \[
+    \texttt{char} \le \texttt{short} \le \texttt{int} \le \texttt{long}, \quad \texttt{double} \le \texttt{long double}
+  \]
+  → attention à la portabilité. 
+\end{itemize}
+
+\subsection{Affectation : différence clé avec Java}
+\begin{itemize}
+  \item En C, \texttt{=} copie la \textbf{valeur} (et la sémantique diffère fortement de Java). 
+\end{itemize}
+
+\subsection{Opérateurs et expressions (rappels essentiels)}
+\begin{itemize}
+  \item Arithmétiques : \texttt{+ - * / \%}, incr./décr. \texttt{++ --}, composés \texttt{+=} etc.
+  \item Comparaison : \texttt{== != < > <= >=}
+  \item Logiques : \texttt{\&\& || !} (short-circuit)
+  \item Bit-à-bit : \texttt{\& | \^{} \~{} << >>}
+\end{itemize}
+
+\textbf{Piège classique : division entière}
+\begin{lstlisting}[language=C]
+int a = 5 / 2;    // 2
+double b = 5.0/2; // 2.5
+\end{lstlisting}
+
+\subsection{Structures de contrôle}
+\subsubsection{Blocs et portée}
+\begin{lstlisting}[language=C]
+{
+  int x = 3;   // visible seulement ici
+}
+\end{lstlisting}
+
+\subsubsection{if / else}
+\begin{lstlisting}[language=C]
+if (cond) {
+  ...
+} else {
+  ...
+}
+\end{lstlisting}
+
+\subsubsection{switch (souvent avec enum)}
+\begin{lstlisting}[language=C]
+switch (x) {
+  case 1: ...; break;
+  default: ...; break;
+}
+\end{lstlisting}
+Sans \texttt{break} : \textit{fall-through}.
+
+\subsubsection{Boucles}
+\begin{lstlisting}[language=C]
+while (cond) { ... }
+
+do { ... } while (cond);
+
+for (int i = 0; i < n; ++i) { ... }
+\end{lstlisting}
+
+\texttt{break} : sort de la boucle, \texttt{continue} : saute à l’itération suivante.
+
+\subsection{Fonctions : définition, prototype, passage par valeur/référence}
+\begin{itemize}
+  \item Déclaration (prototype) avant usage.
+  \item Passage \textbf{par valeur} par défaut.
+  \item Pour modifier une variable de l’appelant : passer un \textbf{pointeur} (adresse) — notion de « par référence » (valeur de pointeur en fait).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+int f(int x) {         // passage par valeur
+  x = x + 1;
+  return x;
+}
+
+void g(int* px) {      // passage par "référence" via pointeur
+  *px = *px + 1;
+}
+\end{lstlisting}
+
+\subsection{Tableaux (taille fixe en C)}
+\begin{itemize}
+  \item En C, un tableau est \textbf{homogène} et de \textbf{taille fixe}. 
+  \item Indices : \texttt{0} à \texttt{taille-1}; \textbf{pas de contrôle de débordement} → buffer overflow possible.
+  \item Un tableau \textbf{ne connaît pas sa taille} : il faut la gérer séparément. 
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+#define N 5
+int age[N];
+
+for (size_t i = 0; i < N; ++i) {
+  printf("Age %zu ? ", i+1);
+  scanf("%d", &age[i]);
+}
+\end{lstlisting}
+
+\subsubsection{Initialisation}
+\begin{lstlisting}[language=C]
+int t[3] = { 1, 2, 3 };
+\end{lstlisting}
+
+\subsubsection{Tableaux multidimensionnels}
+Déclaration \texttt{type tab[a][b];} et accès \texttt{tab[i][j]}. 
+
+\begin{lstlisting}[language=C]
+double rotation[2][2];
+rotation[0][1] = 3.14;
+\end{lstlisting}
+
+\subsubsection{Passage d’un tableau à une fonction}
+\begin{itemize}
+  \item Un paramètre \texttt{type tab[]} est en réalité traité comme \texttt{type* tab}.
+  \item Donc l’appel peut modifier les éléments (effets de bord) : ajouter \texttt{const} si nécessaire.
+  \item Conseil : toujours passer la taille en plus. 
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+void fill(int tab[], size_t n) {
+  for (size_t i = 0; i < n; ++i) tab[i] = (int)(i+1);
+}
+
+void print(int const tab[], size_t n) { // pas de modif
+  for (size_t i = 0; i < n; ++i) printf("%d ", tab[i]);
+}
+\end{lstlisting}
+
+\subsection{Types énumérés (enum)}
+\begin{itemize}
+  \item Sert à donner des noms à des valeurs entières (couleurs, cantons, etc.). 
+  \item Par convention, le premier vaut 0, puis 1, 2, … 
+  \item Pratique avec \texttt{switch} et indexation de tableaux.
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+enum CantonRomand { Vaud, Valais, Geneve, Neuchatel, Fribourg, Jura };
+
+enum CantonRomand c = Vaud;
+switch (c) {
+  case Vaud:   /* ... */ break;
+  case Valais: /* ... */ break;
+  default:     /* ... */ break;
+}
+\end{lstlisting}
+
+\subsection{typedef (alias de types)}
+\begin{itemize}
+  \item Permet de renommer un type (souvent pour lisibilité, maintenance, concepts). 
+  \item Très utile pour tableaux et signatures de fonctions. 
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+typedef unsigned long int Compteur;
+typedef double Matrice3[3][3];
+
+#define N 3
+typedef double Vecteur[N];
+typedef Vecteur Matrice[N];
+\end{lstlisting}
+
+\subsection{Structures (struct)}
+\begin{itemize}
+  \item Pour regrouper des champs hétérogènes (contrairement aux tableaux homogènes). 
+  \item Déclaration : \texttt{struct Nom \{ ... \};} puis \texttt{struct Nom var;}.
+  \item Accès aux champs : \texttt{.} ; si pointeur : \texttt{->}.
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+#define TAILLE_MAX_NOM 64
+
+struct Personne {
+  char nom[TAILLE_MAX_NOM];
+  double taille;
+  int age;
+  char sexe;
+};
+
+struct Personne p;
+p.age = 20;
+\end{lstlisting}
+
+\subsubsection{typedef + struct (style pratique)}
+\begin{lstlisting}[language=C]
+typedef struct {
+  char nom[TAILLE_MAX_NOM];
+  double taille;
+  int age;
+  char sexe;
+} Personne;
+
+Personne untel;
+\end{lstlisting}
+(Plus besoin du mot \texttt{struct}.) 
+
+\subsubsection{Initialisation de struct}
+\begin{lstlisting}[language=C]
+Personne a = { "Dupontel", 1.75, 20, 'M' };
+\end{lstlisting}
+Et depuis C99 : initialisation par champs (\textit{designated initializers}).
+
+\subsubsection{Affectation de structures}
+Une struct peut être affectée globalement (\texttt{p2 = p1;}) : copie champ par champ.
+
+\subsubsection{Exemple complet (struct + I/O)}
+Inspiré des slides : affichage, modification via pointeur, création via saisie. 
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+  double taille;
+  int age;
+  char sexe;
+} Personne;
+
+void affiche_personne(Personne p) {
+  printf("taille: %f\n", p.taille);
+  printf("age   : %d\n", p.age);
+  printf("sexe  : %c\n", p.sexe);
+}
+
+void anniversaire(Personne* p) {
+  ++(p->age);
+}
+
+Personne naissance(void) {
+  Personne p;
+  memset(&p, 0, sizeof(p));
+  puts("Saisie d'une nouvelle personne");
+  printf("Entrez sa taille : ");
+  scanf("%lf", &p.taille);
+  printf("Entrez son age   : ");
+  scanf("%d", &p.age);
+  printf("Homme [M] ou Femme [F] : ");
+  scanf(" %c", &p.sexe); // espace pour ignorer blancs
+  return p;
+}
+\end{lstlisting}
+
+\subsection{Autres types / remarques importantes}
+\begin{itemize}
+  \item En C, il n’y a pas de type \texttt{string} natif : une chaîne est un \texttt{char*} (ou \texttt{char[]} terminé par \texttt{'\textbackslash 0'}).
+  \item Recommandation sécurité : toujours borner les tailles lors des lectures/copies (préférer \texttt{strncpy} à \texttt{strcpy}) → éviter \textit{buffer overflow}.
+\end{itemize}
+
+\subsection{Entrée/Sortie standard (stdio.h)}
+Flots standards :
+\begin{itemize}
+  \item \texttt{stdin} (clavier/entrée), \texttt{stdout} (sortie), \texttt{stderr} (erreurs).
+  \item \texttt{stderr} est séparé et non bufferisé → utile pour messages d’erreur. 
+\end{itemize}
+
+\subsubsection{printf : formats et options}
+\begin{itemize}
+  \item \texttt{printf} retourne le nombre de caractères écrits (ou négatif si échec). 
+  \item Options entre \% et la conversion : \texttt{- + ' ' \# 0}, largeur, \texttt{.precision}, modificateurs \texttt{h l L}.
+  \item Conversions utiles : \texttt{\%d \%u \%x \%o \%c \%s \%f \%e \%g \%p \%\%}.
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+double x = 10.4276;
+printf(">%7.2f%%<\n", x);   // largeur 7, precision 2, affiche un %
+\end{lstlisting}
+
+\subsubsection{Buffering et fflush}
+\begin{itemize}
+  \item \texttt{printf} écrit souvent dans un buffer : un message peut ne pas être affiché avant un crash.
+  \item On peut forcer l’affichage avec \texttt{fflush(stdout)}. 
+  \item \texttt{fflush(stdin)} n’a pas de sens (aucun effet utile).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+printf("Entrez un nombre: ");
+fflush(stdout);
+\end{lstlisting}
+
+\subsubsection{scanf : principe + pièges}
+\begin{itemize}
+  \item \texttt{scanf("FORMAT", ptr1, ptr2, ...)} stocke dans la mémoire pointée (souvent \texttt{\&var}). 
+  \item Les blancs (\texttt{isspace}) séparent les valeurs (et peuvent être absorbés). 
+  \item Pour lire une ligne avec des espaces : préférer \texttt{fgets} (contrôle de taille, \texttt{\textbackslash 0} garanti).
+  \item \textbf{Toujours} contrôler la valeur de retour de \texttt{scanf} (nb de champs convertis, ou \texttt{EOF}). 
+\end{itemize}
+
+\paragraph{Formats de lecture (spécifiques scanf).}
+\begin{itemize}
+  \item \texttt{\%lf} pour lire un \texttt{double}.
+  \item \texttt{\%ns} (ex. \texttt{\%19s}) pour borner la taille lue.
+  \item \texttt{\%[A-Z]} / \texttt{\%[^\textbackslash n]} : lecture par ensembles de caractères. 
+\end{itemize}
+
+\paragraph{Piège : boucle infinie si saisie invalide.}
+\begin{itemize}
+  \item Exemple : si on attend un int et que l’utilisateur tape \texttt{a}, on peut boucler infiniment.
+  \item Solution : vérifier le retour de \texttt{scanf}, puis vider le buffer d’entrée (avec \texttt{getc} jusqu’au \texttt{\textbackslash n}).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+int main(void) {
+  int i = 0, j = 0;
+  do {
+    printf("Entrez un nombre entre 1 et 10 : ");
+    fflush(stdout);
+    j = scanf("%d", &i);
+
+    if (j != 1) {
+      printf("Je vous ai demandé un nombre, pas du charabia !\n");
+      while (!feof(stdin) && !ferror(stdin) && getc(stdin) != '\n') { }
+    }
+  } while (!feof(stdin) && !ferror(stdin) && ((j != 1) || (i < 1) || (i > 10)));
+
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{fgets (lecture de ligne)}
+\begin{itemize}
+  \item \texttt{fgets(buf, size, stdin)} lit au plus \texttt{size-1} caractères et garantit le \texttt{'\textbackslash 0'}.
+  \item Si un \texttt{'\textbackslash n'} est lu, il est inclus dans la chaîne → on peut le supprimer ensuite.
+\end{itemize}
+
+\subsubsection{sprintf / sscanf (flots dans des chaînes)}
+\begin{itemize}
+  \item Pour écrire dans une chaîne (au lieu de stdout) : \texttt{sprintf}.
+  \item \texttt{sscanf} existe aussi (conversion depuis une chaîne).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+char adresse[129];
+int code = 1000;
+char ville[] = "Lausanne";
+sprintf(adresse, "%5d %.122s", code, ville);
+\end{lstlisting}
+
+\subsection{Fichiers (FILE*)}
+Résumé de la section fichiers. 
+
+\subsubsection{Ouverture et modes}
+\begin{itemize}
+  \item Type : \texttt{FILE*}.
+  \item \texttt{FILE* fopen(const char* nom, const char* mode)}.
+  \item Modes : \texttt{"r"} lecture, \texttt{"w"} écriture (écrase), \texttt{"a"} append; \texttt{+} pour lecture+écriture; \texttt{b} pour binaire. 
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+FILE* f1 = fopen("in.txt", "r");
+FILE* f2 = fopen("out.txt", "w");
+FILE* f3 = fopen("data.bin", "a+b");
+\end{lstlisting}
+
+\subsubsection{Gestion d’erreur à l’ouverture}
+\begin{itemize}
+  \item Si \texttt{fopen} échoue → retourne \texttt{NULL}.
+  \item Pour plus d’infos : \texttt{perror}, \texttt{strerror(errno)}.
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+FILE* f = fopen("inexistant.txt", "r");
+if (f == NULL) {
+  perror("fopen");
+  return 1;
+}
+\end{lstlisting}
+
+\subsubsection{Fichiers texte : fprintf / fscanf}
+Principe : mêmes formats que \texttt{printf/scanf} mais sur un \texttt{FILE*}.
+
+\begin{lstlisting}[language=C]
+FILE* entree = fopen("in.txt", "r");
+FILE* sortie = fopen("out.txt", "a");
+int i = 0;
+
+if (entree && sortie) {
+  fscanf(entree, "%d", &i);
+  fprintf(sortie, "%d\n", i);
+}
+\end{lstlisting}
+
+\subsubsection{Fin de fichier et erreurs}
+\begin{itemize}
+  \item \texttt{feof(FILE*)} : fin de fichier atteinte (non nul).
+  \item \texttt{ferror(FILE*)} : erreur sur le fichier (non nul).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+while (!feof(entree) && !ferror(entree)) {
+  /* lecture */
+}
+\end{lstlisting}
+
+\subsubsection{Fermeture}
+\begin{itemize}
+  \item \texttt{fclose(FILE*)} ferme un flot. \textbf{Ne pas oublier} surtout après écriture. 
+\end{itemize}
+
+\subsubsection{Exemple : lecture fichier texte mot par mot}
+Exemple directement inspiré des slides (borne \%10s). 
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+int main(void) {
+  FILE* entree = fopen("test", "r");
+  if (entree == NULL) {
+    fprintf(stderr, "Erreur : impossible de lire le fichier %s\n", "test");
+    return 1;
+  }
+
+  #define TAILLE_MAX 10
+  char mot[TAILLE_MAX+1] = "";
+
+  while (fscanf(entree, "%10s", mot) == 1) {
+    printf("lu : ->%-*s<-\n", TAILLE_MAX, mot);
+  }
+
+  fclose(entree);
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Écriture dans un fichier avec fgets/fputs}
+Exemple des slides : demander un nom de fichier, lire une phrase, écrire.
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+  char nom_fichier[FILENAME_MAX+1] = "";
+  FILE* sortie = NULL;
+
+  size_t len = 0;
+  do {
+    printf("Dans quel fichier voulez-vous écrire ?\n");
+    fgets(nom_fichier, FILENAME_MAX+1, stdin);
+    len = strlen(nom_fichier);
+    if (len != 0 && nom_fichier[len-1] == '\n') {
+      nom_fichier[--len] = '\0';
+    }
+  } while (len == 0 && !feof(stdin) && !ferror(stdin));
+
+  if (nom_fichier[0] != '\0') {
+    sortie = fopen(nom_fichier, "a");
+    if (sortie == NULL) {
+      fprintf(stderr, "Erreur : impossible d'écrire dans %s\n", nom_fichier);
+    } else {
+      #define MAX_PHRASE 513
+      char phrase[MAX_PHRASE] = "";
+      printf("Entrez une phrase :\n");
+      fgets(phrase, MAX_PHRASE, stdin);
+      fputs(phrase, sortie);
+      fclose(sortie);
+    }
+  }
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Flots standards vs fichiers}
+\begin{itemize}
+  \item \texttt{printf} = \texttt{fprintf(stdout, ...)}
+  \item \texttt{scanf} = \texttt{fscanf(stdin, ...)}
+  \item Messages d’erreur : \texttt{fprintf(stderr, ...)} 
+\end{itemize}
+
+\subsubsection{Fichiers binaires : fwrite / fread}
+\begin{itemize}
+  \item \texttt{fwrite(ptr, taille\_el, nb\_el, fichier)} écrit des données brutes; retourne nb d’éléments écrits.
+  \item \texttt{fread(ptr, taille\_el, nb\_el, fichier)} lit des données brutes; retourne nb d’éléments lus.
+\end{itemize}
+
+\paragraph{Écriture binaire (exemple).} 
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#define TAILLE 12
+
+int main(void) {
+  int tab[TAILLE];
+  for (size_t i = 0; i < TAILLE; ++i) tab[i] = (int)(i*i - 6*i);
+
+  FILE* sortie = fopen("test-fwrite.bin", "wb");
+  if (sortie != NULL) {
+    size_t nb_ok = fwrite(tab, sizeof(int), TAILLE, sortie);
+    fclose(sortie);
+    if (nb_ok != TAILLE) {
+      fprintf(stderr, "Unable to write %zu elements, wrote only %zu\n",
+              (size_t)TAILLE, nb_ok);
+    }
+  }
+  return 0;
+}
+\end{lstlisting}
+
+\paragraph{Lecture binaire (exemple).} 
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#define TAILLE 12
+
+int main(void) {
+  FILE* entree = fopen("test-fwrite.bin", "rb");
+  if (entree != NULL) {
+    int tab[TAILLE];
+    size_t nb_ok = fread(tab, sizeof(int), TAILLE, entree);
+    fclose(entree);
+
+    if (nb_ok != TAILLE) {
+      fprintf(stderr, "Unable to read %zu elements, read only %zu\n",
+              (size_t)TAILLE, nb_ok);
+    } else {
+      for (size_t i = 0; i < TAILLE; ++i)
+        printf("tab[%2zu] = % 3d\n", i, tab[i]);
+    }
+  }
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Manipulations diverses (fseek/ftell/rewind/clearerr)}
+\begin{itemize}
+  \item \texttt{fseek(FILE*, offset, SEEK\_SET|SEEK\_CUR|SEEK\_END)} repositionne la tête de lecture.
+  \item \texttt{ftell(FILE*)} donne la position courante.
+  \item \texttt{rewind(FILE*)} revient au début.
+  \item \texttt{clearerr(FILE*)} remet à zéro l’état d’erreur.
+\end{itemize}
+
+\subsection{Règles d’or (sécurité / robustesse)}
+\begin{itemize}
+  \item Toujours borner les lectures (\texttt{\%ns}, \texttt{fgets(size)}), et contrôler les retours (\texttt{scanf}, \texttt{fscanf}, \texttt{fread}, \texttt{fwrite}). 
+  \item Ne jamais oublier \texttt{fclose}.
+  \item Préférer \texttt{stderr} pour erreurs.
+  \item Attention aux débordements (buffer overflow) : tailles, copies (\texttt{strncpy} vs \texttt{strcpy}).
+\end{itemize}

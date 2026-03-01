@@ -1,0 +1,1056 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\chapter{Pointeurs - 3}
+\label{chap:pointeurs_}
+
+\section{Chaînes de caractères en C : principes fondamentaux}
+
+\subsection{1. Différence fondamentale avec Java}
+
+En C :
+
+\[
+\boxed{\text{Il n’existe pas de type string.}}
+\]
+
+Une « chaîne de caractères » est simplement :
+
+\[
+\boxed{\text{un tableau de } char \text{ terminé par } '\textbackslash 0'}
+\]
+
+Il n’y a aucun objet spécial.
+
+\subsection{2. Convention de terminaison}
+
+La longueur n’est pas stockée explicitement.
+Elle est indiquée par une convention :
+
+\[
+\boxed{\text{le caractère nul } '\textbackslash 0'}
+\]
+
+Exemple en mémoire :
+
+\[
+H \quad E \quad L \quad L \quad O \quad '\textbackslash 0'
+\]
+
+C’est uniquement la présence du caractère nul qui marque la fin.
+
+\subsection{3. Littéraux de chaînes}
+
+\begin{lstlisting}[language=C]
+"Bonjour"
+\end{lstlisting}
+
+est équivalent en mémoire à :
+
+\begin{lstlisting}[language=C]
+{'B','o','n','j','o','u','r','\0'}
+\end{lstlisting}
+
+Remarque :
+
+\begin{itemize}
+\item Les guillemets simples `'A'` → un seul caractère.
+\item Les guillemets doubles `"ABC"` → tableau de caractères + `'\0'`.
+\end{itemize}
+
+Si on veut écrire un guillemet dans la chaîne :
+
+\begin{lstlisting}[language=C]
+"Il a dit \"Bonjour\""
+\end{lstlisting}
+
+\subsection{4. Initialisation d’un tableau}
+
+\begin{lstlisting}[language=C]
+char s[] = "Bonjour";
+\end{lstlisting}
+
+Ici :
+
+\begin{itemize}
+\item s est un tableau.
+\item Il y a copie automatique des caractères.
+\item La taille inclut le caractère nul.
+\end{itemize}
+
+C’est équivalent à :
+
+\begin{lstlisting}[language=C]
+char s[] = {'B','o','n','j','o','u','r','\0'};
+\end{lstlisting}
+
+\subsection{5. Pointeur n’est PAS string}
+
+\begin{lstlisting}[language=C]
+char* s;
+\end{lstlisting}
+
+Ce n’est PAS une string.
+
+C’est simplement :
+
+\[
+\boxed{\text{un pointeur vers char}}
+\]
+
+À ce stade, il pointe vers n’importe quoi.
+Il doit être :
+
+\begin{itemize}
+\item soit initialisé à \texttt{NULL},
+\item soit alloué dynamiquement.
+\end{itemize}
+
+\subsection{6. Allocation dynamique correcte}
+
+Toujours allouer :
+
+\[
+n + 1
+\]
+
+pour inclure le caractère nul.
+
+\begin{lstlisting}[language=C]
+size_t n = 10;
+char* s = calloc(n + 1, sizeof(char));
+\end{lstlisting}
+
+Pourquoi \texttt{n + 1} ?
+
+Parce que nous voulons manipuler n caractères utiles,
+et garder une place pour '\textbackslash 0'.
+
+\subsection{7. Erreur classique}
+
+\begin{lstlisting}[language=C]
+char* s = "Bonjour";   // Mauvaise pratique
+\end{lstlisting}
+
+Pourquoi ?
+
+Parce que :
+
+\begin{itemize}
+\item "Bonjour" est un littéral constant.
+\item Il est stocké en mémoire en lecture seule.
+\item s pointe vers une zone que vous n’avez pas le droit de modifier.
+\end{itemize}
+
+Si vous faites :
+
+\begin{lstlisting}[language=C]
+s[0] = 'A';   // comportement indefini
+\end{lstlisting}
+
+Vous risquez un crash.
+
+\subsection{8. Cas correct 1 : chaîne constante}
+
+Si vous ne modifiez jamais la chaîne :
+
+\begin{lstlisting}[language=C]
+const char* s = "Bonjour";
+\end{lstlisting}
+
+Ici :
+
+\begin{itemize}
+\item s pointe vers une zone constante.
+\item Toute tentative de modification est interdite par le compilateur.
+\end{itemize}
+
+\subsection{9. Cas correct 2 : chaîne modifiable}
+
+Si vous voulez modifier la chaîne :
+
+\begin{lstlisting}[language=C]
+char* s = calloc(256, sizeof(char));
+strcpy(s, "Bonjour");
+\end{lstlisting}
+
+Ici :
+
+\begin{itemize}
+\item La zone est allouée dynamiquement.
+\item On copie les caractères (y compris '\textbackslash 0').
+\item On peut modifier le contenu.
+\end{itemize}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+s[0] = 'A';
+\end{lstlisting}
+
+La chaîne devient :
+
+\[
+"Aonjour"
+\]
+
+\subsection{10. Différence clé : copie vs pointeur}
+
+\paragraph{Initialisation de tableau}
+
+\begin{lstlisting}[language=C]
+char s[] = "Bonjour";
+\end{lstlisting}
+
+→ Copie réelle des caractères.
+
+\paragraph{Initialisation de pointeur}
+
+\begin{lstlisting}[language=C]
+char* s = "Bonjour";
+\end{lstlisting}
+
+→ Copie d’adresse uniquement.
+
+Il n’y a aucune copie du contenu.
+
+\subsection{11. Règle essentielle}
+
+\[
+\boxed{
+\text{En C, une chaîne est juste un tableau de char terminé par '\textbackslash 0'}
+}
+\]
+
+Il n’existe aucun objet string.
+
+Tout repose sur :
+
+\begin{itemize}
+\item la gestion explicite de la mémoire,
+\item le caractère nul,
+\item la distinction tableau vs pointeur.
+\end{itemize}
+
+\section{Fonctions utilitaires pour les chaînes de caractères}
+
+Heureusement, la bibliothèque standard fournit de nombreuses fonctions
+pour manipuler les chaînes de caractères.
+
+Toutes se trouvent dans :
+
+\begin{lstlisting}[language=C]
+#include <string.h>
+\end{lstlisting}
+
+Nous ne détaillons pas toutes les fonctions ici.
+Il est essentiel de consulter les man pages :
+
+\[
+\boxed{\texttt{man 3 string}}
+\]
+
+Nous allons surtout insister sur les pièges et les bonnes pratiques.
+
+\subsection{Toujours utiliser les versions avec \texttt{n}}
+
+Beaucoup de fonctions existent en deux versions :
+
+\begin{itemize}
+    \item \texttt{strcpy} / \texttt{strncpy}
+    \item \texttt{strcat} / \texttt{strncat}
+    \item \texttt{strcmp} / \texttt{strncmp}
+\end{itemize}
+
+\[
+\boxed{\text{Recommandation : toujours utiliser les versions avec } n}
+\]
+
+Pourquoi ?
+
+Parce qu’elles permettent de contrôler explicitement
+la taille maximale manipulée.
+
+\subsection{Copie : \texttt{strncpy}}
+
+Prototype :
+
+\begin{lstlisting}[language=C]
+char* strncpy(char* dest, const char* src, size_t n);
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{dest} : destination (modifiable)
+    \item \texttt{src} : source (const)
+    \item \texttt{n} : nombre maximal de caractères copiés
+\end{itemize}
+
+\textbf{Attention importante :}
+
+\begin{itemize}
+    \item Si la longueur de \texttt{src} ≥ n,
+    \item alors \texttt{strncpy} ne garantit PAS l’ajout du caractère '\textbackslash 0'.
+\end{itemize}
+
+C’est un piège classique.
+
+D’où la recommandation :
+
+\[
+\boxed{\text{Toujours allouer } taille + 1}
+\]
+
+et travailler avec une variable \texttt{taille}
+qui représente uniquement les caractères utiles.
+
+\subsection{Concaténation : \texttt{strncat}}
+
+\begin{lstlisting}[language=C]
+char* strncat(char* dest, const char* src, size_t n);
+\end{lstlisting}
+
+Elle concatène au plus n caractères de \texttt{src}
+à la fin de \texttt{dest}.
+
+Contrairement à \texttt{strncpy},
+\texttt{strncat} garantit la terminaison par '\textbackslash 0'.
+
+Toujours vérifier la taille disponible avant concaténation.
+
+\subsection{Comparaison : \texttt{strncmp}}
+
+\begin{lstlisting}[language=C]
+int strncmp(const char* s1, const char* s2, size_t n);
+\end{lstlisting}
+
+Retour :
+
+\begin{itemize}
+    \item < 0 si s1 < s2 (ordre lexicographique)
+    \item = 0 si égalité
+    \item > 0 si s1 > s2
+\end{itemize}
+
+\textbf{Erreur classique :}
+
+\begin{lstlisting}[language=C]
+if (s1 == s2)   // FAUX
+\end{lstlisting}
+
+Cela compare les adresses,
+pas le contenu.
+
+La bonne façon :
+
+\begin{lstlisting}[language=C]
+if (strncmp(s1, s2, n) == 0) {
+    // egalite
+}
+\end{lstlisting}
+
+Souvent on écrit :
+
+\begin{lstlisting}[language=C]
+if (!strncmp(s1, s2, n)) {
+    // egalite
+}
+\end{lstlisting}
+
+\subsection{Longueur : \texttt{strlen}}
+
+\begin{lstlisting}[language=C]
+size_t strlen(const char* s);
+\end{lstlisting}
+
+Important :
+
+\begin{itemize}
+    \item Une chaîne ne connaît pas sa longueur.
+    \item \texttt{strlen} parcourt les caractères jusqu’à '\textbackslash 0'.
+\end{itemize}
+
+Complexité :
+
+\[
+\boxed{O(n)}
+\]
+
+Si vous appelez \texttt{strlen} dans une boucle,
+vous pouvez transformer un algorithme linéaire en quadratique.
+
+Toujours stocker la longueur si elle est utilisée fréquemment.
+
+\subsection{Recherche de caractères}
+
+\paragraph{\texttt{strchr}}
+
+\begin{lstlisting}[language=C]
+char* strchr(const char* s, int c);
+\end{lstlisting}
+
+Retourne un pointeur vers la première occurrence de \texttt{c}
+dans \texttt{s}, ou \texttt{NULL}.
+
+\paragraph{\texttt{strrchr}}
+
+Même chose, mais recherche de droite à gauche.
+
+\subsection{Recherche de sous-chaîne : \texttt{strstr}}
+
+\begin{lstlisting}[language=C]
+char* strstr(const char* s1, const char* s2);
+\end{lstlisting}
+
+Retourne un pointeur vers la première occurrence de
+la sous-chaîne \texttt{s2} dans \texttt{s1}.
+
+\subsection{Entrées / sorties}
+
+Affichage
+
+\begin{lstlisting}[language=C]
+printf("%s", s);
+\end{lstlisting}
+
+puts
+
+\begin{lstlisting}[language=C]
+puts(s);
+\end{lstlisting}
+
+Ajoute automatiquement un retour à la ligne.
+
+fputs
+
+\begin{lstlisting}[language=C]
+fputs(s, stdout);
+\end{lstlisting}
+
+N’ajoute PAS de retour à la ligne.
+
+\subsection{Lecture}
+
+scanf
+
+\begin{lstlisting}[language=C]
+scanf("%s", s);
+\end{lstlisting}
+
+Attention :
+
+\begin{itemize}
+    \item Ne pas mettre \texttt{\&s}
+    \item \texttt{s} est déjà un pointeur
+\end{itemize}
+
+Mais \texttt{scanf} ne protège pas contre les débordements.
+
+fgets (recommandé)
+
+\begin{lstlisting}[language=C]
+fgets(s, taille, stdin);
+\end{lstlisting}
+
+\begin{itemize}
+    \item Protège contre les dépassements
+    \item Lit au maximum \texttt{taille - 1} caractères
+    \item Ajoute toujours '\textbackslash 0'
+\end{itemize}
+
+\section{Résumé des bonnes pratiques}
+
+\begin{itemize}
+    \item Toujours allouer \texttt{n + 1}.
+    \item Toujours utiliser les versions avec \texttt{n}.
+    \item Ne jamais comparer deux chaînes avec \texttt{==}.
+    \item Toujours vérifier les tailles.
+    \item Éviter \texttt{scanf} non contrôlé.
+    \item Stocker la longueur si utilisée souvent.
+\end{itemize}
+
+\[
+\boxed{
+\text{En C, une chaîne est fragile : elle repose uniquement sur '\textbackslash 0'.}
+}
+\]
+
+\section{Pointeurs sur fonctions et généricité}
+
+En C, on peut pointer vers n’importe quelle zone mémoire,
+y compris vers du code.
+
+Cela signifie :
+
+\[
+\boxed{\text{On peut avoir des pointeurs sur fonctions.}}
+\]
+
+\subsection{Déclaration d’un pointeur sur fonction}
+
+Supposons la fonction :
+
+\begin{lstlisting}[language=C]
+double f(int x);
+\end{lstlisting}
+
+Pour déclarer un pointeur vers cette fonction :
+
+\begin{lstlisting}[language=C]
+double (*g)(int);
+\end{lstlisting}
+
+Règle :
+
+\[
+\text{On remplace le nom de la fonction par } (*nom\_pointeur)
+\]
+
+\subsection{Affectation}
+
+\begin{lstlisting}[language=C]
+g = &f;   // syntaxe pedagogique
+\end{lstlisting}
+
+On peut aussi écrire :
+
+\begin{lstlisting}[language=C]
+g = f;    // equivalent
+\end{lstlisting}
+
+En C, le nom d’une fonction est déjà un pointeur vers la fonction.
+
+\subsection{Appel via pointeur}
+
+Version explicite :
+
+\begin{lstlisting}[language=C]
+double y = (*g)(10);
+\end{lstlisting}
+
+Version simplifiée :
+
+\begin{lstlisting}[language=C]
+double y = g(10);
+\end{lstlisting}
+
+Les deux sont équivalentes.
+
+\section{Passage de fonctions en argument}
+
+Exemple classique : intégration numérique.
+
+\begin{lstlisting}[language=C]
+typedef double (*fonction)(double);
+
+double integrer(fonction f, double a, double b);
+\end{lstlisting}
+
+Appel :
+
+\begin{lstlisting}[language=C]
+double resultat = integrer(sin, 0.0, M_PI);
+\end{lstlisting}
+
+On passe ici un pointeur sur la fonction \texttt{sin}.
+
+\section{Généricité et pointeurs génériques}
+
+Le type :
+
+\begin{lstlisting}[language=C]
+void*
+\end{lstlisting}
+
+ne signifie pas « pointeur vers rien ».
+
+Il signifie :
+
+\[
+\boxed{\text{pointeur vers quelque chose dont on ignore le type}}
+\]
+
+C’est un pointeur générique.
+
+\section{Exemple : tri générique avec qsort}
+
+Prototype standard :
+
+\begin{lstlisting}[language=C]
+void qsort(void* base,
+           size_t nmemb,
+           size_t size,
+           int (*compar)(const void*, const void*));
+\end{lstlisting}
+
+Arguments :
+
+\begin{itemize}
+\item \texttt{base} : pointeur vers le tableau
+\item \texttt{nmemb} : nombre d’éléments
+\item \texttt{size} : taille d’un élément
+\item \texttt{compar} : fonction de comparaison
+\end{itemize}
+
+\subsection{Pourquoi void* ?}
+
+Parce que le tableau peut contenir :
+
+\begin{itemize}
+\item des int,
+\item des double,
+\item des structures,
+\item etc.
+\end{itemize}
+
+On ne connaît pas le type à l’avance.
+
+\subsection{Exemple : tri d’un tableau d’entiers}
+
+\begin{lstlisting}[language=C]
+int tab[] = {4, 1, 9, 2};
+size_t n = 4;
+
+qsort(tab, n, sizeof(int), compare_int);
+\end{lstlisting}
+
+\subsection{Fonction de comparaison générique}
+
+Prototype imposé :
+
+\begin{lstlisting}[language=C]
+int compare_int(const void* a, const void* b)
+\end{lstlisting}
+
+Implémentation propre :
+
+\begin{lstlisting}[language=C]
+int compare_int(const void* a, const void* b) {
+    const int* i = a;
+    const int* j = b;
+
+    if (*i < *j) return -1;
+    if (*i > *j) return 1;
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Pourquoi faire cette conversion ?}
+
+Parce que :
+
+\begin{itemize}
+\item \texttt{a} et \texttt{b} sont des \texttt{void*}
+\item On doit les interpréter comme des \texttt{int*}
+\item On ne modifie pas les valeurs → \texttt{const}
+\end{itemize}
+
+\section{Comparaison pour des doubles}
+
+\begin{lstlisting}[language=C]
+int compare_double(const void* a, const void* b) {
+    const double* x = a;
+    const double* y = b;
+
+    if (*x < *y) return -1;
+    if (*x > *y) return 1;
+    return 0;
+}
+\end{lstlisting}
+
+Même schéma, type différent.
+
+\section{Principe fondamental de la généricité en C}
+
+En C, la généricité repose sur :
+
+\begin{itemize}
+\item \texttt{void*} pour les données,
+\item pointeurs sur fonctions pour les comportements.
+\end{itemize}
+
+Contrairement aux templates C++,
+tout est fait manuellement.
+
+\[
+\boxed{
+\text{void* + pointeur sur fonction = généricité en C}
+}
+\]
+
+\section{Points importants}
+
+\begin{itemize}
+\item Toujours utiliser \texttt{const void*} dans les comparateurs.
+\item Toujours convertir vers le bon type avant déréférencement.
+\item Ne jamais modifier les données dans une fonction de comparaison.
+\item Toujours passer \texttt{sizeof(type)} à \texttt{qsort}.
+\end{itemize}
+
+\section{Lecture des types complexes en C}
+
+À ce stade, nous avons vu :
+
+\begin{itemize}
+\item des pointeurs sur int,
+\item des pointeurs sur pointeurs,
+\item des fonctions retournant des pointeurs,
+\item des pointeurs sur fonctions,
+\item des tableaux de pointeurs,
+\item des combinaisons de tout cela.
+\end{itemize}
+
+Il devient alors essentiel de savoir lire des déclarations complexes.
+
+\subsection{Règle fondamentale de lecture}
+
+\[
+\boxed{\text{Toujours commencer par le nom.}}
+\]
+
+Ensuite :
+
+\begin{itemize}
+\item Respecter les parenthèses.
+\item Lire d’abord ce qui est immédiatement autour du nom.
+\item Puis élargir progressivement vers l’extérieur.
+\end{itemize}
+
+Les parenthèses sont cruciales :
+elles définissent les priorités.
+
+\section{Exemple de type complexe}
+
+Considérons la déclaration suivante :
+
+\begin{lstlisting}[language=C]
+int *(*(*f())[])();
+\end{lstlisting}
+
+Comment lire cela ?
+
+\subsection{Étape 1 : partir du nom}
+
+Le nom est :
+
+\[
+f
+\]
+
+On regarde immédiatement ce qui suit :
+
+\begin{lstlisting}
+f()
+\end{lstlisting}
+
+Donc :
+
+\[
+f \text{ est une fonction}
+\]
+
+\subsection{Étape 2 : que retourne f ?}
+
+On regarde à gauche de \texttt{f()} :
+
+\begin{lstlisting}
+(*f())
+\end{lstlisting}
+
+Donc :
+
+\[
+f \text{ retourne un pointeur}
+\]
+
+\subsection{Étape 3 : vers quoi pointe ce pointeur ?}
+
+On regarde :
+
+\begin{lstlisting}
+(*(*f())[])
+\end{lstlisting}
+
+Donc :
+
+\[
+f \text{ retourne un pointeur vers un tableau}
+\]
+
+\subsection{Étape 4 : contenu du tableau}
+
+On regarde :
+
+\begin{lstlisting}
+(*(*f())[])()
+\end{lstlisting}
+
+Cela signifie :
+
+\[
+\text{tableau de pointeurs sur fonctions}
+\]
+
+\subsection{Étape 5 : que retournent ces fonctions ?}
+
+On regarde le type final :
+
+\begin{lstlisting}
+int *
+\end{lstlisting}
+
+Donc :
+
+\[
+\text{les fonctions retournent un pointeur sur int}
+\]
+
+\section{Lecture complète}
+
+On peut lire la déclaration ainsi : \\
+
+f est une fonction qui retourne un pointeur vers un tableau de pointeurs sur fonctions retournant des pointeurs sur int
+
+\section{Conseil pratique essentiel}
+
+Même si vous êtes capable de lire ce genre de déclaration :
+
+\[
+\boxed{\text{N’écrivez jamais cela directement.}}
+\]
+
+Utilisez des \texttt{typedef}.
+
+\section{Réécriture avec typedef}
+
+\begin{lstlisting}[language=C]
+typedef int* int_ptr;
+
+typedef int_ptr (*func_ptr)(void);
+
+typedef func_ptr func_array[];
+
+typedef func_array* return_type;
+
+return_type f(void);
+\end{lstlisting}
+
+Cette version est :
+
+\begin{itemize}
+\item plus lisible,
+\item plus maintenable,
+\item moins sujette aux erreurs.
+\end{itemize}
+
+\section{Casting en C : valeurs et pointeurs}
+
+En C, le typage est souple.  
+On peut convertir des expressions vers un autre type via un \textbf{casting}.
+
+Syntaxe générale :
+
+\begin{lstlisting}[language=C]
+(type) expression
+\end{lstlisting}
+
+Il est essentiel de distinguer :
+
+\begin{itemize}
+\item le casting de valeurs,
+\item le casting de pointeurs.
+\end{itemize}
+
+\section{Casting de valeurs}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+double x = 5.4;
+int y = (int)x;
+\end{lstlisting}
+
+Ici :
+
+\begin{itemize}
+\item x est une valeur double.
+\item (int)x convertit la valeur.
+\item La partie fractionnaire est supprimée.
+\end{itemize}
+
+Donc :
+
+\[
+y = 5
+\]
+
+Le comportement est un arrondi vers zéro :
+
+\begin{itemize}
+\item 5.9 → 5
+\item -5.9 → -5
+\end{itemize}
+
+Ici, il y a réellement transformation de valeur.
+
+\section{Casting de pointeurs}
+
+C’est ici que les choses deviennent délicates.
+
+Considérons :
+
+\begin{lstlisting}[language=C]
+double x = 5.4;
+int* i = (int*)&x;
+\end{lstlisting}
+
+Important :
+
+\[
+\boxed{
+\text{Le casting de pointeur ne modifie pas la mémoire.}
+}
+\]
+
+Il change uniquement \textbf{l’interprétation} des bits.
+
+\subsection{Ce qui se passe réellement}
+
+En mémoire :
+
+\begin{itemize}
+\item x occupe sizeof(double) octets.
+\item Ces octets représentent 5.4 en format IEEE.
+\item i pointe vers la même adresse.
+\item Mais i lit seulement sizeof(int) octets.
+\end{itemize}
+
+Donc :
+
+\begin{lstlisting}[language=C]
+printf("%d\n", *i);
+\end{lstlisting}
+
+affichera une valeur incohérente correspondant
+à l’interprétation binaire des premiers octets du double.
+
+Il n’y a aucune conversion de valeur.
+
+\section{Différence fondamentale}
+
+\begin{itemize}
+\item Casting de valeur → conversion réelle.
+\item Casting de pointeur → relecture brute des bits.
+\end{itemize}
+
+\[
+\boxed{
+\text{Un casting de pointeur change la lecture, pas les données.}
+}
+\]
+
+\section{Casting et code générique}
+
+Le casting est utilisé légitimement dans :
+
+\begin{itemize}
+\item les fonctions génériques,
+\item les manipulations de void*,
+\item qsort.
+\end{itemize}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+int compare_int(const void* a, const void* b) {
+    const int* i = a;
+    const int* j = b;
+
+    if (*i < *j) return -1;
+    if (*i > *j) return 1;
+    return 0;
+}
+\end{lstlisting}
+
+Ici, le cast est nécessaire
+pour interpréter correctement la mémoire.
+
+\section{Casting de pointeurs sur fonctions}
+
+On peut aussi caster des pointeurs sur fonctions.
+
+Exemple avec \texttt{qsort} :
+
+\begin{lstlisting}[language=C]
+qsort(tab, n, sizeof(Person),
+      (int (*)(const void*, const void*))compare_person);
+\end{lstlisting}
+
+Cependant, cette écriture est difficile à lire.
+
+Une alternative plus propre :
+
+\begin{lstlisting}[language=C]
+int compare_person(const void* a, const void* b) {
+    const Person* p1 = a;
+    const Person* p2 = b;
+
+    ...
+}
+\end{lstlisting}
+
+Puis :
+
+\begin{lstlisting}[language=C]
+qsort(tab, n, sizeof(Person), compare_person);
+\end{lstlisting}
+
+Plus lisible et plus sûr.
+
+\section{Casting et void*}
+
+En C :
+
+\begin{itemize}
+\item On peut convertir automatiquement vers void*.
+\item On peut convertir automatiquement depuis void*.
+\end{itemize}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+int* p1;
+void* p2;
+
+p2 = p1;   // pas de cast necessaire
+p1 = p2;   // pas de cast necessaire en C
+\end{lstlisting}
+
+\subsection{Erreur courante avec malloc}
+
+Beaucoup écrivent :
+
+\begin{lstlisting}[language=C]
+int* p = (int*)malloc(sizeof(int));
+\end{lstlisting}
+
+Ce cast est inutile en C.
+
+Écriture correcte :
+
+\begin{lstlisting}[language=C]
+int* p = malloc(sizeof(int));
+\end{lstlisting}
+
+Pourquoi ?
+
+\begin{itemize}
+\item malloc retourne un void*.
+\item La conversion vers int* est implicite en C.
+\end{itemize}
+
+Ajouter un cast :
+
+\begin{itemize}
+\item surcharge le code,
+\item peut masquer des erreurs d’inclusion de headers.
+\end{itemize}

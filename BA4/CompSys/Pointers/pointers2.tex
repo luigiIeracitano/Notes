@@ -1,0 +1,1463 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\chapter{Pointers - 2}\label{chap:pointers_} % (fold)
+
+\section{C01b — Pointers : Introduction à l’allocation dynamique}
+
+\subsection{Rappel : les trois usages des pointeurs}
+
+Lors du premier cours sur les pointeurs, nous avons vu trois usages principaux :
+
+\begin{enumerate}
+    \item \textbf{Passage par référence}  
+    Permettre à une fonction de modifier une variable définie à l’extérieur.
+
+    \item \textbf{Description générique d’objets}  
+    Manipuler des objets dont la nature exacte n’est pas connue au moment de l’écriture du code.
+
+    \item \textbf{Allocation dynamique}  
+    Gérer nous-mêmes la durée de vie d’une zone mémoire.
+\end{enumerate}
+
+Les deux premiers usages ont été détaillés précédemment.  
+Nous abordons maintenant le troisième : \textbf{l’allocation dynamique}.
+
+\subsection{Gestion de la mémoire d’un processus}
+
+Pour comprendre l’allocation dynamique, il faut d’abord comprendre 
+\textbf{l’organisation mémoire d’un programme}.
+
+La mémoire virtuelle d’un processus peut être schématisée ainsi :
+
+\begin{itemize}
+    \item En bas : le \textbf{code du programme} + constantes.
+    \item Puis : les \textbf{variables globales et statiques}.
+    \item Ensuite : le \textbf{tas (heap)}.
+    \item En haut : la \textbf{pile (stack)}.
+\end{itemize}
+
+La pile et le tas évoluent en sens opposés :
+
+\begin{itemize}
+    \item La \textbf{pile} grandit vers les adresses décroissantes.
+    \item Le \textbf{tas} grandit vers les adresses croissantes.
+\end{itemize}
+
+\subsection{Allocation statique (automatique)}
+
+Jusqu’à présent, toutes les variables déclarées dans vos programmes C
+étaient allouées automatiquement sur la \textbf{pile}.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+void f() {
+    int i = 5;
+}
+\end{lstlisting}
+
+Lorsque la fonction commence :
+\begin{itemize}
+    \item de la mémoire est réservée pour \texttt{i} sur la pile.
+\end{itemize}
+
+Lorsque la fonction se termine :
+\begin{itemize}
+    \item la mémoire est automatiquement libérée.
+\end{itemize}
+
+On parle d’\textbf{allocation automatique (statique du point de vue du programmeur)}.
+
+Le programmeur ne contrôle pas la durée de vie exacte :
+elle correspond strictement à la portée (\textit{scope}) de la variable.
+
+\subsection{Limite de la pile}
+
+La pile a une taille limitée (souvent quelques mégaoctets).
+
+Sous Unix/Linux, on peut vérifier la taille maximale avec :
+
+\begin{lstlisting}[language=C]
+ulimit -s
+\end{lstlisting}
+
+Si l’on alloue des structures trop volumineuses sur la pile,
+on risque un \textbf{stack overflow}.
+
+\subsection{Allocation dynamique (sur le tas)}
+
+Lorsque l’on veut :
+
+\begin{enumerate}
+    \item Contrôler la \textbf{durée de vie} d’un objet au-delà de la portée,
+    \item Allouer de \textbf{grandes quantités de mémoire},
+\end{enumerate}
+
+il faut utiliser le \textbf{tas (heap)}.
+
+Contrairement à la pile :
+
+\begin{itemize}
+    \item L’allocation est faite explicitement par le programmeur.
+    \item La désallocation doit aussi être faite explicitement.
+    \item La mémoire disponible est beaucoup plus grande.
+\end{itemize}
+
+Le tas est limité uniquement par la mémoire virtuelle disponible 
+(et bien sûr la mémoire physique réelle).
+
+\subsection{Idée fondamentale : durée de vie}
+
+La notion clé ici est la \textbf{durée de vie d’un objet en mémoire}.
+
+\begin{itemize}
+    \item Sur la pile : durée de vie = durée de la portée.
+    \item Sur le tas : durée de vie = décidée par le programmeur.
+\end{itemize}
+
+L’allocation dynamique permet donc de dissocier :
+
+\[
+\text{durée de vie} \neq \text{durée de la portée}
+\]
+
+C’est précisément le troisième grand usage des pointeurs.
+
+
+\section{C01b — Pointers : malloc et calloc}
+\subsection{Allocation dynamique : \texttt{malloc}, \texttt{calloc}, \texttt{realloc} et \texttt{free}}
+
+\subsubsection{Cycle de vie d’une allocation dynamique}
+
+Lorsque l’on décide de gérer dynamiquement une zone mémoire, son cycle de vie est le suivant :
+
+\begin{center}
+Allocation $\longrightarrow$ Utilisation $\longrightarrow$ Libération
+\end{center}
+
+Les fonctions principales sont :
+
+\begin{itemize}
+    \item \texttt{malloc}
+    \item \texttt{calloc}
+    \item \texttt{realloc}
+    \item \texttt{free}
+\end{itemize}
+
+\subsubsection{\texttt{malloc}}
+
+Prototype :
+
+\begin{lstlisting}[language=C]
+void* malloc(size_t size);
+\end{lstlisting}
+
+\texttt{malloc} réserve \texttt{size} octets sur le tas et retourne un pointeur
+vers le début de la zone allouée.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+double* p = malloc(sizeof(double));
+\end{lstlisting}
+
+On utilise généralement l’opérateur :
+
+\begin{lstlisting}[language=C]
+sizeof(type)
+\end{lstlisting}
+
+qui retourne la taille en octets du type donné.
+
+Important :
+
+\begin{itemize}
+    \item La mémoire retournée par \texttt{malloc} n’est PAS initialisée.
+    \item Son contenu est indéterminé.
+\end{itemize}
+
+\subsubsection{\texttt{calloc}}
+
+Prototype :
+
+\begin{lstlisting}[language=C]
+void* calloc(size_t nmemb, size_t size);
+\end{lstlisting}
+
+\texttt{calloc} alloue :
+
+\[
+nmemb \times size
+\]
+
+octets consécutifs en mémoire.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+double* p = calloc(3, sizeof(double));
+\end{lstlisting}
+
+Cela alloue la place pour 3 doubles consécutifs.
+
+Différences avec \texttt{malloc} :
+
+\begin{itemize}
+    \item \texttt{calloc} protège contre les erreurs d’overflow
+          dans la multiplication.
+    \item \texttt{calloc} initialise la mémoire à 0.
+\end{itemize}
+
+\subsubsection{Pourquoi préférer \texttt{calloc} ? (Bug OpenSSH)}
+
+Considérons le code suivant (simplifié) :
+
+\begin{lstlisting}[language=C]
+int nresp = get_number();
+char** response;
+
+if (nresp > 0) {
+    response = malloc(nresp * sizeof(char*));
+    for (int i = 0; i < nresp; i++) {
+        response[i] = get_packet();
+    }
+}
+\end{lstlisting}
+
+Supposons :
+
+\[
+nresp = 1\,073\,741\,856
+\]
+
+Sur une architecture 32 bits :
+
+\begin{itemize}
+    \item \texttt{sizeof(char*) = 4}
+    \item Donc on calcule :
+    \[
+    1\,073\,741\,856 \times 4
+    \]
+\end{itemize}
+
+Cette valeur dépasse la capacité représentable sur 32 bits.
+Elle déborde et devient 128.
+
+Résultat :
+
+\begin{itemize}
+    \item On alloue 128 octets seulement.
+    \item La boucle itère jusqu’à 1 milliard.
+    \item On écrit largement hors de la zone allouée.
+\end{itemize}
+
+C’est un \textbf{buffer overflow}, faille de sécurité réelle observée dans OpenSSH.
+
+Solution :
+
+\begin{lstlisting}[language=C]
+response = calloc(nresp, sizeof(char*));
+\end{lstlisting}
+
+\texttt{calloc} détecte l’overflow interne et évite ce problème.
+
+\subsubsection{Initialisation mémoire : \texttt{memset}}
+
+Si l’on utilise \texttt{malloc} mais que l’on souhaite initialiser :
+
+\begin{lstlisting}[language=C]
+#include <string.h>
+
+memset(ptr, value, size);
+\end{lstlisting}
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+int* p = malloc(sizeof(int));
+memset(p, 0, sizeof(int));
+\end{lstlisting}
+
+Cela met tous les octets à 0.
+
+Important :
+
+\begin{itemize}
+    \item \texttt{memset} agit au niveau des octets.
+    \item Mettre tous les bits à 0 correspond à la valeur 0
+          pour les types entiers et les pointeurs nuls.
+\end{itemize}
+
+\subsubsection{Vérification obligatoire}
+
+\texttt{malloc} et \texttt{calloc} retournent \texttt{NULL}
+si l’allocation échoue.
+
+Toujours écrire :
+
+\begin{lstlisting}[language=C]
+double* p = calloc(3, sizeof(double));
+if (p == NULL) {
+    // gérer l'erreur
+    exit(EXIT_FAILURE);
+}
+\end{lstlisting}
+
+Ne jamais utiliser un pointeur sans avoir vérifié qu’il n’est pas nul.
+
+\subsubsection{\texttt{free}}
+
+Lorsque la zone mémoire n’est plus nécessaire :
+
+\begin{lstlisting}[language=C]
+free(p);
+\end{lstlisting}
+
+Après un \texttt{free}, le pointeur devient invalide.
+Bonne pratique :
+
+\begin{lstlisting}[language=C]
+free(p);
+p = NULL;
+\end{lstlisting}
+
+\subsection*{Résumé}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Fonction & Initialise ? & Protège overflow ? \\
+\hline
+malloc & Non & Non \\
+calloc & Oui (0) & Oui \\
+\hline
+\end{tabular}
+\end{center}
+
+Principes essentiels :
+
+\begin{itemize}
+    \item Toujours utiliser \texttt{sizeof}.
+    \item Toujours vérifier le retour.
+    \item Toujours libérer avec \texttt{free}.
+    \item Préférer \texttt{calloc} si possible.
+\end{itemize}
+
+
+\section{C01b — Pointers : realloc}
+
+\subsection{Libération de la mémoire : \texttt{free}}
+
+\subsubsection{Fin de la durée de vie}
+
+Dans le cycle de vie d’une allocation dynamique :
+
+\[
+\text{Allocation} \longrightarrow \text{Utilisation} \longrightarrow \text{Libération}
+\]
+
+après avoir utilisé une zone mémoire allouée avec
+\texttt{malloc}, \texttt{calloc} ou \texttt{realloc},
+il faut la rendre au système.
+
+C’est le rôle de :
+
+\begin{lstlisting}[language=C]
+free(ptr);
+\end{lstlisting}
+
+Ne pas libérer la mémoire entraîne une \textbf{fuite mémoire}
+(\textit{memory leak}) :
+
+\begin{itemize}
+    \item Le programme consomme de plus en plus de mémoire.
+    \item La mémoire n’est jamais rendue au système.
+    \item Sur le long terme : ralentissement, crash.
+\end{itemize}
+
+\subsubsection{Ce que fait réellement \texttt{free}}
+
+Attention à un abus de langage courant :
+
+\begin{center}
+\textit{On ne libère pas le pointeur.}
+\end{center}
+
+On libère \textbf{la zone mémoire pointée}.
+
+Schéma conceptuel :
+
+\begin{itemize}
+    \item Monde des adresses : le pointeur contient une adresse.
+    \item Monde des valeurs : la zone mémoire contient des données.
+\end{itemize}
+
+Lorsque l’on fait :
+
+\begin{lstlisting}[language=C]
+free(ptr);
+\end{lstlisting}
+
+\begin{itemize}
+    \item La zone mémoire est rendue au système.
+    \item Mais le pointeur contient toujours la même adresse.
+\end{itemize}
+
+Le pointeur devient alors un \textbf{dangling pointer}
+(pointeur pendu).
+
+Utiliser ce pointeur après un \texttt{free}
+entraîne un comportement indéfini.
+
+\subsubsection{Bonne pratique essentielle}
+
+Toujours écrire :
+
+\begin{lstlisting}[language=C]
+free(ptr);
+ptr = NULL;
+\end{lstlisting}
+
+Pourquoi ?
+
+\begin{itemize}
+    \item On rend la mémoire.
+    \item On efface l’adresse.
+    \item On évite toute utilisation accidentelle.
+\end{itemize}
+
+Un pointeur nul est sûr : toute tentative d’accès
+provoquera une erreur détectable.
+
+\subsubsection{Règle fondamentale}
+
+\begin{center}
+\textbf{Toute allocation dynamique doit avoir un \texttt{free} correspondant.}
+\end{center}
+
+Exemples :
+
+\begin{itemize}
+    \item 1 appel à \texttt{malloc} $\rightarrow$ 1 appel à \texttt{free}
+    \item 25 appels à \texttt{calloc} dans une boucle $\rightarrow$
+          25 appels à \texttt{free}
+\end{itemize}
+
+Sinon : fuite mémoire.
+
+\subsubsection{Erreur classique}
+
+\begin{lstlisting}[language=C]
+int* p = malloc(sizeof(int));
+...
+free(p);
+*p = 5;   // ERREUR : accès après free
+\end{lstlisting}
+
+C’est un accès à une zone mémoire que l’on n’a plus le droit d’utiliser.
+
+\subsection*{Résumé}
+
+\begin{itemize}
+    \item \texttt{free} libère la zone pointée, pas le pointeur.
+    \item Toujours mettre le pointeur à \texttt{NULL} après.
+    \item Toute allocation dynamique doit être libérée.
+    \item Les fuites mémoire sont des erreurs graves en programmation système.
+\end{itemize}
+
+\section{C01b — Pointers : Allocation dynamique : exemple complet avec \texttt{malloc} et \texttt{free}}
+
+Nous considérons ici le cas où l’on souhaite créer un entier dont la durée de vie dépasse
+la portée d’une fonction. Il s’agit du cas classique où une fonction alloue dynamiquement
+une zone mémoire et retourne un pointeur vers celle-ci.
+
+L’objectif est de comprendre clairement la différence entre :
+\begin{itemize}
+    \item la durée de vie des \textbf{pointeurs} (variables locales),
+    \item la durée de vie de la \textbf{zone mémoire pointée}.
+\end{itemize}
+
+\subsection{1. Fonction de création}
+
+La fonction suivante crée dynamiquement un entier et retourne son adresse.
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+#include <stdlib.h>
+
+int* createLongLiveInt(void) {
+    int* px = NULL;              // px existe uniquement dans cette fonction
+
+    px = malloc(sizeof(int));    // allocation dynamique
+
+    if (px != NULL) {
+        *px = 20;                // initialisation de la zone mémoire
+    }
+
+    return px;                   // on retourne l'adresse allouee
+}
+\end{lstlisting}
+
+\paragraph{Analyse détaillée}
+
+\begin{itemize}
+    \item \texttt{px} est un pointeur local : il n'existe que dans \texttt{createLongLiveInt}.
+    \item \texttt{malloc(sizeof(int))} alloue une zone mémoire capable de contenir un entier.
+    \item \texttt{malloc} retourne l'adresse de cette zone.
+    \item Cette adresse est copiée dans \texttt{px}.
+    \item On écrit ensuite dans la zone pointée via \texttt{*px = 20}.
+    \item Lors du \texttt{return px}, on retourne une copie de l'adresse.
+\end{itemize}
+
+Important : à la fin de la fonction, la variable \texttt{px} disparaît,
+mais \textbf{la zone mémoire allouée continue d'exister} tant qu'elle n'est pas libérée avec \texttt{free}.
+
+\subsection{2. Utilisation dans une autre fonction}
+
+Voyons maintenant comment cette zone peut être utilisée ailleurs :
+
+\begin{lstlisting}[language=C]
+void exampleUsage(void) {
+    int* q = createLongLiveInt();   // q recoit l'adresse
+
+    if (q != NULL) {
+        *q = 123;                   // modification de la meme zone
+    }
+
+    int* r = q;                     // copie d'adresse (egalite de pointeurs)
+
+    printf("%d\n", *r);             // acces via r
+
+    free(q);                        // liberation de la zone
+    q = NULL;                       // bonne pratique
+    r = NULL;                       // eviter pointeur pendu
+}
+\end{lstlisting}
+
+\subsection{3. Égalité de pointeurs}
+
+L’instruction :
+
+\[
+r = q;
+\]
+
+ne copie pas la valeur stockée dans la mémoire pointée,
+mais uniquement l'adresse.
+
+Ainsi :
+\begin{itemize}
+    \item \texttt{q} et \texttt{r} pointent vers la même zone mémoire.
+    \item Modifier \texttt{*q} modifie ce que voit \texttt{r}.
+\end{itemize}
+
+Il s'agit d'une \textbf{copie d'adresse}, pas d'une copie de contenu.
+
+\subsection{4. Durée de vie : ce qu’il faut absolument comprendre}
+
+La gestion de la durée de vie concerne :
+
+\[
+\textbf{la zone mémoire allouée}, \quad \textbf{pas les pointeurs}.
+\]
+
+\begin{itemize}
+    \item \texttt{px} disparaît à la fin de \texttt{createLongLiveInt}.
+    \item \texttt{q} disparaît à la fin de \texttt{exampleUsage}.
+    \item Mais la zone mémoire reste valide tant qu'on n'a pas fait \texttt{free}.
+\end{itemize}
+
+La séquence correcte est donc :
+
+\[
+\texttt{malloc} \rightarrow \text{utilisation} \rightarrow \texttt{free}
+\]
+
+C’est le programmeur qui décide explicitement de la durée de vie.
+
+\subsection{5. Attention aux erreurs classiques}
+
+\paragraph{1. Oublier le \texttt{free}}
+
+Provoque une fuite mémoire (memory leak).
+
+\paragraph{2. Pointeur = NULL après \texttt{free}}
+\\
+Après :
+\begin{lstlisting}[language=C]
+free(q);
+\end{lstlisting}
+
+la zone mémoire est libérée, mais l’adresse contenue dans \texttt{q}
+reste inchangée. Le pointeur devient un \textbf{dangling pointer}.
+
+Toujours faire :
+
+\begin{lstlisting}[language=C]
+q = NULL;
+\end{lstlisting}
+
+\subsection{6. Schéma conceptuel temporel}
+
+On peut résumer ainsi :
+
+\begin{itemize}
+    \item Allocation dans \texttt{createLongLiveInt}
+    \item Transmission de l’adresse par copie
+    \item Utilisation via plusieurs pointeurs
+    \item Libération explicite avec \texttt{free}
+\end{itemize}
+
+La zone mémoire existe indépendamment des variables locales
+qui ont servi à transmettre son adresse.
+
+\bigskip
+\textbf{Conclusion :}
+
+L’allocation dynamique permet de créer des objets dont la durée de vie
+n’est pas limitée à la portée d’une fonction.
+Elle donne un contrôle total au programmeur,
+mais impose une discipline stricte :
+
+\[
+\boxed{\text{Chaque malloc doit correspondre à un free}}
+\]
+
+\section{C01b — Pointers : Initialisation des pointeurs et bonnes pratiques}
+
+Un des pièges classiques avec les pointeurs est l’utilisation de zones mémoire
+non valides, en particulier des pointeurs non initialisés.
+
+\subsection{1. Le cas dangereux : pointeur non initialisé}
+
+Considérons le code suivant :
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+void badExample(void) {
+    int* px;          // NON initialise
+
+    // ... beaucoup de code ici ...
+
+    *px = 20;         // Ecriture dans une zone inconnue
+}
+\end{lstlisting}
+
+\paragraph{Que se passe-t-il ici ?}
+
+\begin{itemize}
+    \item \texttt{px} est déclaré mais jamais initialisé.
+    \item Il contient donc une valeur indéterminée.
+    \item L'instruction \texttt{*px = 20;} tente d'écrire à une adresse inconnue.
+\end{itemize}
+
+Le programme compile parfaitement (aucune erreur syntaxique),
+mais à l’exécution il y a de fortes chances d’obtenir :
+
+\[
+\textbf{Segmentation fault}
+\]
+
+Pourquoi ?
+
+Parce que vous accédez à une zone mémoire à laquelle vous n’avez pas le droit
+d’accéder.
+
+\subsection{2. Segmentation fault vs Bus error}
+
+\paragraph{Segmentation fault}
+
+Se produit lorsque :
+\begin{itemize}
+    \item vous accédez à une zone mémoire interdite,
+    \item le noyau détecte directement l'accès invalide.
+\end{itemize}
+
+\paragraph{Bus error}
+
+Plus rare. Peut apparaître lorsque :
+\begin{itemize}
+    \item l’adresse pointe vers une zone mal alignée,
+    \item ou vers de la mémoire matérielle spécifique (périphérique),
+    \item et que l’erreur est détectée au niveau du bus matériel.
+\end{itemize}
+
+Dans les deux cas : c’est un accès mémoire invalide.
+
+\subsection{3. Bonne pratique : toujours initialiser}
+
+Il est fortement recommandé d’écrire :
+
+\begin{lstlisting}[language=C]
+int* px = NULL;
+\end{lstlisting}
+
+Pourquoi ?
+
+Cela ne supprime pas le bug si vous oubliez d’allouer,
+mais garantit que le programme plantera exactement à l’endroit
+où vous utilisez le pointeur.
+
+Exemple :
+
+\begin{lstlisting}[language=C]
+int* px = NULL;
+*px = 20;   // Segmentation fault immediate
+\end{lstlisting}
+
+Cela rend le débogage beaucoup plus simple.
+
+\subsection{4. Règles fondamentales de gestion mémoire}
+
+\paragraph{Règle 1 : Toute allocation doit être libérée}
+
+\[
+\boxed{\texttt{malloc} \longleftrightarrow \texttt{free}}
+\]
+
+Exemple correct :
+
+\begin{lstlisting}[language=C]
+int* px = malloc(sizeof(int));
+if (px != NULL) {
+    *px = 10;
+}
+free(px);
+px = NULL;
+\end{lstlisting}
+
+Sinon : fuite mémoire (\textit{memory leak}).
+
+\subsection{5. Responsabilité : qui alloue doit libérer}
+
+Principe fondamental :
+
+\begin{itemize}
+    \item Si une fonction alloue, elle doit documenter clairement
+    qui est responsable du \texttt{free}.
+    \item Idéalement : fournir une fonction de destruction.
+\end{itemize}
+
+Exemple conceptuel :
+
+\begin{lstlisting}[language=C]
+Matrix* createMatrix(int n);
+void destroyMatrix(Matrix* m);
+\end{lstlisting}
+
+Toujours proposer un couple constructeur / destructeur.
+
+\subsection{6. Toujours tester le retour de malloc / calloc}
+
+\begin{lstlisting}[language=C]
+int* px = malloc(sizeof(int));
+
+if (px == NULL) {
+    fprintf(stderr, "Allocation failed\n");
+    exit(EXIT_FAILURE);
+}
+\end{lstlisting}
+
+Ne jamais supposer que l’allocation réussit.
+
+\subsection{7. malloc vs calloc}
+
+Pour des allocations multiples :
+
+\begin{lstlisting}[language=C]
+int* array = calloc(n, sizeof(int));
+\end{lstlisting}
+
+Avantages :
+
+\begin{itemize}
+    \item Initialise la mémoire à 0
+    \item Evite certaines erreurs d’initialisation
+\end{itemize}
+
+Toujours écrire :
+
+\begin{lstlisting}[language=C]
+int* array = malloc(n * sizeof(int));
+\end{lstlisting}
+
+et jamais :
+
+\begin{lstlisting}[language=C]
+int* array = malloc(n * 4);   // Mauvaise pratique
+\end{lstlisting}
+
+\subsection{8. Initialiser la mémoire}
+
+Deux solutions :
+
+\begin{itemize}
+    \item Utiliser \texttt{calloc}
+    \item Utiliser \texttt{memset}: void *memset(void *adresseDeDepart, int valeurACopier, nbOctetARemplir n);
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+int* array = malloc(n * sizeof(int));
+memset(array, 0, n * sizeof(int));
+\end{lstlisting}
+
+\subsection{9. Après free : effacer l’adresse}
+
+\begin{lstlisting}[language=C]
+free(px);
+px = NULL;
+\end{lstlisting}
+
+Sinon, \texttt{px} devient un \textbf{dangling pointer}
+(pointeur pendu).
+
+\subsection{10. Passage par pointeur et const}
+
+Si un pointeur est utilisé uniquement en lecture :
+
+\begin{lstlisting}[language=C]
+void printValue(const int* px);
+\end{lstlisting}
+
+Cela garantit que la fonction ne modifiera pas la zone pointée.
+
+\textbf{Résumé des bonnes pratiques}
+
+\begin{itemize}
+    \item Toujours initialiser les pointeurs.
+    \item Toujours tester les allocations.
+    \item Toujours libérer ce qui a été alloué.
+    \item Mettre le pointeur à \texttt{NULL} après \texttt{free}.
+    \item Utiliser \texttt{sizeof(type)}.
+    \item Fournir des fonctions de destruction.
+    \item Utiliser \texttt{const} quand c’est possible.
+\end{itemize}
+
+\[
+\boxed{\text{La mémoire dynamique donne du pouvoir, mais exige de la discipline.}}
+\]
+
+\section{C01b — Pointers : Étude de cas : implémentation d’un tableau dynamique (vector)}
+
+Nous commençons maintenant une étude pratique visant à implémenter
+un tableau dynamique en C, c’est-à-dire l’équivalent :
+
+\begin{itemize}
+    \item d’un \texttt{ArrayList} en Java,
+    \item d’un \texttt{std::vector} en C++.
+\end{itemize}
+
+Le langage C ne fournit pas ce type de structure dans sa bibliothèque standard.
+Nous allons donc l’implémenter nous-mêmes, étape par étape.
+
+\subsection*{1. Objectif}
+
+Nous voulons créer un tableau :
+
+\begin{itemize}
+    \item dont la taille n’est pas connue à l’avance,
+    \item et qui peut grandir dynamiquement.
+\end{itemize}
+
+Cela implique :
+\begin{itemize}
+    \item une allocation dynamique,
+    \item une réallocation lorsque la capacité est dépassée,
+    \item une libération explicite.
+\end{itemize}
+
+\subsection*{2. Interface conceptuelle}
+
+On souhaite pouvoir écrire quelque chose comme :
+
+\begin{lstlisting}[language=C]
+vector v;
+
+if (vector_create(&v) == 0) {
+    vector_push(&v, 10);
+    vector_push(&v, 42);
+    vector_destroy(&v);
+}
+\end{lstlisting}
+
+Remarques importantes :
+
+\begin{itemize}
+    \item Les fonctions reçoivent un pointeur sur \texttt{vector}
+    car elles modifient la structure.
+    \item Si on alloue, on doit fournir une fonction de destruction.
+\end{itemize}
+
+\subsection*{3. Définition du type des éléments}
+
+Pour rendre l’implémentation flexible, on définit :
+
+\begin{lstlisting}[language=C]
+typedef int element_type;
+\end{lstlisting}
+
+En changeant une seule ligne, on pourrait transformer notre
+vector d’entiers en vector de \texttt{double}, par exemple.
+
+\subsection*{4. Structure interne du vector}
+
+Nous définissons maintenant la structure :
+
+\begin{lstlisting}[language=C]
+typedef struct {
+    size_t size;        // nombre d'elements effectivement stockes
+    size_t capacity;    // nombre maximal d'elements alloues
+    element_type* data; // pointeur vers la zone memoire
+} vector;
+\end{lstlisting}
+
+Il est crucial de comprendre la différence entre :
+
+\begin{itemize}
+    \item \texttt{size} : nombre réel d’éléments utilisés,
+    \item \texttt{capacity} : nombre maximal d’éléments pouvant être stockés
+    sans nouvelle allocation.
+\end{itemize}
+
+\subsection*{5. Sémantique mémoire}
+
+Supposons :
+
+\[
+\texttt{capacity} = 100
+\]
+
+Si un \texttt{int} occupe 4 octets, alors la zone allouée correspond à :
+
+\[
+100 \times \texttt{sizeof(int)} = 400 \text{ octets}
+\]
+
+Visuellement :
+
+\[
+\underbrace{[\,\square\,][\,\square\,]\dots[\,\square\,]}_{\text{capacity cases}}
+\]
+
+Mais si seulement 5 éléments sont utilisés :
+
+\[
+\texttt{size} = 5
+\]
+
+Les autres cases sont simplement disponibles pour de futurs ajouts.
+
+\subsection*{6. Stratégie d’extension}
+
+Pourquoi stocker une capacité plus grande que la taille réelle ?
+
+Parce que si on réalloue à chaque insertion :
+
+\begin{lstlisting}[language=C]
+push -> realloc -> push -> realloc -> push -> realloc
+\end{lstlisting}
+
+cela serait très coûteux.
+
+On adopte donc une stratégie par blocs :
+
+\begin{itemize}
+    \item Allouer par exemple 100 éléments.
+    \item Quand la capacité est atteinte, doubler la capacité.
+\end{itemize}
+
+\[
+100 \rightarrow 200 \rightarrow 400 \rightarrow 800
+\]
+
+Cela permet d’avoir une complexité amortie efficace.
+
+\subsection*{7. Problème : que faire au 101\textsuperscript{e} élément ?}
+
+Supposons :
+
+\begin{itemize}
+    \item \texttt{capacity = 100}
+    \item \texttt{size = 100}
+\end{itemize}
+
+Lorsqu’on veut insérer le 101\textsuperscript{e} élément,
+il faut agrandir la zone mémoire.
+
+C’est ici qu’intervient :
+
+\[
+\boxed{\texttt{realloc}}
+\]
+
+\subsection*{8. Rôle de realloc}
+
+\texttt{realloc} permet de :
+
+\begin{itemize}
+    \item agrandir ou réduire une zone mémoire existante,
+    \item éventuellement déplacer la zone en mémoire,
+    \item retourner une nouvelle adresse si nécessaire.
+\end{itemize}
+
+Principe général :
+
+\begin{lstlisting}[language=C]
+pointer = realloc(pointer, nouvelle_taille);
+\end{lstlisting}
+
+Attention :
+
+\begin{itemize}
+    \item Si \texttt{realloc} échoue, il retourne \texttt{NULL}.
+    \item L’ancien pointeur reste valide.
+    \item Il faut donc toujours tester le retour.
+\end{itemize}
+
+\subsection*{9. Résumé conceptuel}
+
+Un vector dynamique contient :
+
+\begin{itemize}
+    \item un nombre d’éléments utilisés,
+    \item une capacité allouée,
+    \item un pointeur vers la mémoire.
+\end{itemize}
+
+Lorsqu’on dépasse la capacité :
+
+\begin{itemize}
+    \item on appelle \texttt{realloc},
+    \item on met à jour \texttt{capacity},
+    \item on continue l’insertion.
+\end{itemize}
+
+\bigskip
+\textbf{Idée clé :}
+
+La structure elle-même est statique,
+mais la mémoire pointée est dynamique et peut être déplacée.
+
+\[
+\boxed{\text{Le vector contrôle dynamiquement sa propre zone mémoire.}}
+\]
+
+\section{C01b — Pointers : La fonction \texttt{realloc}}
+
+Pour redimensionner une zone mémoire déjà allouée dynamiquement,
+le langage C fournit la fonction :
+
+\[
+\boxed{\texttt{realloc}}
+\]
+
+Attention : ce n’est pas un \texttt{recalloc}.
+C’est un \textbf{re-malloc}.  
+La nouvelle zone ajoutée n’est pas initialisée.
+
+\subsection*{1. Prototype}
+
+\begin{lstlisting}[language=C]
+void* realloc(void* ptr, size_t new_size);
+\end{lstlisting}
+
+Arguments :
+
+\begin{itemize}
+    \item \texttt{ptr} : ancien pointeur (zone déjà allouée)
+    \item \texttt{new\_size} : nouvelle taille en octets
+\end{itemize}
+
+Valeur de retour :
+
+\begin{itemize}
+    \item Nouvelle adresse (identique ou différente)
+    \item \texttt{NULL} si échec
+\end{itemize}
+
+\subsection*{2. Comportement général}
+
+\paragraph{Cas 1 : agrandissement}
+
+Si on augmente la taille :
+
+\begin{lstlisting}[language=C]
+int* tmp = realloc(ptr, 200 * sizeof(int));
+\end{lstlisting}
+
+Alors :
+
+\begin{itemize}
+    \item Si de l’espace est disponible après la zone actuelle,
+          l’adresse peut rester identique.
+    \item Sinon, une nouvelle zone est allouée ailleurs.
+    \item Les anciennes données sont copiées.
+    \item L’ancienne zone est libérée automatiquement.
+\end{itemize}
+
+Important :
+la partie nouvellement allouée n’est pas initialisée.
+
+\subsection*{3. Cas 2 : réduction}
+
+On peut aussi réduire la taille :
+
+\begin{lstlisting}[language=C]
+ptr = realloc(ptr, 50 * sizeof(int));
+\end{lstlisting}
+
+Dans ce cas :
+
+\begin{itemize}
+    \item La zone peut être conservée telle quelle.
+    \item Ou éventuellement déplacée.
+    \item Les données au-delà de la nouvelle taille sont perdues.
+\end{itemize}
+
+\subsection*{4. Cas 3 : échec}
+
+Si \texttt{realloc} échoue :
+
+\begin{itemize}
+    \item Il retourne \texttt{NULL}.
+    \item L’ancienne zone mémoire reste inchangée.
+\end{itemize}
+
+\paragraph{Mauvaise pratique}
+
+\begin{lstlisting}[language=C]
+ptr = realloc(ptr, new_size);   // DANGEREUX
+\end{lstlisting}
+
+Si \texttt{realloc} retourne \texttt{NULL},
+vous perdez l’adresse originale → fuite mémoire.
+
+\paragraph{Bonne pratique}
+
+\begin{lstlisting}[language=C]
+int* tmp = realloc(ptr, new_size);
+
+if (tmp == NULL) {
+    // echec : ptr est toujours valide
+    fprintf(stderr, "Reallocation failed\n");
+} else {
+    ptr = tmp;
+}
+\end{lstlisting}
+
+Toujours utiliser un pointeur temporaire.
+
+\subsection*{5. Cas particuliers}
+
+\paragraph{realloc(NULL, size)}
+
+\begin{lstlisting}[language=C]
+ptr = realloc(NULL, size);
+\end{lstlisting}
+
+Equivalent à :
+
+\begin{lstlisting}[language=C]
+ptr = malloc(size);
+\end{lstlisting}
+
+Même si c’est autorisé, il est préférable
+d’utiliser explicitement \texttt{malloc}.
+
+\paragraph{realloc(ptr, 0)}
+
+\begin{lstlisting}[language=C]
+realloc(ptr, 0);
+\end{lstlisting}
+
+Equivalent à :
+
+\begin{lstlisting}[language=C]
+free(ptr);
+\end{lstlisting}
+
+Là aussi, il est recommandé d’utiliser directement \texttt{free}.
+
+\subsection*{6. Résumé du fonctionnement interne}
+
+\begin{itemize}
+    \item Peut agrandir ou réduire une zone mémoire.
+    \item Peut déplacer la zone si nécessaire.
+    \item Copie automatiquement les données existantes.
+    \item Libère l’ancienne zone si déplacement.
+    \item Ne touche pas à l’ancienne zone en cas d’échec.
+    \item N’initialise pas la nouvelle mémoire ajoutée.
+\end{itemize}
+
+\bigskip
+\textbf{Point essentiel :}
+
+\[
+\boxed{\texttt{realloc} = \text{redimensionnement intelligent + copie automatique}}
+\]
+
+Mais :
+
+\[
+\boxed{\text{La mémoire ajoutée n’est PAS initialisée}}
+\]
+
+Donc si vous agrandissez un tableau,
+vous devez initialiser manuellement la nouvelle partie.
+
+\section{C01b — Pointers : Étude de cas : implémentation complète du vector (constructeur, push, enlarge)}
+
+Nous détaillons maintenant les fonctions principales :
+\begin{itemize}
+    \item le constructeur,
+    \item le destructeur,
+    \item la fonction \texttt{vector\_push},
+    \item la fonction interne \texttt{vector\_enlarge}.
+\end{itemize}
+
+L’objectif est de comprendre :
+\begin{itemize}
+    \item le passage par référence du vector lui-même (cas 1),
+    \item la gestion dynamique de la zone pointée (cas 3),
+    \item l’écriture dite « atomique » pour éviter les corruptions en cas d’échec.
+\end{itemize}
+
+\subsection{1. Constantes et types}
+
+\begin{lstlisting}[language=C]
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
+
+typedef int element_type;
+
+#define VECTOR_PADDING 128
+
+typedef struct {
+    size_t size;        // nombre d'elements utilises
+    size_t allocated;   // capacite allouee
+    element_type* content; // zone memoire dynamique
+} vector;
+\end{lstlisting}
+
+\subsection{2. Constructeur}
+
+Convention :
+\begin{itemize}
+    \item retourne \texttt{NULL} en cas d’échec,
+    \item sinon retourne le pointeur reçu (pour chaînage possible).
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+vector* vector_create(vector* v) {
+    if (v == NULL) {
+        return NULL;
+    }
+
+    vector result;
+    result.size = 0;
+    result.allocated = VECTOR_PADDING;
+    result.content = calloc(VECTOR_PADDING, sizeof(element_type));
+
+    if (result.content == NULL) {
+        return NULL;
+    }
+
+    *v = result;  // ecriture atomique finale
+    return v;
+}
+\end{lstlisting}
+
+Pourquoi travailler sur \texttt{result} ?
+
+Pour ne modifier \texttt{v} que lorsque tout s’est bien passé.
+
+\subsection{3. Destructeur}
+
+\begin{lstlisting}[language=C]
+void vector_destroy(vector* v) {
+    if (v == NULL) {
+        return;
+    }
+
+    free(v->content);
+    v->content = NULL;
+    v->size = 0;
+    v->allocated = 0;
+}
+\end{lstlisting}
+
+\subsection{4. Fonction interne : vector\_enlarge}
+
+Objectif :
+augmenter la capacité de \texttt{VECTOR\_PADDING} éléments.
+
+Convention :
+\begin{itemize}
+    \item retourne \texttt{NULL} en cas d’échec,
+    \item sinon retourne \texttt{v}.
+\end{itemize}
+
+Protection supplémentaire :
+éviter l’overflow lors de la multiplication
+\[
+allocated \times sizeof(element\_type)
+\]
+
+\begin{lstlisting}[language=C]
+vector* vector_enlarge(vector* v) {
+    if (v == NULL) {
+        return NULL;
+    }
+
+    vector result = *v;
+
+    // nouvelle capacite
+    result.allocated += VECTOR_PADDING;
+
+    // protection contre overflow
+    if (result.allocated > SIZE_MAX / sizeof(element_type)) {
+        return NULL;
+    }
+
+    element_type* tmp = realloc(
+        result.content,
+        result.allocated * sizeof(element_type)
+    );
+
+    if (tmp == NULL) {
+        return NULL;
+    }
+
+    result.content = tmp;
+
+    *v = result;   // ecriture atomique
+    return v;
+}
+\end{lstlisting}
+
+Pourquoi tester :
+
+\begin{lstlisting}[language=C]
+result.allocated > SIZE_MAX / sizeof(element_type)
+\end{lstlisting}
+
+Parce que tester :
+
+\[
+allocated \times sizeof(T) > SIZE\_MAX
+\]
+
+pourrait déjà provoquer un overflow.
+On transforme donc mathématiquement :
+
+\[
+x \times y > z
+\]
+
+en
+
+\[
+x > \frac{z}{y}
+\]
+
+pour éviter le débordement.
+
+\subsection{5. Fonction vector\_push}
+
+Convention choisie :
+\begin{itemize}
+    \item retourne le nouveau nombre d’éléments,
+    \item retourne 0 en cas d’échec.
+\end{itemize}
+
+\begin{lstlisting}[language=C]
+size_t vector_push(vector* v, element_type value) {
+    if (v == NULL) {
+        return 0;
+    }
+
+    // Tant que la capacite est insuffisante
+    while (v->size >= v->allocated) {
+        if (vector_enlarge(v) == NULL) {
+            return 0;
+        }
+    }
+
+    // insertion a la position size
+    v->content[v->size] = value;
+
+    v->size++;
+
+    return v->size;
+}
+\end{lstlisting}
+
+\subsection{6. Pourquoi un while et pas un if ?}
+
+On aurait pu écrire :
+
+\begin{lstlisting}[language=C]
+if (v->size == v->allocated)
+\end{lstlisting}
+
+Mais utiliser :
+
+\begin{lstlisting}[language=C]
+while (v->size >= v->allocated)
+\end{lstlisting}
+
+rend le code plus général :
+
+\begin{itemize}
+    \item Permet d’ajouter plusieurs éléments d’un coup.
+    \item Ne dépend pas d’une hypothèse « on ajoute toujours 1 élément ».
+    \item Rend la fonction plus robuste.
+\end{itemize}
+
+Règle pratique :
+
+\[
+\boxed{\text{Si le corps modifie la condition, demandez-vous si un while n’est pas préférable à un if}}
+\]
+
+\subsection{7. Logique complète du push}
+
+Deux cas :
+
+\paragraph{Cas 1 : place disponible}
+
+\begin{itemize}
+    \item \texttt{size < allocated}
+    \item on écrit directement à l’indice \texttt{size}
+\end{itemize}
+
+\paragraph{Cas 2 : plus de place}
+
+\begin{itemize}
+    \item appel à \texttt{vector\_enlarge}
+    \item éventuellement plusieurs fois
+    \item puis insertion
+\end{itemize}
+
+Les indices valides sont :
+
+\[
+0 \dots size - 1
+\]
+
+Le nouvel élément est inséré à :
+
+\[
+index = size
+\]
+
+Puis :
+
+\[
+size \leftarrow size + 1
+\]
+
+% chapter Pointers - 2 (end)
