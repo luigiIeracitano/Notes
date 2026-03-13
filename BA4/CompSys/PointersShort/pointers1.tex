@@ -223,6 +223,8 @@ Avec malloc, rien n’est initialisé. Pour initialiser :
 struct Machin { int x; double y; };
 struct Machin m;
 memset(&m, 0, sizeof(m));
+
+// sinon memcpy(ptr, données, taille) ou c'est pas juste une valeur qui est copié mais un bloc de donnée, par exemple si on met un tableau alors chaque élément est copié à la position correspondante 
 \end{lstlisting}
 
 \subsubsection{Toujours tester l’allocation}
@@ -386,8 +388,10 @@ vector* vector_enlarge(vector* v) {
 
     if (result.allocated > SIZE_MAX / sizeof(type_el)) return NULL;
 
-    result.content = realloc(result.content, result.allocated * sizeof(type_el));
-    if (result.content == NULL) return NULL; // v inchangé
+    type_el* temp = realloc(result.content, result.allocated * sizeof(type_el));
+    if (temp == NULL) return NULL; // v inchangé
+    
+    result.content = temp; // si succès de réallocation on met à jour le pointeur
 
     *v = result;
   }
