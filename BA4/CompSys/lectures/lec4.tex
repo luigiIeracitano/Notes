@@ -1,0 +1,79 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Network and File Syscalls}
+
+\subsection{Sockets}
+
+A \textbf{socket} is an abstraction that allows processes to communicate with remote processes.
+
+To the program, a socket is simply an integer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Creating Communication}
+
+Preparation steps:
+
+\begin{enumerate}
+\item socket()
+\item bind()
+\end{enumerate}
+
+\subsection{Connectionless Communication}
+
+Syscalls:
+
+\begin{itemize}
+\item sendto()
+\item recvfrom()
+\end{itemize}
+
+Characteristics:
+
+\begin{itemize}
+\item same socket used for multiple remote processes
+\item used by protocols like DNS
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Connection-Oriented Communication}
+
+Used by web servers.
+
+Server steps:
+
+\begin{enumerate}
+\item socket()
+\item bind()
+\item listen()
+\item accept()
+\end{enumerate}
+
+Client steps:
+
+\begin{enumerate}
+\item socket()
+\item connect()
+\end{enumerate}
+
+After connection:
+
+\begin{itemize}
+\item send()
+\item recv()
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closing Communication}
+
+When communication ends:
+
+\begin{verbatim}
+close(socket)
+\end{verbatim}
+
+The socket is destroyed and the port is released.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

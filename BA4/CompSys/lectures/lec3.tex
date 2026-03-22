@@ -1,0 +1,100 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{DNS}
+
+\subsection{IP Addresses}
+
+An IP address identifies a \textbf{network interface}, not directly a computer.
+
+Each end-system has at least one network interface.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Port Numbers}
+
+Each process has a unique port number on its host.
+
+Examples:
+
+\begin{itemize}
+\item 80 → HTTP
+\item 443 → HTTPS
+\end{itemize}
+
+These are called \textbf{reserved ports}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{URL Structure}
+
+Example:
+
+\begin{verbatim}
+https://www.youtube.com/watch?v=...
+\end{verbatim}
+
+Components:
+
+\begin{itemize}
+\item protocol
+\item hostname
+\item path
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Domain Name System (DNS)}
+
+DNS translates:
+
+\[
+\text{hostname} \leftrightarrow \text{IP address}
+\]
+
+Example:
+
+\[
+www.youtube.com \rightarrow 192.178.170.91
+\]
+
+DNS is itself a distributed application.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DNS Client and Server}
+
+Components:
+
+\begin{itemize}
+\item DNS client (resolver)
+\item DNS server
+\end{itemize}
+
+Server port:
+
+\[
+53
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DNS Hierarchy}
+
+DNS uses a hierarchical architecture.
+
+Levels:
+
+\begin{itemize}
+\item Root servers
+\item Top-Level Domain (TLD) servers
+\item Authoritative DNS servers
+\end{itemize}
+
+Example resolution:
+
+\begin{enumerate}
+\item Client asks local DNS server
+\item Local server asks root server
+\item Root server refers to TLD server
+\item TLD server refers to authoritative server
+\item Authoritative server returns IP address
+\end{enumerate}
+
+

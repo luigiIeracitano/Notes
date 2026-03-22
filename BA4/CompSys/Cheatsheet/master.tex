@@ -1,0 +1,510 @@
+\documentclass[8pt]{article}
+
+\usepackage[a4paper,margin=0.7cm]{geometry}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\setlist[itemize]{noitemsep, topsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% couleurs reprises de style.sty
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\definecolor{kw}{rgb}{0.00,0.30,0.55}
+\definecolor{com}{rgb}{0.30,0.50,0.10}
+\definecolor{str}{rgb}{0.80,0.20,0.55}
+
+\lstdefinestyle{notes}{
+  backgroundcolor=\color{bg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\bfseries\color{kw},
+  commentstyle=\color{com},
+  stringstyle=\color{str},
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  frame=none,
+  tabsize=2,
+  aboveskip=0pt,
+  belowskip=0pt
+}
+\lstset{style=notes,language=C}
+
+\titleformat{\section}{\normalsize\bfseries}{}{0em}{}
+\titleformat{\subsection}{\small\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{2pt}
+\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+
+\begin{document}
+
+\begin{multicols}{2}
+
+\section{switch}
+\begin{lstlisting}[language=C]
+switch(x){
+   case 1:
+     ...
+      break;
+    default:
+     ...
+}
+\end{lstlisting}
+
+\section{Pointer}
+\subsection{Arithmétique}
+\begin{lstlisting}[language=C]
+*p++ = *(p++) // recup la valeur actuelle pointee puis deplace le pointeur a l'adresse suivante 
+(*p)++ // incremente la valeur pointee
+*++p // deplace le pointeur a l'adresse suivante puis recupere la valeur qui s'y trouve
+
+p2 - p1 // donne le nb d'elements (du meme type) entre les deux pointeurs. (retourne un ptrdiff_t)
+\end{lstlisting}
+
+\subsection{sizeof}
+sur un tableau
+\begin{lstlisting}
+int tab[1000];
+int* t = tab;
+
+sizeof(tab); // taille du tab en octets
+sizeof(t); // taille du pointeur
+
+//Ce qu'on veut vraiment:
+size_t N = sizeof(tab)/sizeof(tab[0]);
+\end{lstlisting}
+
+\section{Allocation dynamique (sur la heap)}
+
+{\small\textbf{Bibliothèque :}}
+\begin{lstlisting}
+#include <stdlib.h>
+\end{lstlisting}
+
+\subsection{malloc}
+\begin{lstlisting}
+int *p = malloc(n*sizeof(int)); // sizeof renvoie en nombre d'octet
+\end{lstlisting}
+
+Alloue n éléments.
+
+Retourne :
+
+\begin{itemize}
+\item pointeur vers mémoire
+\item NULL si échec
+\end{itemize}
+
+Mémoire non initialisée.
+
+\subsection{calloc}
+
+\begin{lstlisting}
+int *p = calloc(n,sizeof(int));
+\end{lstlisting}
+
+Alloue mémoire et initialise à 0.
+
+Retourne NULL si échec.
+
+\subsection{realloc}
+
+\begin{lstlisting}
+p = realloc(p,new_size);  //Redimensionne un bloc memoire.
+\end{lstlisting}
+
+Attention :
+\begin{itemize}
+\item peut déplacer le bloc
+\item l'ancien pointeur devient invalide
+\item si échec, retourne NULL et l'ancienne zone reste inchangé
+\item mémoire supplémentaire non initialisée  
+\end{itemize}
+
+\subsection{memset (dans string.h)}
+\begin{lstlisting}[language=C]
+  #include <string.h> 
+  struct Machin{int x; double y;};
+  struct Machin m; 
+  memset(ptr, valeur, taille); //pour initialiser
+  // sinon memcpy(ptr, donnees, taille) ou c'est pas juste une valeur qui est copie mais un bloc de donnee (ex: tableau)
+\end{lstlisting}
+
+\subsection{free}
+
+\begin{lstlisting}
+free(p);
+p = NULL;
+\end{lstlisting}
+
+Libère la mémoire.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Segmentation fault = accès mémoire interdit}
+Pour eviter :
+
+\begin{itemize}
+  \item tout \textbf{malloc/calloc} doit avoir un \textbf{free}
+  \item tester systématiquement \textbf{calloc/malloc} si NULL
+  \item tjr initialiser les pointeurs (NULL si inconnu)
+  \item ptr = NULL après chaque free
+\item const dans $faux$ passage par référence
+\end{itemize}
+\section{Tableaux}
+
+Un tableau est une zone mémoire contiguë.
+
+\begin{lstlisting}
+int a[10];
+\end{lstlisting}
+
+Passage à une fonction :
+
+\begin{lstlisting}
+void f(int *a,int n)
+void f(int a[],int n)
+\end{lstlisting}
+
+Allocation dynamique :
+
+\begin{lstlisting}
+int *a = malloc(n*sizeof(int));
+\end{lstlisting}
+
+Ce qui est pas légal lors de la déclaration c'est de faire:
+
+\begin{lstlisting}
+int tab[];  // sans specifier la taille
+\end{lstlisting}
+
+Piége en fonction
+\begin{lstlisting}
+void f(int t[5]){
+ //t est en realite un int*
+ //sizeof(t)/sizeof(int) -> FAUX
+
+ // + passer la taille avec un tableau ! 
+}
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Strings}
+
+Bibliothèque :
+
+\begin{lstlisting}
+#include <string.h>
+\end{lstlisting}
+
+Une string est un tableau de char terminé par '\0':
+
+\subsection{modifiable vs nom modifiable}
+Tableau char = modifiable
+\begin{lstlisting}
+char s[] = "Hello"; 
+s[0] = 'Y';
+printf("%s", s); // Yello
+\end{lstlisting}
+
+Pointeur de char = non modifiable (stockée en lecture seul)
+\begin{lstlisting}
+char *s = "Hello";
+
+s[0] = 'Y'; //erreur
+\end{lstlisting}
+Régle: mettre const char *s pour pas se tromper
+
+\subsection{méthodes}
+
+\begin{lstlisting}
+size_t strlen( const char * s);// Retourne la longueur de la chaine sans compter '\0'.
+
+int strcmp(const char *s1, const char *s2); // compare des strings (0 si egal, <0 si a<b, >0 si a>b)
+
+int strncmp(const char *s1, const char *s2, size_t n); // compare max n char
+
+char *strcpy(char *dst,const char *src) // Copie src dans dst. dst doit etre assez grand -> overflow
+
+char *strncpy(char *dst, const char *src, size_t n); //Copie max n char (pas de \0 si strlen(src) > n  -> dst[n-1] = '\0')
+
+char *strcat(char *dst, const char *src); // ajt tt la chaine src a la fin de dest (s doit avoir assez d'espace)
+
+char *strncat(char *dst, const char *src, size_t n);
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Structures}
+
+\begin{lstlisting}
+typedef struct{
+ int x;
+ int y;
+} Point;
+\end{lstlisting}
+
+Utilisation :
+
+\begin{lstlisting}
+Point p;
+p.x = 3;
+\end{lstlisting}
+
+Pointeur vers structure :
+
+\begin{lstlisting}
+Point *p = malloc(sizeof(Point));
+
+p->x = 3;
+\end{lstlisting}
+
+Recursive Struct.
+\begin{lstlisting}
+typedef struct Node {
+  int value;
+  struct Node* next;
+} Node;
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linked Lists}
+
+Structure classique :
+
+\begin{lstlisting}
+typedef struct Node{
+ int val;
+ struct Node *next;
+} Node;
+\end{lstlisting}
+
+Insertion en tête :
+
+\begin{lstlisting}
+Node *n = malloc(sizeof(Node));
+
+n->val = x;
+n->next = head;
+
+head = n;
+\end{lstlisting}
+
+Parcours :
+
+\begin{lstlisting}
+Node *cur = head;
+
+while(cur != NULL){
+ cur = cur->next;
+}
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pointer de fonction}
+
+Un pointeur de fonction stocke l'adresse d'une fonction.
+
+\begin{lstlisting}
+int (*f)(int,int);
+\end{lstlisting}
+
+Assignation :
+
+\begin{lstlisting}
+f = &add
+ou
+f = add;
+\end{lstlisting}
+
+Appel :
+
+\begin{lstlisting}
+(*f)(2,3);
+ou
+f(2,3);
+\end{lstlisting}
+
+\section{Lire pointer}
+[ ] précède * et ( ) sur tout
+
+\begin{lstlisting}[language = C]
+int *ptr[10]; = tableau de 10 pointeurs de int  
+int (*ptr)[10] = pointeur vers tableau de 10 int
+\end{lstlisting}
+
+\section{Cast pointer}
+Change pas le contenu mémoire juste l'interprétation
+\begin{lstlisting}[language = C]
+double x = 5.4;
+int* i = (int*)&x;
+
+printf("%d\n", (int)x); //5
+printf("%d\n", *i); //valeur bizarre
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Entrées / sorties}
+
+Bibliothèque :
+
+\begin{lstlisting}
+#include <stdio.h>
+\end{lstlisting}
+
+\subsection{Flots standards}
+stdin : entrée standard
+
+stdout: sortie standard (bufferisé)
+
+stderr: sortie d'erreur standard (non bufferisé)
+
+\subsection{Ecrire}
+
+\begin{lstlisting}
+printf("%d",x); // ret nb char ecrits
+fprintf(stream, format, ...) 
+puts(s); // ajoute \n, nb >= 0 succes, -1 erreur
+fputs(s, stream (FILE *f)); //comme puts mais sans \n
+\end{lstlisting}
+
+Pour forcer l'affichage: ajoute \textbackslash n ou utiliser fflush(stdout);
+\subsection{Lire}
+
+\begin{lstlisting}
+scanf("%d",&x); // ret nb val lues et s'arrt au premier espace, tab, \n
+fgets(s, n, stdin (FILE *f)); // lit max n-1 char, s'arrt si \n, EOF puis ajoute '\0', ret pointeur vers s si succes, NULL sinon (evite le depassement memoire et lit aussi \n)
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Fichiers}
+
+FILE toujours par pointeur !
+\subsection{fopen}
+\begin{lstlisting}
+FILE *f = fopen("file.txt","r");
+\end{lstlisting}
+
+Modes :
+
+\begin{itemize}
+\item r lecture
+\item w écriture
+\item a append
+\end{itemize}
+
+Retourne :
+\begin{itemize}
+\item FILE*
+\item NULL si erreur
+\end{itemize}
+
+Toujours vérifier le retour
+
+\begin{lstlisting}
+if (f==NULL){
+  fprintf(stderr, "Opening Error\n");
+}else{...}
+\end{lstlisting}
+
+\subsection{fprintf}
+
+Écrit dans un fichier.
+\begin{lstlisting}
+fprintf(f,"%d",x);
+\end{lstlisting}
+
+\subsection{fscanf}
+
+Lit depuis un fichier.
+
+\begin{lstlisting}
+fscanf(f,"%d",&x);
+\end{lstlisting}
+
+\subsection{Fin de fichier et erreur}
+\begin{lstlisting}
+feof(f) // ret. non zero nb si fin de fichier atteinte
+
+ferror(f) // ret. non zero nb si erreur de lecture
+\end{lstlisting}
+
+\subsection{fclose}
+
+\begin{lstlisting}
+fclose(f);
+\end{lstlisting}
+Toujours fermer un fichier, car ça garantit que tout est ecrit, sinon on pourrait perdre des données comme les écritures sont bufferisées 
+
+\subsection{Fichier binaire}
+\begin{lstlisting}
+size_t fwrite(void* ptr, size_t size, size_t n, FILE* stream); // ecrit n elem de size bytes depuis ptr, ret nb d'elem ecrit
+
+fread(void* ptr, size_t size, size_t n, FILE* stream); // lit n elem de size bytes dans ptr, ret le nb d'elem lu
+int n;
+int t[12];
+
+n = fwrite(t, sizeof(int), 12, f);
+if(n != 12){fprint(stderr,...)}
+
+n = fread(t, sizeof(int), 12, f);
+if (n!= 12){...}
+fclose(f);
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pièges fréquents}
+
+Pointeur non initialisé :
+
+\begin{lstlisting}
+int *p; // si = NULL alors segm. fault
+*p = 5; //faux
+
+//plutot 
+int x;
+int *p = &x;
+
+*p = 5;
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Format specifiers (\%)}
+
+Utilisés dans : \texttt{printf}, \texttt{scanf}, \texttt{fprintf}, \texttt{fscanf}
+
+\subsection{Entiers}
+
+\begin{tabular}{ll}
+\%d & int signé \\
+\%i & int signé \\
+\%u & unsigned int \\
+\%ld & long \\
+\%lu & unsigned long \\
+\%zu & size_ t (entier adaptatif (32 - 64 bits))
+\end{tabular}
+
+\subsection{Flottants}
+
+\begin{tabular}{ll}
+\%f & float / double (printf) \\
+\%lf & double (scanf) \\
+\%e & scientifique \\
+\%g & format intelligent/compact \\
+\end{tabular}
+
+\subsection{Caractères / chaînes}
+
+\begin{tabular}{ll}
+\%c & char \\
+\%s & string (char*) \\
+\end{tabular}
+
+\subsection{Autres}
+
+\begin{tabular}{ll}
+\%p & adresse mémoire \\
+\%\% & affiche \% \\
+\end{tabular}
+
+\end{multicols}
+
+\end{document}

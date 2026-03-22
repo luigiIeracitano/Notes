@@ -1,0 +1,126 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\section{Client-Server and the Web}
+
+\subsection{Client-Server Architecture}
+
+Most distributed applications use the \textbf{client-server architecture}.
+
+Roles:
+
+\begin{itemize}
+\item Client generates requests
+\item Server generates responses
+\end{itemize}
+
+Servers usually run on dedicated infrastructure such as data centers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Process Name}
+
+To communicate, processes must identify each other.
+
+A process is identified by:
+
+\[
+\text{IP address : Port number}
+\]
+
+Example:
+
+\[
+192.178.170.91 : 443
+\]
+
+Components:
+
+\begin{itemize}
+\item IP address → identifies a network interface
+\item Port number → identifies the process
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Web Architecture}
+
+The Web is a distributed application.
+
+Components:
+
+\begin{itemize}
+\item web client (browser)
+\item web server
+\end{itemize}
+
+Communication protocol:
+
+\textbf{HTTP (HyperText Transfer Protocol)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{HTTP Requests}
+
+Common request types:
+
+\begin{itemize}
+\item GET
+\item HEAD
+\item POST
+\end{itemize}
+
+Example:
+
+\begin{verbatim}
+GET www.youtube.com/watch?v=...
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{HTTP Responses}
+
+Common response codes:
+
+\begin{itemize}
+\item 200 OK
+\item 404 Not Found
+\item 400 Bad Request
+\item 301 Moved Permanently
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Web Objects}
+
+A \textbf{web object} can be:
+
+\begin{itemize}
+\item text file
+\item image
+\item video
+\item script
+\end{itemize}
+
+Each web object has a \textbf{URL} (Uniform Resource Locator).
+
+Example:
+
+\begin{verbatim}
+https://actu.epfl.ch/image/142932/1920x1080.jpg
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Web Pages}
+
+A web page consists of:
+
+\begin{itemize}
+\item a base file (HTML)
+\item referenced objects
+\end{itemize}
+
+Referenced objects may include:
+
+\begin{itemize}
+\item images
+\item videos
+\item scripts
+\end{itemize}
+
+
