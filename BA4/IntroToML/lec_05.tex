@@ -75,6 +75,13 @@ I.e
   
   \text{Then :} x^2 - 1.44 \leq \phi(x) \leq x^2 - 4 
 \]
+For class that need a polynomial of degree bigger than 2, what we can do, is to look 
+where we want our gradient to vanish after the application of $\phi(\cdot)$. Then we start with 
+$(\phi(x))'$ and integrate it to find the appropriate $\phi(x)$. 
+I.e, if our gradient vanish at x = -2, 0, 2 
+\[
+  (\phi(x))' = (x+2)(x-0)(x-2) = x(x^2 - 4) = x^3 - 4x \implies \phi(x) = \int \phi(x)' dx 
+\]
 
 The resulting expanded features can then be used in any linear alogrithm that we have seen previously.
 
