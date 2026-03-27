@@ -12,7 +12,7 @@ Given a vector in $\mathbb{R}^D$ whose values are all non-negative(and at least 
 one can obtain a histogram by dividing each value by the sum of values. 
 
 \subsection{k-Nearest neighbor method}
-We assign the label/value of the nearest neighbor. \\
+We assign the label/value of the most common nearest neighbor. \\
 For $classification$ it consists to give to similar data samples the same label, and for $regression$, the same associated value.
 
 \subsubsection{k-NN: Algorithm}
@@ -95,14 +95,14 @@ To use it with linear regresion, we rewrite the least-square loss like this \[
 \]
 
 This new function is still convex, and its gradient is given by: \[
-  \nabla R = 2 \sum_{i=1}^{N}\phi(x_i)^T w - y_i) 
+  \nabla R = 2 \sum_{i=1}^{N}\phi(x_i)(\phi(x_i)^T w - y_i) 
 \] 
 Setting it to zero we get a $F \times F \cdot F \times 1$ matrix
 \[
 \left(\sum_{i=1}^{N}\phi(x_i)\phi(x_i)^T \right)w^* = \sum_{i=1}^{N}\phi(x_i)y_i 
 \]
 
-Then we group the transformed inputs $\{\phi(x_i)\}$ and the outputs $\y_i\}$ in a matrix vector of the form \[
+Then we group the transformed inputs $\{\phi(x_i)\}$ and the outputs $\{y_i\}$ in a matrix vector of the form \[
   \phi = \begin{pmatrix}
      \phi(x_1)^T  \\
      \vdots \\

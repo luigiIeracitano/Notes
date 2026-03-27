@@ -181,7 +181,7 @@ The multi-output linear regression is written
 \[
   min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
 \]
-where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(j)})^2}$ indicates the norm of a vector (here a $\in \mathbb{R}^C$\\
+where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here a $\in \mathbb{R}^C$)\\
 
 To compute the gradient of this function, we make use of the following properties: \\
 1. Norm and derivative:
@@ -239,7 +239,7 @@ So because the formulation is the same, the solution too
   w^* = (X^TX)^{-1}X^Ty
 \]
 
-However, this model isn't that good because with some data it the \textbf{decision boundary}(threshold) will not react well and misclassified some samples.  \\
+However, this model isn't that good because with some data, the \textbf{decision boundary}(threshold) will not react well and misclassified some samples.  \\
   \includegraphics[width=0.5\linewidth]{images/img_20260304_185637.png}
   \includegraphics[width=0.5\linewidth]{images/img_20260304_192312.png}
 

@@ -7,7 +7,7 @@
 \begin{wrapfigure}{r}{0.3\linewidth}
 \includegraphics[width=\linewidth]{images/img_20260311_212913.png}
 \end{wrapfigure}
-For binatry case we could use confusion matrix:\\
+For binary case we could use confusion matrix:\\
 TP: True positive (number of samples correctly classified as positive)\\
 FP: False positive (number of samples incorrectly classified as positive)\\
 TN: True negative (number of samples correctly classified as negative)\\
@@ -96,22 +96,22 @@ Decision boundaries for C = 4 and C = 5 classes.
 Confusion matrix for multi-class case.\\
 \textbf{Accuracy} : A global accuracy can be obtained by summing the correct predictions for all
 classes (diagonal values of the confusion matrix), and dividing this by the
-total number of samples (sum of all entries in the confusion matrix) \\
+total number of samples (sum of all entries in the confusion matrix). \\
 \textbf{Precision, recall, FP-rate and F1-score}:
 The simplest approach to handling these metrics is to compute them for
-each individual class, and then average over the classes\\
+each individual class, and then average over the classes.\\
 In this case, each individual class is in turn considered as the “positive” class
-while the others act as the “negative” class\\
+while the others act as the “negative” class.\\
 This does not account for class imbalance (some classes may have many
-more samples than others; more about this in a future lecture)\\
+more samples than others; more about this in a future lecture).\\
 This can be handled by weighting the metric for each class by a value
-depending on the proportion of samples from that class
+depending on the proportion of samples from that class.
 
 \subsection{Least-square classification}
 The most common approach to modeling a multi-class problem
 consists of encoding the class label as a vector with a single 1
 at the index corresponding to the category and 0s elsewhere. \\
-\textbf{e.g.} in a 5-class problem, a sampe in class 2 is represented as:
+\textbf{e.g.} in a 5-class problem, a sample in class 2 is represented as:
 \[
   y = \begin{pmatrix} 0 \\ 1 \\ 0 \\ 0 \\ 0
   \end{pmatrix}
@@ -120,12 +120,12 @@ As this is similar to making the model output multiple (as for multi-output regr
   \hat{y_i} = W^T x_i = \begin{pmatrix} w_\left(1\right)^T \\ w_\left(2\right)^T \\ \vdots \\ w_\left(C\right)^T
   \end{pmatrix} x_i 
 \]
-where each $w_\left(j\right)$ is a $(D + 1)-$dimensional vector, used to predict one output dimension, i.e., the \textbf{score} for one class. \\ 
+where each $w_\left(j\right)$ is a $(D + 1)-$dimensional vector, used to predict one output dimension, i.e., the \textbf{score} for one class.
 \subsubsection{Training}
 We can then write training as \[
   min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2 
 \]
-where each $y_i$ is now a $C-$dimensional vector with a single one at the inex corresponding to the class label and zeroes everywhere else.
+where each $y_i$ is now a $C-$dimensional vector with a single one at the index corresponding to the class label and zeroes everywhere else.
 \subsubsection{Solution}
 The inputs and the outputs are two matrices: 
 \[
@@ -171,12 +171,12 @@ As in the binary case, the multi-class least-square classification suffer from o
 \subsection{Multi-class logistic regression}
 We still use the one-hot enconding to represent multi-class labels. \\
 We again need to use a matrix \textbf{W} $\in \mathbb{R}^{\left(D+1\right)\times C}$ to represent the model parameters. \\
-But now, the probability for a class $k$ is given by the \textbf{softmax} function (takes scores and transform them into probabilities) \[
+But now, the probability for a class $k$ is given by the \textbf{softmax} function (takes scores and transforms them into probabilities) \[
     \hat{y}^{\left(k\right)}(x) = \frac{\exp(w_{\left(k\right)}^Tx)}{\sum_{j=1}^{C}\exp(w_{\left(j\right)}^Tx)}
   \]
 \\
 The empirical risk can then be derived from the multi-class version of the cross entropy, which yields \[
-  R(W) = - \sum_{i=1}^{N}\sum_{k=1}^{C}y_i^{\left(k\right)}\ln \hat{y}_i^{\left(k\right)}  
+  R(W) = - \sum_{i=1}^{N}\sum_{k=1}^{C}y_i^{\left(k\right)}\ln \hat{y}_i^{\left(k\right)} = - \sum_{i=1}^{N}\ln\hat{y}_i^{\text{(true class of i)}}
 \](i \to go through the samples, k \to go through the classes) 
 \\
 As in the binary case :
@@ -208,7 +208,7 @@ The final class label is then predicted as \[
 \]
 
 That is, as in least-square classification, the label is the
-index (position) of the maximum value in the vector $\hat{y}$
+index (position) of the maximum value in the vector $\hat{y}$.
 
 \subsubsection{Example}
 2D inputs, 3 classes: Logistic regresison results \\
@@ -235,4 +235,4 @@ Multi-class linear classification: Use a linear model to separate the classes, v
 \includegraphics[width=0.3\linewidth]{images/img_20260311_234923.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260311_234938.png}
 \\
-Unfortunately, no linear model can directly fit non linear data (we will go from linear to non linear model)
+Unfortunately, no linear model can directly fit non linear data (we will go from linear to non linear model).

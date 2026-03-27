@@ -42,7 +42,7 @@ it can be interpreted as the probability that \textbf{x} belongs to the positive
   \text{The model computes: } \hat{y} = P\left(y = 1 | x \right)
 \]
 
-\\ Even that the name of this model is logistic \textbf{regression}, this is truly a classification model, not a regression one
+\\ Even that the name of this model is logistic \textbf{regression}, this is truly a classification model, not a regression one.
 
 \subsubsection{Training}
 To learn the parameters \textbf{w} need a loss function: \\
@@ -65,11 +65,11 @@ The \textbf{algorithm} for minimization is:
   \includegraphics[width=\linewidth]{images/img_20260304_195123.png}
 \end{wrapfigure}
 
-This algorithm converges because the derivative becomes smaller $(\frac{dR(w)}{dw} \to  0$ ($\nabla w$ becomes smaller).\\
+This algorithm converges because the derivative becomes smaller $(\frac{dR(w)}{dw} \to  0$ ($\nabla w$ becomes smaller)).\\
 The $\eta$ influences the speed of the convergences (doing bigger or smaller steps), but having too large steps may make the algorithm to jumps between two points and never converge. \\
 As the initial $w_0$ is the starting point, having a $w_0$ near the minimum will makes the algorithm converges faster. \\ 
 \\ 
-To minimize \textbf{non-convex} function the same algorithm can be used. However, different initizialisations yield to different results because there is more than one point with derivative equal to zero.
+To minimize \textbf{non-convex} function the same algorithm can be used. However, different initializations yield to different results because there is more than one point with derivative equal to zero.
 
 \includegraphics[width=0.5\linewidth]{images/img_20260304_200302.png}
 \includegraphics[width=0.5\linewidth]{images/img_20260304_200321.png}
@@ -99,7 +99,7 @@ So to decrease the function we therefore move in the direction opposite to the g
   R(w) = - \sum_{i = 1}^N y_iln \sigma(w^Tx_i) + (1 - y_i)ln(1 - \sigma(w^Tx_i)) 
 \]
 \[
-  = - \sum_{i \in positives samples} ln \sigma(w^Tx_i) - \sum_{i \in negative samples} ln(1 - \sigma(w^Tx_i))
+  = - \sum_{i \in positive samples} ln \sigma(w^Tx_i) - \sum_{i \in negative samples} ln(1 - \sigma(w^Tx_i))
 \]
 To minimize it via gradient descent we compute its gradient w.r.t \textbf{w} \[
   \nabla_w R(w) = \sum_{i=1}^{N} (\hat{y_i} - y_i) x_i 
