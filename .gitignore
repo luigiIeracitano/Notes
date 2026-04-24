@@ -14,10 +14,10 @@
 **/*.snm
 **/*.vrb
 **/_minted*
-/home/luigi/EPFL/Notes/BA4/Algorithms-I
-/home/luigi/EPFL/Notes/BA4/CompSys
-/home/luigi/EPFL/Notes/BA4/Analysis-IV
-/home/luigi/EPFL/Notes/BA4/IntroToSV
+# EPFL notes folders (local only)
+BA4/Algorithms-I/
+BA4/CompSys/
+BA4/ISV/
 # Optional: PDFs
 # **/*.pdf
 

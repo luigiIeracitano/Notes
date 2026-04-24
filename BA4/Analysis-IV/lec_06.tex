@@ -1,0 +1,284 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+\lecture{6}{26-03-2026}{Residues and Residue Theorem}{}
+\section{Residues}
+
+\begin{definition}[Residues]
+ 
+Let $f$ be holomorphic on a punctured neighborhood of $z_0$, and write its Laurent series at $z_0$ as
+\[
+f(z)=\sum_{n=-\infty}^{\infty} c_n (z-z_0)^n.
+\]
+The coefficient $c_{-1}$ of the term $(z-z_0)^{-1}$ is called the \emph{residue} of $f$ at $z_0$:
+\[
+\operatorname{Res}_{z_0}(f)=c_{-1}
+\]
+
+\end{definition}
+\subsection{Integral expression of the residue}
+
+By the definition of the coefficients in the Laurent series,
+\[
+\operatorname{Res}_{z_0}(f)
+=
+\frac{1}{2\pi i}\int_{\gamma} f(z)\,dz,
+\]
+where $\gamma$ is a closed, simple, counterclockwise oriented curve that contains $z_0$ in its interior, and such that $f$ is holomorphic on $int_{\gamma}\setminus \{z_0\}$.
+
+\paragraph{Example}
+
+If $f$ is holomorphic on an open set containing $z_0$, then
+\[
+\operatorname{Res}_{z_0}(f)=0
+\]
+by Cauchy's theorem.
+
+For
+\[
+f(z)=\frac{1}{z},
+\]
+since it's already the Laurent series at $0$, hence
+\[
+\operatorname{Res}_0\!\left(\frac{1}{z}\right)=1
+\]
+
+\subsection{Formula for a pole of order \texorpdfstring{$m$}{m}}
+
+Suppose that $f$ has a pole of order $m$ at $z_0$, so that its Laurent series is
+\[
+f(z)=c_{-m}(z-z_0)^{-m}+\cdots+c_{-1}(z-z_0)^{-1}+c_0+c_1(z-z_0)+\cdots
+\]
+Consider the holomorphic function
+\[
+g(z)=(z-z_0)^m f(z) =c_{-m}+c_{-m+1}(z-z_0)+\cdots+c_{-1}(z-z_0)^{m-1}+c_0(z-z_0)^m+\cdots
+\]
+Therefore,
+\begin{corollary}
+  
+\[
+c_{-1}= \lim_{z \to z_0} \frac{1}{(m-1)!}\frac{d^{\,m-1}}{dz^{m-1}}\Big((z-z_0)^m f(z))\Big)
+\]
+
+This formula is useful when we already know that $f$ has a pole of order $m$ at $z_0$.
+
+In particular, if $m=1$, then
+\[
+\operatorname{Res}_{z_0}(f)
+=
+\lim_{z\to z_0}(z-z_0)f(z).
+\]
+
+\end{corollary}
+
+\paragraph{Example}
+
+\[
+f(z)=\frac{1}{\sin z}
+\]
+At $z_0=0$, this function has a pole of order $1$. 
+
+Hence,
+\[
+\operatorname{Res}_0(f)
+=
+\lim_{z\to 0} z\,f(z)
+=
+\lim_{z\to 0}\frac{z}{\sin z}
+\]
+Using
+\[
+\sin z = z - \frac{z^3}{3!}+\cdots,
+\]
+we get
+\[
+\frac{z}{\sin z}
+=
+\frac{z}{z-\frac{z^3}{3!}+\cdots}
+=
+\frac{1}{1-\frac{z^2}{3!}+\cdots},
+\]
+so the limit is
+\[
+\operatorname{Res}_0(f)=1.
+\]
+
+\section{Residue theorem}
+
+\begin{theorem}[Residue theorem]
+Suppose $D\subseteq \mathbb{C}$ is open and simply connected, and let $\gamma$ be a simple closed curve in $D$ which is counterclockwise oriented. Let $z_1,\dots,z_m\in \operatorname{int}(\gamma)$. Assume
+\[
+f: D\setminus\{z_1,\dots,z_m\}\to \mathbb{C}
+\]
+is holomorphic. Then
+\[
+\int_\gamma f(z)\,dz
+=
+2\pi i \sum_{i=1}^{m}Res_{z_i}(f) 
+\]
+\end{theorem}
+
+Hence, in order to compute $\int_\gamma f(z)\,dz$, it suffices to compute the residues of the singular points in the interior of $\gamma$.
+
+\subsection{Idea of the proof}
+
+For simplicity, assume there are only two singular points $z_1$ and $z_2$. One deforms the contour $\gamma$ into two small positively oriented curves $\gamma_1$ and $\gamma_2$ around the singularities, connected by a very narrow bridge. By Cauchy's theorem, the integral over $\gamma$ is equal to the sum of the integrals over the small circles, since the contributions of the bridge cancel. Therefore,
+\[
+\int_\gamma f(z)\,dz
+=
+\int_{\gamma_1} f(z)\,dz
++
+\int_{\gamma_2} f(z)\,dz
+=
+2\pi i\,\operatorname{Res}_{z_1}(f)
++
+2\pi i\,\operatorname{Res}_{z_2}(f).
+\]
+
+\paragraph{Example}
+
+\[
+f(z)=\frac{1}{z}.
+\]
+Let $\gamma$ be a simple closed counterclockwise oriented curve.
+
+\begin{enumerate}
+    \item If $0\in \operatorname{int}(\gamma)$, then by the residue theorem,
+    \[
+    \int_\gamma \frac{1}{z}\,dz = 2\pi i\,\operatorname{Res}_0\!\left(\frac{1}{z}\right)=2\pi i.
+    \]
+
+    \item If $0\notin \operatorname{int}(\gamma)$, then
+    \[
+    \int_\gamma \frac{1}{z}\,dz=0.
+    \]
+
+    \item If $0\in \gamma$, then the integral is not well-defined.
+\end{enumerate}
+
+\paragraph{Example}
+\[
+f(z)=\frac{1}{z(z+1)}.
+\]
+We have two simple poles, at $z=0$ and $z=-1$.
+
+Their residues are
+\[
+\operatorname{Res}_0(f)
+=
+\lim_{z\to 0} zf(z)
+=
+\lim_{z\to 0}\frac{1}{z+1}
+=1,
+\]
+and
+\[
+\operatorname{Res}_{-1}(f)
+=
+\lim_{z\to -1}(z+1)f(z)
+=
+\lim_{z\to -1}\frac{1}{z}
+=-1.
+\]
+
+So:
+
+\begin{enumerate}
+    \item If neither $0$ nor $-1$ lies in $\operatorname{int}(\gamma)$, then
+    \[
+    \int_\gamma f(z)\,dz = 0.
+    \]
+
+    \item If $0\in \operatorname{int}(\gamma)$ but $-1\notin \operatorname{int}(\gamma)$, then
+    \[
+    \int_\gamma f(z)\,dz = 2\pi i.
+    \]
+
+    \item If $-1\in \operatorname{int}(\gamma)$ but $0\notin \operatorname{int}(\gamma)$, then
+    \[
+    \int_\gamma f(z)\,dz = -2\pi i.
+    \]
+
+    \item If both $0$ and $-1$ lie in $\operatorname{int}(\gamma)$, then
+    \[
+    \int_\gamma f(z)\,dz
+    =
+    2\pi i\big(\operatorname{Res}_0(f)+\operatorname{Res}_{-1}(f)\big)
+    =
+    2\pi i(1-1)=0.
+    \]
+
+    \item If $0\in\gamma$ or $-1\in\gamma$, then the integral is not well-defined.
+\end{enumerate}
+
+\paragraph{Example}
+
+$f: \mathbb{C}\setminus \{0,1\} \to \mathbb{C}$,
+
+\[
+f(z)=\frac{1}{z^2}+\frac{2}{z}+\frac{3}{z-1}.
+\]
+Then $f$ has a pole of order $2$ at $0$ and a pole of order $1$ at $1$.
+
+At $z=1$, since the pole is simple,
+\[
+\operatorname{Res}_1(f)
+=
+\lim_{z\to 1}(z-1)f(z)
+=
+\lim_{z\to 1}\left(\frac{z-1}{z^2}+\frac{2(z-1)}{z}+3\right)
+=3.
+\]
+
+At $z=0$, we use the formula for a pole of order $2$:
+\[
+\operatorname{Res}_0(f)
+= \lim_{z \to 0} \frac{1}{1!}
+\frac{d}{dz}\big(z^2 f(z)\big).
+\]
+Now
+\[
+z^2 f(z)
+=
+1+2z+\frac{3z^2}{z-1},
+\]
+so
+\[
+\frac{d}{dz}\big(z^2 f(z)\big)
+=
+2+\frac{6z}{z-1}-\frac{3z^2}{(z-1)^2}.
+\]
+Evaluating at $z=0$ gives
+\[
+\operatorname{Res}_0(f)=2.
+\]
+
+Actually this could have been seen by reading directly $f(z)$.
+
+If $\gamma(t)=10e^{it}$ for $t\in[0,2\pi]$, then both poles lie inside $\gamma$, hence
+\[
+\int_\gamma f(z)\,dz
+=
+2\pi i\big(\operatorname{Res}_0(f)+\operatorname{Res}_1(f)\big)
+=
+2\pi i(2+3)
+=
+10\pi i.
+\]
+
+\subsection{Useful remark}
+
+It is often advisable to first rewrite the function in a form where the residue can be read off immediately.
+
+For example:
+\[
+e^{1/z}=1+\frac{1}{z}+\frac{1}{2!}\frac{1}{z^2}+\cdots
+\quad\Longrightarrow\quad
+\operatorname{Res}_0\!\left(e^{1/z}\right)=1.
+\]
+
+On the other hand,
+\[
+e^{1/z^2}=1+\frac{1}{z^2}+\frac{1}{2!}\frac{1}{z^4}+\cdots
+\quad\Longrightarrow\quad
+\operatorname{Res}_0\!\left(e^{1/z^2}\right)=0.
+\]

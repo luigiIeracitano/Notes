@@ -1,0 +1,310 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+\lecture{4}{12-03-2025}{Laurent series and Taylor series}{}
+
+\subsection{Remark: trick to compute contour integrals}
+
+A useful trick to compute contour integrals is the following.
+
+\begin{itemize}
+\item Find another simple closed curve that surrounds the same point as the complicated curve.
+\item If the function is holomorphic on the region between the two curves, then the integrals along the two curves are equal.
+\end{itemize}
+
+In other words, if $\Gamma_0$ and $\Gamma_1$ are two curves with the same endpoints and orientation, and if $f$ is holomorphic on the region between them, then
+
+\[
+\int_{\Gamma_0} f(z)\,dz
+=
+\int_{\Gamma_1} f(z)\,dz .
+\]
+
+The idea is to apply Cauchy's theorem to the closed contour formed by $\Gamma_0$ and $-\Gamma_1$.
+
+\subsection{Extended Cauchy Integral Formula}
+
+Under the same assumptions, for every integer $n \ge 0$ we have
+
+\begin{corollary}
+\[
+f^{(n)}(z_0)
+=
+\frac{n!}{2\pi i}
+\int_\Gamma
+\frac{f(z)}{(z-z_0)^{n+1}}\,dz .
+\]
+
+ 
+\end{corollary}
+Equivalently,
+
+\[
+\int_\Gamma
+\frac{f(z)}{(z-z_0)^{n+1}}\,dz
+=
+\frac{2\pi i}{n!}f^{(n)}(z_0).
+\]
+
+\textbf{Remark.}  
+This formula shows that holomorphic functions are infinitely differentiable.
+
+\subsection{Examples}
+
+\subsubsection*{Example 1}
+
+Let
+
+\[
+f(z)=\frac{\cos z}{z}
+\]
+
+and let $\Gamma$ be a positively oriented simple closed curve.
+
+We distinguish three cases:
+
+\begin{itemize}
+
+\item If $0$ lies on $\Gamma$, the integral is not defined.
+
+\item If $0$ is outside $\Gamma$, then
+
+\[
+\int_\Gamma \frac{\cos z}{z}\,dz = 0
+\]
+
+by Cauchy's theorem.
+
+\item If $0$ is inside $\Gamma$, then using Cauchy's integral formula
+
+\[
+\int_\Gamma \frac{\cos z}{z}\,dz
+=
+2\pi i \cos(0)
+=
+2\pi i .
+\]
+
+\end{itemize}
+
+\subsubsection*{Example 2}
+
+Let $\Gamma = \{z \in \mathbb{C} : |z-2| = 1\}$ oriented counterclockwise.  
+Compute
+
+\[
+\int_\Gamma \frac{e^z}{(z-2)^3}\,dz .
+\]
+
+Using the extended Cauchy formula with $f(z)=e^z$, $z_0=2$ and $n=2$,
+
+\[
+\int_\Gamma \frac{e^z}{(z-2)^3}\,dz
+=
+\frac{2\pi i}{2!} f^{(2)}(2).
+\]
+
+Since
+
+\[
+f^{(2)}(z_0)=e^2,
+\]
+
+we obtain
+
+\[
+\int_\Gamma \frac{e^z}{(z-2)^3}\,dz
+=
+\frac{2\pi i}{2}e^2
+=
+\pi i e^2.
+\]
+\newpage 
+
+\chapter{Laurent series and Taylor series}\label{chap:laurent_series_and_taylor_series} % (fold)
+
+\section{Taylor Polynomial}
+
+Let $f : \mathbb{R} \to \mathbb{R}$ be sufficiently regular (N-times differentiable).  
+For any $x_0 \in \mathbb{R}$, the Taylor polynomial of degree $N$ is
+
+\[
+T^N_{x_0}f(x)
+=
+f(x_0)
++
+f'(x_0)(x-x_0)
++
+\cdots
++
+\frac{f^{(N)}(x_0)}{N!}(x-x_0)^N.
+\]
+
+\subsection{Taylor's Theorem}
+
+If $f \in C^{N+1}$, then for all $x_0$, $x \in \mathbb{R}$ there exists $\vartheta \in (0,1)$ such that
+
+\[
+f(x)
+=
+T^N_{x_0}f(x)
++
+\frac{f^{(N+1)}(\vartheta x_0+(1-\vartheta)x)}{(N+1)!}(x-x_0)^{N+1}.
+\]
+
+\textbf{Remark.}  
+Taylor's theorem shows that a function can be approximated locally by a polynomial.
+
+\subsection{Taylor Series}
+
+If $f$ has derivatives of all orders, we can define the Taylor series
+
+\[
+\sum_{n=0}^{\infty}
+\frac{f^{(n)}(x_0)}{n!}(x-x_0)^n.
+\]
+
+A natural question is whether this series converges and whether it converges to the function $f$.
+
+\subsection{Example}
+
+For the exponential function,
+
+\[
+e^x
+=
+\sum_{n=0}^{\infty}
+\frac{x^n}{n!}.
+\]
+
+This series converges for all $x \in \mathbb{R}$. \\
+\textbf{Remark:} Functions $f$ s.t the Taylor series converges to $f$ in a neighborood of $x_o$ are called \textbf{analytic}. (Not all smooth (continually derivable) functions are analytic)
+
+\subsection{Taylor coefficients}
+\begin{definition}[Taylor Coefficients]
+  The Taylor coefficients of a function $f(z)$ around a point $z_0$ are defined as: \[
+    c_n = \frac{f^{(n)}(z_0)}{n!}
+  \]
+  where $f^{(n)}(z_0)$ is the $n$-th derivative of $f$ evaluated at $z_0$.
+
+  This comes from assuming $f$ has a power series representation: \[
+    f(z) = \sum_{n=0}^{\infty}c_n(z-z_0)^n  
+  \]
+  
+\end{definition}
+\section{Taylor series / regular Laurent series for complex functions}
+
+\begin{theorem}[]
+  Let $D \subset \mathbb{C}$ be open and let $z_0 \in D$.  Let $R>0$ such that, the disk $B_R(z_0) = \{z \in \mathbb{C} : \left|z-z_0\right| < R\}$ is contained in D.
+
+If $f : D \to \mathbb{C}$ is holomorphic.
+
+Then for all $z \in B_R(z_0)$
+
+\[
+f(z)=\sum_{n=0}^{\infty} \frac{f^{\left(n\right)}(z_0)}{n!} (z-z_0)^n
+\]
+\end{theorem}
+
+The largest possible $R$ is called \textbf{radius of convergence} (It's the distance between $z_0$ and the nearest singularity (not $z_0$).
+
+\textbf{Remark:}
+
+$(1)$ All holo functions are analytic. 
+
+$(2)$ In practice: $R$ is the distance of $z_0$ from the $nearest$ point where $f$ is not holo or not defined. 
+
+$(3)$ We can connect the Taylor series to Cauchy's integral formula \[
+  f(z) = \sum_{n = 0}^{\infty} \frac{f^{\left(n\right)}(z_0)}{n!}(z-z_0)^n = \sum_{n=0}^{\infty}c_n(z-z_0)^n 
+\]
+where \[
+  c_n = \frac{f^{\left(n\right)}(z_0)}{n!} = \frac{1}{2 \pi i}\int_{\gamma} \frac{f(\zeta)}{\zeta - z_0} d\zeta
+\]
+for every simple, close curve $\gamma$ aroung $z_0$ with int $\gamma \subset D$ and counterclockwise oriented.
+
+\textbf{Caution:} The Taylor series representation around a given point is unique! In particular in order to compute the Taylor series at a given point, we can use other "tricks".
+
+\begin{theorem}[Laurent series]
+ Let $D \subset \mathbb{C}$ be open and let $z_0 \in D$.  
+Assume $f : D \setminus \{z_0\} \to \mathbb{C}$ is holomorphic.
+
+Let $R>0$ such that $B_R(z_0) \subset D$.
+
+Then for all $z \in B_R(z_0)\setminus\{z_0\}$
+
+\[
+f(z)=\sum_{n=-\infty}^{\infty} c_n (z-z_0)^n
+\]
+
+where for every simple closed counterclockwise oriented curve $\gamma$
+such that $\mathrm{int}(\gamma)\subset D$ and $z_0$ is enclosed by $\gamma$,
+
+\[
+c_n=\frac{1}{2\pi i}\int_\gamma
+\frac{f(\zeta)}{(\zeta-z_0)^{n+1}}\,d\zeta .
+\]
+
+\end{theorem}
+\paragraph{Remark}
+
+\begin{itemize}
+
+\item The Laurent series is like a Taylor series but it may include
+terms with polynomial singularities (negative powers).
+
+\item As for Taylor series, the Laurent series representation is unique.
+Hence if we determine the coefficients $c_n$ by any method
+(not necessarily by path integrals), we have determined the Laurent series.
+
+\item We do not assume that $f$ is holomorphic at $z_0$.
+It might be holomorphic there or not; no hypothesis is made.
+
+\end{itemize}
+
+\begin{definition}[]
+ Any Laurent series can be split into a \textbf{singular part} and a
+\textbf{regular part}:
+
+\[
+\sum_{n=-\infty}^{\infty} c_n (z-z_0)^n
+=
+\underbrace{\sum_{n=1}^{\infty} c_{-n}(z-z_0)^{-n}}_{\text{singular part}}
++
+\underbrace{\sum_{n=0}^{\infty} c_n (z-z_0)^n}_{\text{regular part}} .
+\]
+
+ 
+\end{definition}
+In other words, a Taylor series is a Laurent series whose singular
+part vanishes.
+
+\paragraph{Example}
+
+If $f : D \to \mathbb{C}$ is holomorphic and $z_0 \in D$,
+then its Taylor expansion
+
+\[
+f(z)=\sum_{n=0}^{\infty} c_n (z-z_0)^n
+\]
+
+is a Laurent series whose singular part is zero since for all $n\leq -1$\[
+  \frac{f(\zeta)}{(\zeta-z_0)^{n+1}} \text{is holo. near} z_0
+\]
+so by Cauchy's integral formula $\int_{\gamma} \frac{f(\zeta)}{(\zeta-z_0)^{n+1}} d\zeta = 0$
+\paragraph{Example}
+
+For the following function $f: \mathbb{C}\setminus{0} \to \mathbb{C}$ let find the Laurent series around $z_0 = 0$
+
+
+1) $f(z)=\frac{1}{z}$, this is already a Laurent serieswith
+\[
+c_{-1}=1, \qquad c_n=0 \ \text{otherwise}.
+\]
+
+2) $f(z) = \frac{5z + 1}{z^2} = \frac{1}{z^2} + \frac{5}{z} = \sum_{n=-\infty}^{\infty}c_nz^n$ where \[
+  c_n = 
+  \begin{cases}
+    1 \quad \text{if }n = -2 \\
+    5 \quad \text{if }n = -1 \\
+    0 \quad otherwise
+  \end{cases}
+\]

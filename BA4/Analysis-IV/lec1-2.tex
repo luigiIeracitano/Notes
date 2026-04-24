@@ -1,0 +1,187 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+\chapter{Review of complex numbers $\mathbb{C}$}\label{chap:}
+
+\section{Basic Definitions}
+A complex number is written as
+\[
+z = x + iy, \qquad x=\Re(z)\in\mathbb{R},\; y=\Im(z)\in\mathbb{R},\; i^2=-1.
+\]
+\textbf{Conjugate:} $\overline{z}=x-iy$.
+
+\textbf{Modulus:}
+\[
+|z| = \sqrt{x^2+y^2}.
+\]
+Geometric interpretation: $|z|$ is the distance from $z$ to $0$, and $|z-z_0|$ is the distance from $z$ to $z_0$.
+
+\section{Euler's Formula}
+For $\theta\in\mathbb{R}$,
+\[
+e^{i\theta}=\cos\theta+i\sin\theta,
+\quad\text{thus}\quad |e^{i\theta}|=1.
+\]
+
+\section{Polar Coordinates}
+If $z\neq 0$, there exist $r=|z|>0$ and an argument $\theta$ such that
+\[
+z = r e^{i\theta}, \qquad \theta \equiv \Arg(z)\;\;(\mathrm{mod}\;2\pi).
+\]
+\textbf{Principal argument:} $\Arg(z)\in(-\pi,\pi]$.
+
+\textbf{Products/quotients in polar form:} if $z_1=r_1e^{i\theta_1}$, $z_2=r_2e^{i\theta_2}$,
+\[
+z_1z_2 = r_1r_2 e^{i(\theta_1+\theta_2)}, \qquad
+\frac{z_1}{z_2} = \frac{r_1}{r_2} e^{i(\theta_1-\theta_2)} \quad (z_2\neq 0).
+\]
+\textbf{Rotation:} multiplying by $e^{i\phi}$ corresponds to a rotation of angle $\phi$.
+
+\section{Algebraic Equations: $k$-th Roots}
+To solve $z^k = a$ ($a\neq 0$), write $a=\rho e^{i\alpha}$:
+\[
+z = \rho^{1/k} e^{i(\alpha+2\pi m)/k}, \qquad m=0,1,\dots,k-1.
+\]
+Thus there are \textbf{$k$ solutions} (counting multiplicities).
+\chapter{Complex functions}\label{chap:}
+\section{Complex functions}
+A function $f:\Omega\subset\mathbb{C}\to\mathbb{C}$ can be written as
+\[
+f(z)=f(x+iy)=u(x,y)+iv(x,y),
+\]
+where $u,v:\Omega\subset\mathbb{R}^2\to\mathbb{R}$.
+
+\subsection{Complex Exponential and Trigonometry}
+\[
+e^{x+iy}=e^x(\cos y+i\sin y).
+\]
+Definitions (via the exponential, consistent with Euler’s formula):
+\[
+\cos z=\frac{e^{iz}+e^{-iz}}{2},\qquad
+\sin z=\frac{e^{iz}-e^{-iz}}{2i}.
+\]
+Hyperbolic functions:
+\[
+\cosh z=\frac{e^z+e^{-z}}{2},\qquad
+\sinh z=\frac{e^z-e^{-z}}{2}.
+\]
+
+\section{Continuity}
+$f$ is continuous at $z_0$ if
+\[
+\forall \varepsilon>0,\;\exists \delta>0:\ |z-z_0|<\delta \Rightarrow |f(z)-f(z_0)|<\varepsilon.
+\]
+Equivalent: $\lim_{z\to z_0} f(z)=f(z_0)$.
+
+\textbf{Practical criterion:} if $f=u+iv$, then $f$ is continuous at $z_0=x_0+iy_0$
+\[
+\Longleftrightarrow\ u \text{ and } v \text{ are continuous at } (x_0,y_0).
+\]
+
+\section{Complex Derivative}
+$f$ is \textbf{complex differentiable} at $z_0$ if the limit exists:
+\[
+f'(z_0)=\lim_{z\to z_0}\frac{f(z)-f(z_0)}{z-z_0}.
+\]
+
+\section{Holomorphic and Entire Functions}
+Let $\Omega\subset\mathbb{C}$ be \textbf{open}.
+\begin{itemize}
+\item $f$ is \textbf{holomorphic} on $\Omega$ if it is differentiable at every point of $\Omega$.
+\item $f$ is \textbf{entire} if it is holomorphic on $\mathbb{C}$.
+\end{itemize}
+Recall: $\Omega$ is open if $\forall z_0\in\Omega,\ \exists r>0$ such that the disk
+$D_r(z_0)=\{z:|z-z_0|<r\}\subset\Omega$.
+
+\section{Cauchy--Riemann Equations}
+
+\subsection{Theorem (C--R)}
+Let $\Omega$ be open and $f=u+iv$ with $u,v\in C^1(\Omega)$.
+If $f$ is holomorphic, then
+\[
+\boxed{\frac{\partial u}{\partial x}=\frac{\partial v}{\partial y}
+\qquad\text{and}\qquad
+\frac{\partial u}{\partial y}=-\frac{\partial v}{\partial x}}
+\quad\text{(Cauchy--Riemann equations).}
+\]
+
+\subsection{Useful Formula for $f'$}
+When C--R are satisfied,
+\[
+\boxed{f'(z)=u_x+iv_x=v_y-iu_y.}
+\]
+
+\subsection{Quick Examples}
+\begin{itemize}
+\item $f(z)=z^2=(x+iy)^2=(x^2-y^2)+i(2xy)$:
+$u=x^2-y^2,\ v=2xy$.
+We have $u_x=2x=v_y$ and $u_y=-2y=-v_x$, hence $f$ is holomorphic and $f'(z)=2z$.
+\item Conjugation $f(z)=\overline{z}=x-iy$:
+$u=x,\ v=-y$, so $u_x=1$ but $v_y=-1$ $\Rightarrow$ C--R fails:
+\textbf{not holomorphic}.
+\item $f(z)=e^z=e^x(\cos y+i\sin y)$: C--R holds $\Rightarrow$ holomorphic and $(e^z)'=e^z$.
+\item $f(z)=\frac{1}{z}$ is holomorphic on $\mathbb{C}^\ast$ and $f'(z)=-\frac{1}{z^2}$.
+\end{itemize}
+
+\subsection{Differentiation Rules (same as real case)}
+If $f,g$ are holomorphic on $\Omega$:
+\[
+(f+g)'=f'+g',\qquad
+(fg)'=f'g+fg',\qquad
+\left(\frac{f}{g}\right)'=\frac{f'g-fg'}{g^2}\ \ (g\neq 0).
+\]
+\textbf{Chain rule:} if $g(\Omega)\subset W$ and $f$ is holomorphic on $W$, then
+\[
+(f\circ g)'(z)=f'(g(z))\,g'(z).
+\]
+Usual consequences:
+\[
+(z^k)'=kz^{k-1},\qquad (\cos z)'=-\sin z,\qquad (\sin z)'=\cos z.
+\]
+
+\subsection{Geometric Interpretation of C--R (idea)}
+View $f:\mathbb{R}^2\to\mathbb{R}^2$ via $(x,y)\mapsto(u(x,y),v(x,y))$.
+If $f$ is holomorphic, the Jacobian matrix $Df$ has the form
+\[
+Df=
+\begin{pmatrix}
+u_x & u_y\\
+v_x & v_y
+\end{pmatrix}
+=
+\begin{pmatrix}
+a & -b\\
+b & a
+\end{pmatrix},
+\]
+so locally it is a \textbf{scaling} (factor $\sqrt{a^2+b^2}$) followed by a \textbf{rotation}
+(no anisotropic stretching): small squares remain squares.
+
+\section{Complex Logarithm}
+
+\subsection{Argument and Discontinuity}
+$\Arg(z)$ (principal value) is defined on $\mathbb{C}\setminus\{0\}$ but is \textbf{discontinuous} along the negative real axis
+(jump from $\pi$ to $-\pi$).
+
+\subsection{Definition of the Principal Logarithm}
+For $z\neq 0$,
+\[
+\boxed{Log(z)=\log|z|+i\,\Arg(z)}
+\]
+(principal branch).
+
+\subsection{Properties and Remarks}
+\begin{itemize}
+\item $Log$ is not defined at $0$ and is not globally continuous (branch cut).
+\item On a domain where a branch is chosen (e.g. $\mathbb{C}\setminus\{x\le 0\}$), $Log$ is holomorphic and
+\[
+(Log z)'=\frac{1}{z}.
+\]
+\item Usual rules do not hold \emph{strictly} due to multivaluedness/discontinuity:
+\[
+Log(z_1z_2)\neq Log z_1+Log z_2 \quad \text{in general},
+\]
+but they hold \textbf{up to a multiple of $2\pi i$}:
+\[
+Log(z_1z_2)=Log z_1+Log z_2 + 2\pi i k,\qquad k\in\mathbb{Z}.
+\]
+\end{itemize}

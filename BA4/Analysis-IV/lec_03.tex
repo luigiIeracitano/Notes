@@ -1,0 +1,296 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+\lecture{3}{10-03-2026}{Integration and Cauchy theorem}{}
+
+\chapter{Complex integration}\label{chap:complex_integration}
+\section{Line Integrals in $\mathbb{R}^2$ (Recall)}
+
+Let $F : \mathbb{R}^2 \rightarrow \mathbb{R}^2$ be a continuous vector field
+\[
+F(x_1,x_2) = (F_1(x_1,x_2),F_2(x_1,x_2))
+\]
+
+Let $\gamma : [a,b] \rightarrow \mathbb{R}^2$ be a $C^1$ curve with image $\Gamma$.
+
+The line integral of $F$ along $\gamma$ is defined as
+
+\[
+\int_\Gamma F \cdot d\ell
+=
+\int_a^b F(\gamma(t)) \cdot \gamma'(t)\,dt
+\]
+
+which explicitly gives
+
+\[
+\int_a^b \left[
+F_1(\gamma(t))\gamma_1'(t) +
+F_2(\gamma(t))\gamma_2'(t)
+\right]dt
+\]
+
+\subsection*{Remarks}
+
+\begin{itemize}
+\item The line integral is independent of the parametrization.
+\item Reversing the orientation changes the sign.
+\item A curve is called
+\begin{itemize}
+\item \textbf{simple} if it has no self-intersections
+\item \textbf{regular} if $\gamma'(t) \neq 0$
+\end{itemize}
+\end{itemize}
+
+If $\Gamma$ is closed and $\nabla \times F = 0$ in the interior of $\Gamma$ then
+
+\[
+\int_\Gamma F \cdot d\ell = 0
+\]
+
+(Stokes' theorem).
+
+\section{Complex Line Integrals}
+
+Let $\gamma : [a,b] \to \mathbb{C}$ be a regular curve parametrizing $\Gamma \subset \mathbb{C}$.
+
+Let $f : \Gamma \to \mathbb{C}$ be continuous.
+
+\begin{definition}
+The line integral of $f$ along $\Gamma$ is
+
+\[
+\int_\Gamma f(z)\,dz
+=
+\int_a^b f(\gamma(t))\gamma'(t)\,dt
+\]
+\end{definition}
+
+\subsection*{Orientation}
+
+If $-\Gamma$ denotes the curve with opposite orientation then
+
+\[
+\int_{-\Gamma} f(z)\,dz
+=
+-\int_\Gamma f(z)\,dz
+\]
+
+\subsection*{Remark}
+
+The value of the line integral does not depend on the parametrization as long as the orientation is preserved.
+
+\section{Examples}
+
+\subsection{Integral of $z^2$ on the unit circle}
+
+Let $\Gamma$ be the unit circle parametrized by
+
+\[
+\gamma(t) = e^{it}, \quad t \in [0,2\pi]
+\]
+
+Then
+
+\[
+\gamma'(t) = i e^{it}
+\]
+
+We compute
+
+\[
+\int_\Gamma z^2\,dz
+=
+\int_0^{2\pi} (e^{it})^2 (i e^{it})\,dt
+\]
+
+\[
+=
+i \int_0^{2\pi} e^{3it}dt
+\]
+
+\[
+=
+i \left[\frac{e^{3it}}{3i}\right]_0^{2\pi} = 0
+\]
+
+\subsection{Integral of $\frac{1}{z}$}
+
+\[
+\int_\Gamma \frac{1}{z}dz
+=
+\int_0^{2\pi}
+\frac{1}{e^{it}}(i e^{it})dt
+=
+i\int_0^{2\pi}dt
+=
+2\pi i
+\]
+
+\subsection{Integral of $\frac{1}{z^2}$}
+
+\[
+\int_\Gamma \frac{1}{z^2}dz
+=
+\int_0^{2\pi}
+\frac{1}{e^{2it}}(i e^{it})dt
+=
+i\int_0^{2\pi} e^{-it}dt
+=
+0
+\]
+
+\section{Cauchy's Theorem}
+
+\begin{theorem}
+Let $U \subset \mathbb{C}$ be open and simply connected.
+
+Let $\Gamma$ be a closed piecewise regular curve contained in $U$.
+
+If $f : U \to \mathbb{C}$ is holomorphic then
+
+\[
+\int_\Gamma f(z)\,dz = 0
+\]
+\end{theorem}
+
+\textbf{Simply connected:} the domain has no holes.
+
+Examples:
+
+\[
+\mathbb{C}, \quad \{z \in \mathbb{C} : |z| < 1\}
+\]
+
+are simply connected, while
+
+\[
+\mathbb{C}^* = \mathbb{C}\setminus\{0\}
+\]
+
+is not.
+
+\textbf{Piecewise regular:} $\Gamma$ might have finitely many curves, e.g. square. 
+\subsection{Idea of the Proof}
+
+Write
+
+\[
+f(z) = u(x,y) + i v(x,y)
+\]
+
+and parametrize
+
+\[
+\gamma(t) = \alpha(t) + i\beta(t)
+\]
+
+Then
+
+\[
+\int_\Gamma f(z)\,dz
+=
+\int_a^b
+\left[u(\gamma(t))+iv(\gamma(t))\right]
+(\alpha'(t)+i\beta'(t))dt
+\]
+
+Separating real and imaginary parts gives two line integrals in $\mathbb{R}^2$.
+
+Using Green's theorem and the Cauchy--Riemann equations
+
+\[
+\frac{\partial u}{\partial x} = \frac{\partial v}{\partial y},
+\qquad
+\frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}
+\]
+
+both integrals vanish, hence
+
+\[
+\int_\Gamma f(z)\,dz = 0.
+\]
+
+\subsection{Extension of Cauchy's Theorem}
+
+\begin{corollary}
+Let $\Gamma_0$ and $\Gamma_1$ be closed simple regular curves with
+
+\[
+\Gamma_1 \subset \text{int}(\Gamma_0)
+\]
+
+If $f$ is holomorphic on the region between them then
+  \[
+\int_{\Gamma_0} f(z)\,dz
+=
+\int_{\Gamma_1} f(z)\,dz
+\]
+
+
+\end{corollary}
+This allows computation of complicated integrals using simpler curves.
+
+\section{Cauchy Integral Formula}
+
+\begin{theorem}
+Let $D \subset \mathbb{C}$ be open and $f : D \to \mathbb{C}$ holomorphic.
+
+Let $\Gamma$ be a closed simple curve inside $D$ oriented clockwise and let $z_0$ lie inside $\Gamma$.
+
+Then
+
+\[
+f(z_0)
+=
+\frac{1}{2\pi i}
+\int_\Gamma
+\frac{f(z)}{z-z_0}dz
+\]
+\end{theorem}
+This formula is particularly useful to compute integrals of the form
+
+\[
+\int_\Gamma \frac{f(z)}{z-z_0}\,dz.
+\]
+\\
+\textbf{Remark:} if the curves is oriented counterclockwise we change the sign as usual.
+
+If more than one $z_0$, we can use this formula if only one $z_0$ is inside $\Gamma$, if yes use this formula by using this $z_0$. 
+
+I.e: 
+\[
+I = \int_{\gamma}^{} \frac{e^z}{(z-1)(z^2 + 4)} dx \quad \gamma = e^{it} \quad t \in [\ 0,2 \pi ]\
+\]
+Here $z_0 = 2i, -2i$ is out of the unit circle, so only do for $z_0 = 1$ \[
+  f(z) = \frac{e^z}{z^2 + 4}
+\]
+\subsection*{Idea of the proof}
+
+Consider a small circle around $z_0$
+
+\[
+\gamma_r(t) = z_0 + re^{it}
+\]
+
+Then
+
+\[
+\int_\Gamma \frac{f(z)}{z-z_0}dz
+=
+\int_{\gamma_r} \frac{f(z)}{z-z_0}dz
+\]
+
+which becomes
+
+\[
+\int_0^{2\pi} f(z_0 + re^{it}) i dt
+\]
+
+As $r \to 0$, continuity of $f$ gives
+
+\[
+2\pi i f(z_0)
+\]
+
+which proves the formula.
+
