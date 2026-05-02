@@ -5,7 +5,7 @@
 When using non linear model we should care about the model complexity, because by using those type of model
  we have added flexibility, that can make the model too complex fot the task at hand. 
 
-\textbf{E.g,} a high degree polynomial is more complex than a low degree one.
+E.g,: a high degree polynomial is more complex than a low degree one.
 
 \subsection{Overfitting vs Underfitting}
 \textbf{Overfitting:} when the error on the test data is larger than the training data. 
@@ -13,22 +13,25 @@ When using non linear model we should care about the model complexity, because b
 \textbf{Underfitting:} when the error is large on $both$ training and test data. 
 
 The general phenomenon look like this:
-
+\begin{center}
+   
 \includegraphics[width=0.5\linewidth]{images/img_20260324_090839.png}
+\end{center}
 
 Thus we want to find the point that minimize the test data error (model selection), without having prior access to the test data. 
 
 To do that we could use \textbf{Cross-validation}.
 
 \subsection{Cross-validation}
-First let's start with an example of a regression problem with 1D input x, 1D output y, 
+First let's start with an example of a regression problem with $1D$ input $x$, $1D$ output $y$, 
 and let's consider 3 different models of increasing complexity:
 
+\begin{center} 
 \includegraphics[width=0.8\linewidth]{images/img_20260324_091416.png}
+\end{center}
 
 Here the best models is the quadratic function, because we have non prior knowledge of the test data (only the same distribution), hence 
 the piecewise linear function will probably work poorly on it (it is an overfitted model as it goes through each point of the training set but it is completely wrong between those points).
-\newpage
 \subsubsection{The validation set method}
 
 \begin{enumerate}
@@ -37,7 +40,6 @@ the piecewise linear function will probably work poorly on it (it is an overfitt
 
 \includegraphics[width=0.3\linewidth]{images/img_20260324_095608.png}
   \item Perform regression on this new training set only
-
 
 \includegraphics[width=0.3\linewidth]{images/img_20260324_100140.png}
   \item Estimate the performance on the test data using the validation set
@@ -96,6 +98,7 @@ Randomly split the dataset into $k$ partitions (e.g., $k = 3$, shown with differ
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102515.png}
 
 \subsubsection{Which kind of cross-validation?}
+
 \includegraphics[width=0.55\linewidth]{images/img_20260324_102656.png}
 
 To resume, cross-validation can help to:
@@ -119,12 +122,19 @@ E(w) = R(w) + \lambda E_w(w)
 \]
 where $R(w)$ is the empirical risk, $E_w(w)$ the regularizer, $\lambda$ is a hyper-parameter that defines the influence of the regularizer ($\lambda > 0$). So know we want not only to 
 minimize the error on the data but to keep the weight as low as possible too. By adding this constraints, it reduces the complexity of overfitted model by making them simpler (the higher the hyperparameter $\lambda$, the stronger is the constraint, i.e., $\lambda = 1'000'000$ force the weights to be almost zero and results on a flat line ($\hat{y} \approx 0$)).
-\subsubsection{Regularized linear regression}
-One of the most common regularizers is the sum of squares
-of the weights (there is a probabilistic motivation behind it) \[
+
+\subsubsection{Example of regularizer}
+\textbf{L1 regularizer : } sum of the absolute values \[
+  E_w(w) = \sum_{j} \left|w^{(j)}\right|
+
+\]
+\textbf{L2 regularizer : } sum of squares
+of the weights\[
   E_w(w) = w^Tw
 \]
-This lets us write regularized linear regression as \[
+
+\subsubsection{Regularized linear regression}
+We use the L2 regularizer, this lets us write regularized linear regression as \[
   min_w \sum_{i=1}^{N}(\phi(x_i)^Tw- y_i)^2 + \lambda w^Tw
 \]
 This remains a convex function (for $\lambda \geq 0$) and so we can still find the solution by zeroing out the gradient. 

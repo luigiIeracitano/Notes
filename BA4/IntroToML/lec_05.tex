@@ -25,7 +25,7 @@ For $classification$ it consists to give to similar data samples the same label,
 \end{enumerate}
 If several labels appear the same number of times among the $k$-NN, one strategy
 consists of taking the one whose samples have the smallest average distance to
-the test sample
+the test sample.
 
 \textbf{Regression:}
 \begin{enumerate}
@@ -52,7 +52,7 @@ So we need: good data representation, a distance function and a given value $k$ 
 To handle some non linear data, we could use a polynomial curve that transform the input and separate our classes. 
 
 And then we can apply a linear model to the resulting variable to find the decision boundary :
-i.e :
+e.g :
 
 \includegraphics[width=0.3\linewidth]{images/img_20260318_163111.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260318_163124.png}
@@ -65,16 +65,17 @@ i.e :
 
 So this consists, of performing a \textbf{change of variable} $x \to \phi (x)$. 
 
-In general for $D-$ dimensional inputs, we can obtain a large $\phi(x)$ 
+In general for $D-$ dimensional inputs, we can obtain a large $\phi(x)$ .
 
 \phi(x) is found by mapping the samples from different classes in two different direction. 
 
-I.e 
+E.g: 
 \[
   class 1: \left|x\right| < 1.2 \quad class 2: \left|x\right| > 2.0 
   
   \text{Then :} x^2 - 1.44 \leq \phi(x) \leq x^2 - 4 
 \]
+
 For class that need a polynomial of degree bigger than 2, what we can do, is to look 
 where we want our gradient to vanish after the application of $\phi(\cdot)$. Then we start with 
 $(\phi(x))'$ and integrate it to find the appropriate $\phi(x)$. 
@@ -117,7 +118,7 @@ y = \begin{pmatrix}
    w^* = (\phi ^T \phi)^{-1}\phi ^T y
  \]
 
- \subsubsection{Mapping to a higher-dimensional sapce}
+ \subsubsection{Mapping to a higher-dimensional space}
  We can observe, that the mapping $\phi(\cdot)$ always increases the dimension of the input. We do this because increasing the dimensionality allows linear models to represent nonlinear relationships, but only if the feature mapping is nonlinear. 
 
  \subsubsection{Feature expansion: Properties}

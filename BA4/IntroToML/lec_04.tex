@@ -48,7 +48,7 @@ But, still two classifiers with the same precision and recall could have a very 
 \end{definition}
 
 \begin{definition}[F1 score]
-Single number that combines precision and recall
+Single number that combines precision and recall (good for unbalance data)
   \[
     F1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall}
   \]
@@ -77,9 +77,10 @@ What if we have more than two classes? How our three linear models can handle th
 \includegraphics[width=\linewidth]{images/img_20260311_222244.png}
 \end{wrapfigure}
 
-
 First let's update our knowledge on decision boundaries, as here we are not anymore treating binary label. \\ 
-The decision boundary between two classes $k$ and $j$ is defined as the set of points \\\textbf{x} such that $\hat{y}^{\left(k\right)}(x) = \hat{y}^{\left(j\right)}(x)$.\\
+The decision boundary between two classes $k$ and $j$ is defined as the set of points  \textbf{x} such that \[
+ \hat{y}^{\left(k\right)}(x) = \hat{y}^{\left(j\right)}(x)
+\]\\
 This corresponds to the $(D - 1)-$dimensional hyperplane. \\
 The decision regions are \textbf{singly-connected and convex} (any point $\hat{x}$ between two points $x_A$ and $x_B$ in the same region (e.g, k) will also be in the same region)
 
@@ -140,7 +141,7 @@ $X$ = data \quad $Y$ = True classes \\ $N$ = number of samples \quad $D$ = numbe
 Then, the solution has the same form as in the regression case (obtained by zeroing out the gradient w.r.t. W), i.e., \[
   W^* = (X^TX)^{-1}X^TY = X^{\dagger}Y
 \]
-$W$ = weight matrix (i.e $W = [W_0, W_1]$, \quad $W_0, W_1 _$ weight classes 0 and 1)
+$W$ = weight matrix (e.g, $W = [W_0, W_1]$, \quad $W_0, W_1 _$ weight classes 0 and 1)
 \subsubsection{Prediction}
 Given the optimal parameters, the prediction for a new sample is computed as \[
   \hat{y} = (W^*)^Tx 
@@ -154,16 +155,17 @@ In other words the final label k is obtained as \[
 \]
 That is, the label is the index (position) of the maximum value in the vector $\hat{y}$
 \\
-I.e: if we have \[
+E.g: if we have \[
   \hat{y} = \begin{pmatrix} \hat{y}^{\left(1\right)} \\ \hat{y}^{\left(2\right)} \\ \hat{y}^{\left(3\right)}\end{pmatrix} = \begin{pmatrix} 2.3 \\ 0.7 \\ -1.5\end{pmatrix}
 \] here the $\operatorname*{argmax}_j$(biggest score) is 2.3, so the label predicted is the label 1.
 \\
 
 (boundary where $\hat{y}_i$ = $\hat{y}_k$ (for 2 different classes))
 Example of success and failure case of 2D inputs and 3 classes least-square classification:
-
+\begin{center}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_222715.png}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_222727.png}
+\end{center}
 
 \subsubsection{Drawbacks}
 As in the binary case, the multi-class least-square classification suffer from outliers, because it tries to minimize the distance (regression). So we need an other model like the logistic regression one but for multi-class: \textbf{Multi-class logistic regression} :O !!
@@ -190,7 +192,7 @@ The gradient descent is the same algorithm as for the muti-outputs binary case, 
 \textbf{Algorithm - gradient descent}
 \begin{itemize}
   \item 1. Initialize $W_0$ (e.g, randomly)
-  \item 2. While not converged \implies  update $ W_k \leftarrow W_{k-1} - \eta \nabla_w R(W_{k-1})$
+  \item 2. While not converged \implies  update $ W_k \leftarrow W_{k-1} - \eta \nabla_W R(W_{k-1})$
 \end{itemize}
 Thus the gradient will also be a matrix 
 
@@ -200,7 +202,7 @@ Thus the gradient will also be a matrix
 
 \subsubsection{Prediction}
 
-At test time, given a new input sample \textbf{x}, the probability/score for any class $k$ is computed via the softmax function as \[
+At test time, given a new input sample \textbf{x}, the probability for any class $k$ is computed via the softmax function as \[
   \hat{y}^{\left(k\right)}(x) = \frac{\exp((w_{\left(k\right)}^*)^Tx)}{\sum_{j=1}^{C}exp((w_{\left(j\right)}^*)^Tx) } 
 \]
 The final class label is then predicted as \[
@@ -214,6 +216,7 @@ index (position) of the maximum value in the vector $\hat{y}$.
 2D inputs, 3 classes: Logistic regresison results \\
 \includegraphics[width=0.4\linewidth]{images/img_20260311_231537.png}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_231544.png}
+
 
 \subsection{Dealing with multiple classes}
 SVM cannot be extended to the multi-class scenario. \\

@@ -23,7 +23,7 @@ We will use a nonlinear function (\textbf{activation function}) $f: \mathbb{R} \
 
 \subsection{Hidden representation}
 
-Let's first define \[
+Let's first apply a linear transformation to the input (pre-activation) \[
   a_{(1)} = W_{(1)}^T \begin{pmatrix}
      1  \\
      x 
@@ -40,7 +40,7 @@ W_{(1)}^{(M,0)} + W_{(1)}^{(M,1)}x
 a_{(1)}^{(M)}
   \end{pmatrix}
 \]
-Then we apply $f$ elementwise to $a_{(1)}$, and it gives our complete $M-$dimensional \textit{hidden represantation} \[
+Then we apply $f$ elementwise to $a_{(1)}$, and it gives our complete $M-$dimensional \textit{hidden representation} (analogous to a learn $\phi(x)$ of the feature expansion)\[
   x \to \begin{pmatrix}
     f(a_{(1)}^{(1)})   \\
   f(a_{(1)}^{(2)}) \\
@@ -81,6 +81,7 @@ called \textit{fully-connected} \begin{itemize}
   \item Each hidden dimension (hidden unit) $z_{(1)}^{(j)}$ depends on all input dimensions $x^{(1)}, ... x^{(D)}$   
   \item Each output dimension $\hat{y}^{(k)}$depends on all hidden units $z_{(1)}^{(1)}, ..., z_{(1)}^{(M)}$
 \end{itemize}
+In short, it means that each output neurons is connected to each input neurons.
 
 \subsubsection{Extension to multi-dimensional input and output}
 The formulation above assumed $x \in \mathbb{R}$ and $\hat{y} \in \mathbb{R}$. 
@@ -137,7 +138,7 @@ We can write the prediction as a function of all parameters $W = \{W_{(l)}\}$:
 \[
   \hat{y} = W_{(L)}^T f\left(W_{(L-1)}^T f\left(W_{(L-2)}^T f\left(\cdots f\left(W_{(1)}^T x\right)\cdots\right)\right)\right) = \hat{y}(W)
 \]
-As we have seen with the $1$D example, because we use a matrix-vector product at each layer, the layers are called 
+As we have seen with the $1D$ example, because we use a matrix-vector product at each layer, the layers are called 
 \textbf{fully-connected}: each hidden unit $z_{(l)}^{(j)}$ depends on all units 
 of the previous layer.
 
@@ -202,13 +203,23 @@ This gives us a way to compute the gradient at any layer, starting from the last
     where $z_{l-1}$ has been computed during the forward pass.
 \end{enumerate}
 
+\\
+So the training consists of repeating this until convergence: 
+\begin{enumerate}
+  \item \textbf{Forward pass : } propagate $x_i$ through each layer to compute and $z_{(l)}$ 
+  \item \textbf{Backpropagation : } compute each $\delta_{(l)}$, starting from the last layer, and gives us the gradient $\frac{\partial \ell_i}{\partial W_{(l)}^{(k,j)}}$ 
+  \item \textbf{Gradient descent : } use those gradients to update the weights $W_i$
+\end{enumerate}
+
 \subsection{Optimization}
 \subsubsection{Gradient descent and SGD}
 The standard gradient descent update at iteration $k$:
 \[
   W_k \leftarrow W_{k-1} - \eta \frac{1}{N}\sum_{i=1}^{N} \nabla_W \ell_i(W_{k-1})
 \]
-This is expensive for large $N$. \textbf{Stochastic gradient descent (SGD)} 
+This is expensive for large $N$. 
+
+\textbf{Stochastic gradient descent (SGD)} 
 uses a single sample per iteration:
 \[
   W_k \leftarrow W_{k-1} - \eta \nabla \ell_{i(k)}(W_{k-1})

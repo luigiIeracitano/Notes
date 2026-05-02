@@ -72,12 +72,10 @@ What (classes of) algorithms ?
   \item Assumption: they are both drawn from the same statistical distribution. E.g., digit recognition: A model trained on MNIST will work poorly on Street
 View House Numbers
 \end{itemize}
-\begin{figure}[htpb]
-  \centering
+\begin{center}
   \includegraphics[width=\linewidth]{images/img_20260217_113405.png}
-  \caption{Same distribution assumption}
-  \label{fig: distrib}
-\end{figure}
+\end{center}
+
 
 \newpage
 
@@ -94,8 +92,10 @@ $y_i$ :
   \item for regression, it can be a single continuous value, or a column vector of dim C.
 \end{itemize}
 
-Example:\\
+Example:
+\begin{center}
 \includegraphics[width=0.5\linewidth]{images/img_20260217_114947.png}\\ 
+\end{center}
 Here, $x_i$ is one 2D point and thus D = 2, $y_i$ is a discrete value indicating the class (color), i.e, 1, 2 or 3.
 
 \section{Linear Regression}
@@ -104,25 +104,26 @@ Here, $x_i$ is one 2D point and thus D = 2, $y_i$ is a discrete value indicating
 Given $N$ annotated data samples {($x_i,y_i$)} with measurements, we can plot the data, and we will approximate it with a line. Our goal is to find the line that bests fits these measurements \textrightarrow linear regression.
 It consists of finding the best line parameters $w^{\left(0\right)*}$ and $w^{\left(1\right)*}$ for some given data.\\ 
 This corresponds to the training stage: \\
-Given $N$ training pairs { $\left(x_i, y_i\right)$ } , we aim to find $\left(w^{\left(0\right)}, w^{\left(1\right)}\right)$, s.t the predictions of the model 
+Given $N$ training pairs {$\left(x_i, y_i\right)$}, we aim to find $\left(w^{\left(0\right)}, w^{\left(1\right)}\right)$, s.t the predictions of the model 
 \[\hat{y_i} = w^{\left(0\right)} + w^{\left(1\right)}x_i\] are close to the true values $y_i$.
 
 The mesure of closeness/error between $y_i$ and $\hat{y_i}$ is represented by the Euclidean distance: \\ 
 \[d\left(\hat{y_i},y_i\right) = \sqrt{\left(\hat{y_i} - y_i\right)^2}\]
-
+\begin{center}
 \includegraphics[width=0.6\linewidth]{images/img_20260217_173521.png}
+\end{center}
 
 $\hat{y_i} - y_i$ : often reffered to as the \textit{residual}\\ 
 
-In practice, one often prefers using the squared Euclidian distance 
+In practice, one often prefers using the squared Euclidian distance:
 \[d^2\left(\hat{y_i}, y_i\right) = \left(\hat{y_i} - y_i\right)^2\]
 
-Training can then be expressed as the least-squared minization problem 
+Training can then be expressed as the least-squared minization problem:
 \[ min_{w^{\left(0\right)}, w^{\left(1\right)}} \frac{1}{N} \sum_{i= 1}^{N} d^2{\left(\hat{y_i},y_i\right)} \]
 
 \subsection{Prediction}%
 \label{sub:Prediction}
-Once the best line for the given \textit{N} observations is found, we can use it to predict a y value for a new x.\\
+Once the best line for the given \textit{N} observations is found, we can use it to predict a $y$ value for a new $x$.\\
 Let $w^{\left(0\right)*}$ and $w^{\left(1\right)*}$ be the best line parameters given the observations. \\ 
 Then 
 \[\hat{y} = w^{\left(0\right)*} + w^{\left(1\right)*}x\] is the estimate value of y for any x.

@@ -60,11 +60,11 @@ $Visualization$:
 
 2D inputs, one sample $x_j = \[5,3\]^T$, and vary $x_i$
 
-
-\includegraphics[width=0.33\linewidth]{images/img_20260402_135010.png}
-\includegraphics[width=0.33\linewidth]{images/img_20260402_135030.png}
-\includegraphics[width=0.33\linewidth]{images/img_20260402_135046.png}
-
+\begin{center}
+\includegraphics[width=0.25\linewidth]{images/img_20260402_135010.png}
+\includegraphics[width=0.25\linewidth]{images/img_20260402_135030.png}
+\includegraphics[width=0.25\linewidth]{images/img_20260402_135046.png}  
+\end{center}
 \subsubsection{Trick}
 Since a kernel function corresponds to a similarity, as a dot
 product, one can replace any dot product between two
@@ -76,7 +76,7 @@ The kernel function computes a similarity between two samples, and can be writte
 
 We could to use the kernel function to encode the similarity between one sample and all traning samples (matrix $X$): 
 \[
-  k(X, x_i) = \begin{pmatrix} k(x_1, x_j) \\ k(x_2, x_j) \\ \vdots \\ k(x_N, x_j)    
+  k(X, x_i) = \begin{pmatrix} k(x_1, x_i) \\ k(x_2, x_i) \\ \vdots \\ k(x_N, x_i)    
   \end{pmatrix} \in \mathbb{R}^N
 \]
 
@@ -102,7 +102,7 @@ To kernelize linear regression we need to rewrite the solution so that $\phi(\cd
 In essence, this theorem states that the minimizer of a
 regularized empirical risk function can be represented as a
 linear combination of the points in the high dimensional
-space.That is, we can write
+space. That is, we can write
 \[
   w^* = \sum_{i=1}^{N}\alpha_i^* \phi(x_i) = \Phi^T \alpha^*
 \]
@@ -162,11 +162,11 @@ empirical risk
 \[
   E(W) = \sum_{i=1}^{N} \left\|W^T \phi(x_i) - y_i\right\|^2 + \lambda \left\|W\right\|_F^2
 \]
-And by using the Representer theorem, we can again derive a solution that depend on kernel values $k(x_i, x_j$ instead of $\phi(\cdot)$. 
+And by using the Representer theorem, we can again derive a solution that depend on kernel values $k(x_i, x_j)$ instead of $\phi(\cdot)$. 
 
 The solution is given by \[
   W^* = \Phi ^T (K + \lambda I)^{-1} Y 
-\]where \Phi is the same matrix concatenating the training inputs $\{ \phi(x_i) \}$, and $Y \in \mathbb{R}^{N \times C}$ is the matrix stacking the training output vectors. 
+\]where $\Phi$ is the same matrix concatenating the training inputs $\{ \phi(x_i) \}$, and $Y \in \mathbb{R}^{N \times C}$ is the matrix stacking the training output vectors. 
 
 The prediction vector for a test sample is given as \[
   \hat{y} = (W^*)^T \phi(x) = Y^T (K + \lambda I)^{-1} \Phi \phi(x) = Y^T (K + \lambda I)^{-1} k(X,x)

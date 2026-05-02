@@ -135,8 +135,26 @@ For each attribute:
 \item Smooth the data by taking the bin means or medians
 \end{enumerate}
 
-\includegraphics[width=0.5\linewidth]{images/img_20260414_004200.png}
-
+E.g:
+\begin{itemize}
+  \item \textbf{Data :} 0, 4, 12, 16, 16, 16, 18, 24, 26, 28 
+  \item \textbf{Equal width}
+  \begin{itemize}
+    \item[] \begin{tabular}{l@{\hspace{2cm}}l}
+      Bin 1: 0, 4          & $[-\infty, 10)$ \\
+      Bin 2: 12, 16, 16, 18 & $[10, 20)$ \\
+      Bin 3: 24, 26, 28    & $[20, +\infty)$ \\
+    \end{tabular}
+  \end{itemize}
+  \item \textbf{Equal frequency}
+  \begin{itemize}
+    \item[] \begin{tabular}{l@{\hspace{2cm}}l}
+      Bin 1: 0, 4, 12      & $[-\infty, 10)$ \\
+      Bin 2: 16, 16, 18    & $[14, 21]$ \\
+      Bin 3: 24, 26, 28    & $[21, +\infty)$ \\
+    \end{tabular}
+  \end{itemize}
+\end{itemize}
 \item Clustering : Detect outliers as the clusters with too few elements and remove these
 samples
 
@@ -150,7 +168,7 @@ within a specified range.
 \subsubsection{Min-max normalization}
 For each feature dimension $d$, compute the normalized feature
 \[
-  \tilde{x}_i^{(d)} = \frac{x_i^{(d)} - x_{min}^{(d)}}{x_{max}^{(d)} - x_{max}^{(d)}}
+  \tilde{x}_i^{(d)} = \frac{x_i^{(d)} - x_{min}^{(d)}}{x_{max}^{(d)} - x_{min}^{(d)}}
 \]
 where $x_{min}^{(d)} = \min_{i=1}^N x_i^{(d)}$ and $x_{max}^{(d)} = \max_{i=1}^N x_i^{(d)}$
 
@@ -202,15 +220,17 @@ Two type of imbalance :
   \item Within-class imbalance : bad spatial repartition of the samples inside a class
 \end{itemize}
 
+\begin{center}
 \includegraphics[width=0.5\linewidth]{images/img_20260414_011401.png}
-\includegraphics[width=0.5\linewidth]{images/img_20260414_011415.png}
+\includegraphics[width=0.2125\linewidth]{images/img_20260430_182033.png}
+\end{center}
 
 \subsubsection{Learning with imbalanced data}
 Two main approaches: 
 \begin{itemize}
   \item One that act on the data: Sampling Methods 
   \item One that act on the cost function: Cost-Sensitive Methods
-\end{itemize}em
+\end{itemize}
 
 \subsubsection{Sampling Methods}
 Two ways to compensate the lack of data:
@@ -231,8 +251,10 @@ More clever undersampling:
 \begin{itemize}
   \item Remove the redundant samples 
   \item Good if the class to undersample is densely populated (e.g., lowdimensional representation because of the curse of dimensionality)
-
+\begin{center}  
 \includegraphics[width=0.4\linewidth]{images/img_20260414_012315.png}
+\end{center}
+
 \end{itemize}
 \subsubsection{Increase the data: Oversampling}
 Naive (random) oversampling: \begin{itemize}
@@ -245,8 +267,10 @@ More clever oversampling:  \begin{itemize}
   \item Create new data samples based on neighboring existing ones 
   \item This may create noisy samples
 
-
+\begin{center} 
 \includegraphics[width=0.45\linewidth]{images/img_20260414_012533.png}
+\end{center}
+
 \end{itemize}
 
 \subsubsection{Empirical risk}

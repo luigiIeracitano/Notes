@@ -6,12 +6,17 @@
 \begin{definition}[Loss function]
   The loss function (general ML concept) : $l(\hat{y_i}, yi)$ computes an error value between the prediction and the true value.
 \end{definition}
+In general we use the empirical risk (the mean of the loss on the training or test data) \[
+  \hat{R}(w) = \frac{1}{N_t}\sum_{i=1}^{N_t}\mathcal{L}(y_i, \hat{y}_i) 
+\] with a different loss function $\mathcal{L}(y_i, \hat{y}_i)$.
 
 \subsection{Logistic regression}
 
-The idea of the logistic regression is that first we compute $y = w^Tx$ and then we apply the sigmoid on y written $\sigma(y)$, to establish a probability $p(y=1|x)$. Then the decision boundary is obtained when the probability equals \left(0.5\right).
+The idea of the logistic regression is that first we compute $y = w^Tx$ and then we apply the sigmoid on $y$ written $\sigma(y)$, to establish a probability $p(y=1|x)$. Then the decision boundary is obtained when the probability equals \left(0.5\right).
 \\
-\textbf{Logistic function}: $f(a) = \frac{1}{1 + exp(-a)}$ 
+\textbf{Logistic function}: \[
+  f(a) = \frac{1}{1 + exp(-a)}
+\]
 \\
 Applying it to the output of a linear model gives a prediction:
 \[
@@ -27,7 +32,7 @@ This is a smooth approximation of the step function (avoid the gradient that is 
   \includegraphics[width=\linewidth]{images/img_20260304_192441.png}\\
 \end{wrapfigure}
 
-Then the data fit much better even with the presence of outliers
+Then the data fit much better even with the presence of outliers.
 
 In the binary case, with $D$ dimensional inputs, we can write the prediction of the model (logistic regression) as
 \[
@@ -83,12 +88,13 @@ As in practice we have more than one parameter (i.e \textbf{w} $\in \mathbb{R}^{
   \end{pmatrix}
   \in \mathbb{R}^D
 \]
-Recap : the gradient at a point w has the direction of the greatest increase of the function at w and its magnitude is the rate of increase in that direction. \\
+Recap : the gradient at a point $w$ has the direction of the greatest increase of the function at $w$ and its magnitude is the rate of increase in that direction. \\
 So to decrease the function we therefore move in the direction opposite to the gradient. 
 \\
 \textbf{Gradient descent} is used to find the $argmin$ of a function, i.e., we want to find the values of parameters $x$ such that a function $f$ is minimized : \[
   x^* = \operatorname*{argmin}_xf(x)
 \]
+\newpage
 \textbf{Algorithm - gradient descent}
 \begin{itemize}
   \item 1. Initialize $w_0$ (e.g, randomly)

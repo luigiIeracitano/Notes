@@ -24,7 +24,7 @@ x_i =\begin{pmatrix} 1 \\ x_i \end{pmatrix} \in \mathbb{R}^2 \qquad w = \begin{p
 \end{wrapfigure}
 
 Here instead of a line, we can define a plane. \\ 
-Expressed 
+Expressed
 \[
   y = w^{\left(0\right)} + w^{\left(1\right)}x^{\left(1\right)} + w^{\left(2\right)}x^{\left(2\right)} = w^T \begin{pmatrix} 1 \\ x^{\left(1\right)} \\ x^{\left(2\right)}\end{pmatrix}
 \]
@@ -37,7 +37,6 @@ In dimension D we can write
 y = w^{\left(0\right)} + w^{\left(1\right)}x^{\left(1\right)} + w^{\left(2\right)}x^{\left(2\right)} + \ldots +  w^{\left(D\right)}x^{\left(D\right)}  = w^T \begin{pmatrix} 1 \\ x^{\left(1\right)} \\ x^{\left(2\right)} \\ \vdots \\x^{\left(D\right)} \end{pmatrix}
 \]
 Whatever the dimension, we can write 
-
 \[
   y = w^Tx \quad x \in \mathbb{R}^{D+1}
 \] , where the extra dimesion contains a 1 to account for $w^{\left(0\right)}$\\
@@ -60,7 +59,7 @@ With our least-square formulation, we seek to minimize
 \[
   R(w) = \frac{1}{N}\sum_{i=1}^{N}(x_i^Tw - y_i)^2  
 \]
-This is a convex function of \textbf{w}, which means that we search for parameters \textbf{$w^*$} s.t
+This is a convex function of $w$, which means that we search for parameters \textbf{$w^*$} s.t
 \[
  \nabla_w R(w^*) = 0 
 \]   
@@ -84,7 +83,7 @@ Let us start by computing the gradient $\nabla_w R(w)$ \\
 
 \textbf{Hint 3:} To compute the gradient of g(w), you can make use of the following general vector derivative rule:
 \begin{itemize}
-  \item Given 2 vectors (a,b) in $\mathbb{R}^D$
+  \item Given 2 vectors $(a,b)$ in $\mathbb{R}^D$
     \[
     \nabla_b(a^Tb) = a
     \]
@@ -104,11 +103,11 @@ This means
 \[
   (\sum_{i=1}^{N}x_ix_i^T)w^* = \sum_{i=1}^{N}x_iy_i
 \]
-$(D+1) \times (D+1)$ matrix * $(D+1) \times 1$ vector = $(D+1) \times 1$ vector
+$(D+1) \times (D+1)$ matrix $\cdot $ $(D+1) \times 1$ vector = $(D+1) \times 1$ vector
 
 Let us now group all ${x_i}$ and all ${y_i}$ in a matrix and a vector
 \[
-x = \begin{pmatrix} x_1^T \\ x_2^T \\ \vdots \\ x_N^T \end{pmatrix} = \begin{pmatrix} 1 & x_1^{(1)}& x_1^{(2)}& \dots & x_1^{(D)} \\ 1 & x_2^{(1)}& x_2^{(2)}& \dots & x_2^{(D)} \\ \vdots & \vdots & \vdots & \vdots & \vdots \\ 1 & x_N^{(1)}& x_N^{(2)}& \dots & x_N^{(D)}\end{pmatrix} \in \mathbb{R}^{N \times (D+1)}
+X = \begin{pmatrix} x_1^T \\ x_2^T \\ \vdots \\ x_N^T \end{pmatrix} = \begin{pmatrix} 1 & x_1^{(1)}& x_1^{(2)}& \dots & x_1^{(D)} \\ 1 & x_2^{(1)}& x_2^{(2)}& \dots & x_2^{(D)} \\ \vdots & \vdots & \vdots & \vdots & \vdots \\ 1 & x_N^{(1)}& x_N^{(2)}& \dots & x_N^{(D)}\end{pmatrix} \in \mathbb{R}^{N \times (D+1)}
 \]
 \[
   y = \begin{pmatrix} y_1 \\ y_2 \\ \vdots \\ y_N\end{pmatrix} \in \mathbb{R}^N
@@ -157,21 +156,10 @@ where $\hat{y_i}$ is the prediction for the test sample i and $y_i$ the correspo
   MAPE = \frac{1}{N_t}\sum_{i=1}^{N_t}\left|\frac{\hat{y_i} - y_i}{y_i}\right| 
 \]
 
-Example, UCI Wine Quality dataset, predict the quality of wine based on several attributes\\
-
-\includegraphics[width=\linewidth]{images/img_20260224_211627.png}
-Here the final RMSE is 0.65 for the training data and 0.63 for the test data \\
-
-\begin{wrapfigure}{r}{0.2\linewidth}
-  \includegraphics[width=\linewidth]{images/img_20260224_231831.png}
-\end{wrapfigure}
-One can the look at the coefficient values {$w^{(i)}$} to see the influence of each attribute\\
-Warning: The magnitude of a coefficient will depend on the magnitude of the corresponding feature/attribute (A coefficient might be very small simply to compensate for the fact that the range of the feature is very large)
-
 \subsection{Linear regression with multiple output dimensions}
-Example of multiple output: human pose estimation
-\subsection{Model}
-The linear model has to be modified to output multiple values (not a vector w anymore because $w^Tx_i$ output a single value) \\
+Example of multiple output: human pose estimation.
+\subsubsection{Model}
+The linear model has to be modified to output multiple values (not a vector $w$ anymore because $w^Tx_i$ output a single value) \\
 So we use a matrix \textbf{W} $\in \mathbb{R}^{(D+1)\times C}$ s.t 
 \[
   \hat{y_i} = W^Tx_i = \begin{pmatrix} w_{(1)}^T \\ w_{(2)}^T \\ \vdots \\ w_{(C)}^T \end{pmatrix}x_i
@@ -179,9 +167,9 @@ So we use a matrix \textbf{W} $\in \mathbb{R}^{(D+1)\times C}$ s.t
 where each $w_{(j)}$ is a $(D+1)$-dimensional vector, used to predict one output dimension. \\
 The multi-output linear regression is written
 \[
-  min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
+  R(W) = min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
 \]
-where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here a $\in \mathbb{R}^C$)\\
+where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here $a \in \mathbb{R}^C$).\\
 
 To compute the gradient of this function, we make use of the following properties: \\
 1. Norm and derivative:
@@ -214,7 +202,7 @@ Then, following the same strategy as before, we have
 \[
 W^* = (X^T X)^{-1}X^T Y = X^\dagger Y
 \]
-
+\newpage
 \section{Linear classification}
 To predict one discrete label for a given sample e.g., binary classification or movies (like vs not), multi-class image recognition. \\
 Classification can be tackle as a regression task (given a threshold we can classify the output in categories).\\
@@ -229,9 +217,9 @@ E.g. Classify a tumor as benign vs malignant
 To fit the linear model to training data, the same strategy as
 for linear regression can be used:
 \begin{itemize}
-  \item Given N pairs {$(x_i, y_i)$} , we can use the least-square loss to write
+  \item Given $N$ pairs {$(x_i, y_i)$}, we can use the least-square loss to write
     \[
-      min_w \sum_{i=1}^{N}(x_i^Tw - y_i)^2  
+      R(w) = min_w \sum_{i=1}^{N}(x_i^Tw - y_i)^2  
     \]
 \end{itemize}
 So because the formulation is the same, the solution too
