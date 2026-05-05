@@ -142,6 +142,7 @@ As we have seen with the $1D$ example, because we use a matrix-vector product at
 \textbf{fully-connected}: each hidden unit $z_{(l)}^{(j)}$ depends on all units 
 of the previous layer.
 
+\vspace{-10pt}
 \subsubsection{Universal approximation}
 Any continuous function can be approximated by a linear combination of 
 translated and scaled activation functions. This holds for ReLU and other 
@@ -192,7 +193,7 @@ For earlier layers $l < L$, $\delta_{(l)}$ is computed from $\{\delta_{(l+1)}^{(
 $W_{(l+1)}$, and $f'$. 
 
 In other words, given $\delta_{(l + 1)}$, we can compute $\delta_{(l)}$. So because we can explicitly compute $\delta_{(L)}$ for the last layer, we can in turn compute any $\delta_{(l)}$.
-
+\newpage
 This gives us a way to compute the gradient at any layer, starting from the last one and it's called the \textbf{backpropagation} algorithm:
 \begin{enumerate}
   \item Propagate $x_i$ forward through the network and at each layer compute and store $z_{(1)}, \dots, z_{(L-1)}$

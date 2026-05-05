@@ -1,10 +1,9 @@
 %! TeX root = master.tex
 % !TEX program = lualatex
 
-\lecture{1}{2026-02-17}{Introduction}{}
 \chapter{Introduction}%
-\label{cha:hop la}
 
+\lecture{1}{2026-02-17}{Introduction}{}
 \section{What is Machine Learning ?}
 Machine learning = Data \textrightarrow Algorithms \textrightarrow Insight
 \subsection{Data}%
@@ -76,10 +75,9 @@ View House Numbers
   \includegraphics[width=\linewidth]{images/img_20260217_113405.png}
 \end{center}
 
-
 \newpage
 
-\chapter{Supervised Linear Model}%k
+\chapter{Supervised Learning}%k
 \label{cha:Supervised Linear Model}
 \section{Notation}
 We denote the $i^{th}$ data sample (input) in the collection of $N$ samples as 
@@ -107,8 +105,8 @@ This corresponds to the training stage: \\
 Given $N$ training pairs {$\left(x_i, y_i\right)$}, we aim to find $\left(w^{\left(0\right)}, w^{\left(1\right)}\right)$, s.t the predictions of the model 
 \[\hat{y_i} = w^{\left(0\right)} + w^{\left(1\right)}x_i\] are close to the true values $y_i$.
 
-The mesure of closeness/error between $y_i$ and $\hat{y_i}$ is represented by the Euclidean distance: \\ 
-\[d\left(\hat{y_i},y_i\right) = \sqrt{\left(\hat{y_i} - y_i\right)^2}\]
+The mesure of closeness/error (loss function) between $y_i$ and $\hat{y_i}$ is represented by the Euclidean distance: \\ 
+\[d\left(\hat{y_i},y_i\right) = \sqrt{\left(\hat{y_i} - y_i\right)^2}\].
 \begin{center}
 \includegraphics[width=0.6\linewidth]{images/img_20260217_173521.png}
 \end{center}
@@ -118,8 +116,8 @@ $\hat{y_i} - y_i$ : often reffered to as the \textit{residual}\\
 In practice, one often prefers using the squared Euclidian distance:
 \[d^2\left(\hat{y_i}, y_i\right) = \left(\hat{y_i} - y_i\right)^2\]
 
-Training can then be expressed as the least-squared minization problem:
-\[ min_{w^{\left(0\right)}, w^{\left(1\right)}} \frac{1}{N} \sum_{i= 1}^{N} d^2{\left(\hat{y_i},y_i\right)} \]
+Training can then be expressed as the least-squared minimization problem:
+\[ R(w) = min_{w^{\left(0\right)}, w^{\left(1\right)}} \frac{1}{N} \sum_{i= 1}^{N} d^2{\left(\hat{y_i},y_i\right)} \]
 
 \subsection{Prediction}%
 \label{sub:Prediction}
