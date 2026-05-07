@@ -1,9 +1,7 @@
 %! TeX root = master.tex
 % !TEX program = lualatex
-
-\chapter{Unsupervised Learning}
-
 \lecture{11}{05-05-2026}{Dimensionality Reduction}{}
+\chapter{Unsupervised Learning}
 
 \section{From supervised to unsupervised learning}
 Until now, we have focused on \textbf{supervised learning}, which proceeds in two stages:
@@ -18,6 +16,18 @@ to \emph{understand} the data rather than predict something about it.
 This motivates \textbf{unsupervised learning}, where the goal is no longer prediction but
 rather to \textbf{transform the data} for further analysis. There is no ``training/testing''
 split: a single algorithm produces a transformed version of the input data.
+
+\section{Recall from Linear Algebra}
+First let's recall some important notions from linear algebra. 
+
+\textbf{Rank:} number of lines (or columns) lineary independent. Intuitively: how many "truly different" directions are encoded in the matrix. 
+So for a matrix $\mathbb{R}^{N \times D}$, the rank is at most $\min(N,D)$.
+
+\textbf{Eigenvector and eigenvalues:} \[
+  Av = \lambda v
+\]with $v$ an eigenvector and $\lambda$ the associate eigenvalue.
+
+Geometrical intuition: an eigenvector is a direction that remains the same after the application of the transformation $A$, it is only stretched or compressed by a factor $\lambda$. 
 
 \section{Dimensionality reduction}
 \textbf{Dimensionality reduction (DR)} is our first unsupervised learning task. It is useful for
@@ -98,10 +108,8 @@ since the data is centered by construction. The variance after projection then b
   \[
     = \frac{1}{N} \sum_{i=1}^{N}w_{(1)}^T (x_i - \bar{x})(x_i - \bar{x})^T w_{(1)}
 = w_{(1)}^T \underbrace{\biggl( \frac{1}{N} \sum_{i=1}^{N} (x_i - \bar{x})(x_i - \bar{x})^T \biggr)}_{C} w_{(1)}
-= w_{(1)}^T C w_{(1)},
-
-  \]
-where $C \in \mathbb{R}^{D \times D}$ is the \textbf{input data covariance matrix}.
+= w_{(1)}^T C w_{(1)}
+\], where $C \in \mathbb{R}^{D \times D}$ is the \textbf{input data covariance matrix}.
 
 \subsubsection{Constrained optimization via Lagrangian}
 We seek to solve
@@ -124,12 +132,12 @@ constraint gives
 \[
 w_{(1)}^T C w_{(1)} = \lambda_1 w_{(1)}^T w_{(1)} = \lambda_1.
 \]
-The left-hand side is exactly the variance of the projected data. Since we want to
+The left-hand side is exactly the variance of the projected data ($\lambda_i$ = variance in the direction of $w_{(i)}$). Since we want to
 \emph{maximize} it, we should choose $w_{(1)}$ to be the eigenvector corresponding to the
 \textbf{largest eigenvalue} of $C$.
 
 \subsubsection{From 1D to $d$-dimensional projections}
-For $d > 1$ output dimensions, we proceed \textbf{recursively}:
+For $d > 1$ output dimensions, we proceed recursively:
 \begin{itemize}
   \item $w_{(2)}$ is the eigenvector of $C$ with the second largest eigenvalue.
   \item $w_{(3)}$ is the third one, and so on.
@@ -139,9 +147,13 @@ The projection matrix is obtained by concatenating these eigenvectors as columns
 W = \bigl[\, w_{(1)} \;\; w_{(2)} \;\; \cdots \;\; w_{(d)} \,\bigr] \in \mathbb{R}^{D \times d}.
 \]
 This automatically satisfies the constraint $W^T W = I_d$, since the eigenvectors of a
-(symmetric) matrix are orthogonal and of unit norm.
-
-
+(symmetric) matrix are orthogonal and of unit norm.  The projected data $y_i = W^T(x_i - \bar{x}) \in \mathbb{R}^d$
+has covariance matrix
+\[
+\frac{1}{N}\sum_{i=1}^N y_i y_i^T = W^T C W = W^T W \Lambda W^T W = \Lambda,
+\]
+where $\Lambda \in \mathbb{R}^{d \times d}$ is diagonal with $\Lambda_{ii} = \lambda_i$ for $i \leq d$.
+Since $\Lambda$ is diagonal, the projected dimensions are uncorrelated.
 \subsubsection{Choosing the dimension $d$}
 Several options exist:
 \begin{itemize}
@@ -152,9 +164,8 @@ Several options exist:
      \includegraphics[width=0.7\linewidth]{images/img_20260505_184656.png}
   \end{center}
   
-  \item \textbf{Keep all eigenvectors with non-zero eigenvalues}: the data is then truly
-        low-dimensional (e.g., when fewer samples than dimensions: $N < D$), and the resulting $\{y_i\}$ have $d < D$
-        with no loss of information. 
+  \item \textbf{Keep all eigenvectors with non-zero eigenvalues}: (remove direction that gives no information (variance)),
+  the resulting $\{y_i\}$ have $d = rank(C) \leq D$ with no loss of information. If we have $N < D$ then $d = rank(C) \leq \min(N-1, D)$. ($N - 1$ because we lose one degree of liberty to center the data).
 
   \begin{center}
      \includegraphics[width=0.7\linewidth]{images/img_20260505_185111.png}
@@ -186,15 +197,6 @@ onto a $d$-dimensional subspace yields a smaller reconstruction error than PCA -
 the loss incurred by truncation is the smallest possible at that dimension.
 
 \end{itemize}
-
-\textbf{Remark:}
-The maximum dimensionality obtained after PCA is
-\[
-d_{\max} = \min(N - 1, D),
-\]
-where $N$ is the number of samples and $D$ is the dimension of the original space.
-The $-1$ comes from the fact that we subtract the mean to center the data, which 
-costs one degree of freedom.
 
 \subsubsection{PCA as a continuous mapping}
 PCA does not only compress the data: it also defines a \textbf{continuous mapping back} from
