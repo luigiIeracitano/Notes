@@ -1,14 +1,9 @@
 % !TEX root = master.tex
-% !TEX program = lualatex
+% !TEX program = lualate:
+
 \lecture{5}{19-03-2026}{Singularities}{}
 
-\begin{remark}
-The Laurent series of a function is unique. Hence, if we compute a power series expansion for $f$ (e.g. from a known expansion), we have determined its Laurent series.
-\end{remark}
-
-\begin{parag}{Example}
-  
-
+\paragraph{Example}
 We know:
 \[
 \frac{1}{1-z} = \sum_{n=0}^{\infty} z^n, \quad |z|<1
@@ -32,9 +27,7 @@ c_k =
 \end{cases}
 \]
 
-\end{parag}
-
-\begin{parag}{Example: Laurent expansion around $z_0$}
+\paragraph{Example: Laurent expansion around $z_0$}
 
 Let $f: \mathbb{C} \setminus \{0, -1 \} \to \mathbb{C}$
 \[
@@ -44,28 +37,25 @@ f(z) = \frac{1}{z(z+1)}
 We study the Laurent expansion at $z_0$.
 
 \textbf{Case 1: $z_0 = 0$}
-
 \[
 f(z) = \frac{1}{z} - \frac{1}{z+1}
 \]
-
 We expand:
 \[
 \frac{1}{z+1} = \sum_{n=0}^{\infty} (-1)^n z^n, \quad |z|<1
 \]
-
 Thus:
 \[
 f(z) = \frac{1}{z} - \sum_{n=0}^{\infty} (-1)^n z^n
 = \sum_{n=-1}^{\infty} (-1)^{n+1} z^n
 \]
-
 Radius of convergence:
 \[
 R = 1
 \]
 as the nearest singularity is at $z = -1$
 (distance of $z_0$ to the next distinct singular point of $f$)
+
 \textbf{Case 2: $z_0 = -1$}
 
 \[
@@ -97,8 +87,6 @@ Radius:
 R = \min\{|z_0|, |z_0 + 1|\}
 \]
 
-\end{parag}
-
 \section{Types of Singularities}
 
 \subsection{Regular Point}
@@ -117,7 +105,7 @@ $z_0$ is a regular point $\iff lim_{z \to z_0} f(z)$ exists
 \[
 f(z) = e^z = \sum_{n=0}^{\infty} \frac{z^n}{n!}
 \]
-$z=0$ is a regular point (no terms of the form $z^{-1}, z^{-2}, \dots$ ($n < 0$))
+$z_0=0$ is a regular point (no terms of the form $z^{-1}, z^{-2}, \dots$ ($n < 0$))
 \end{example}
 
 \subsection{Pole}
@@ -143,7 +131,7 @@ pole of order 2 at $z=-2$, pole of order 1 at $z=0$.
 \begin{remark}
 $f$ has a pole of order $m$ at $z_0$ $\iff$ $\lim_{z \to z_0} (z-z_0)^m f(z)$
 
-exist and is not zero.
+exists and is not zero.
 \end{remark}
 In particular if $f$ has a pole of order $m$ at $z_0$ we can write \[
   f(z) = \frac{g(z)}{(z-z_0)^m}
@@ -183,17 +171,17 @@ if $b_0 \neq 0$ so $q(z_0) \neq 0$. We have \[
   \lim_{z \to z_0}\frac{p(z)}{q(z)} = \frac{p(z_0)}{q(z_0)} = \frac{a_0}{b_0} \quad \text{exists, so } z_0 \text{ is a regular point for } \frac{p}{q}
 \] 
 
-if $a_0 = b_0$ but $b_1 \neq 0$ then we have \[
+if $a_0 = b_0 = 0$ but $b_1 \neq 0$ then we have \[
   \lim_{z \to z_0} \frac{a_1(z - z_0) + a_2(z-z_0)^2 + \dots}{b_1(z-z_0) + b_2(z-z_0)^2 + \dots} = \lim_{z \to z_0} \frac{a_1 + a_2(z-z_0) + \dots}{b_1 + b_2(z-z_0) + \dots} = \frac{a_1}{b_1}
 \]exists hence $z_0$ is a regular point for $f$. (similarly if $a_0 = b_0 = 0$ and $a_1 = b_1 = 0$ yet $b_2 \neq  0$) 
 
-In summary, either expand in power series and take out as many common powers of $z-z_o$ from the nominator and denominator, and take the \textbf{limit} or us \textbf{l'Hôpital's rule}
+In summary, either expand in power series and take out as many common powers of $z-z_0$ from the nominator and denominator, and take the \textbf{limit} or use \textbf{l'Hôpital's rule}:
 
 \begin{itemize}
-\item If $k \ge \ell$: regular point, as the limit = \begin{cases}
+\item If $k \ge \ell$: regular point, as the limit $= \begin{cases}
     0 & \text{if } k>\ell \\
-    $\frac{a_k}{b_\ell}$ & \text{if } k=\ell
-\end{cases} exists
+    \frac{a_k}{b_\ell} & \text{if } k=\ell
+  \end{cases}$ exists 
 \item If $k < \ell$: pole of order $\ell - k$
 \end{itemize}
 

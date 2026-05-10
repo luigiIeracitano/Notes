@@ -1,9 +1,10 @@
 % !TEX root = master.tex
 % !TEX program = lualatex
 
+\lecture{3}{05-03-2026}{Integration and Cauchy theorem}{}
+
 \chapter{Complex integration}\label{chap:complex_integration}
 
-\lecture{3}{10-03-2026}{Integration and Cauchy theorem}{}
 \section{Line Integrals in $\mathbb{R}^2$ (Recall)}
 
 Let $F : \mathbb{R}^2 \rightarrow \mathbb{R}^2$ be a continuous vector field
@@ -42,13 +43,11 @@ F_2(\gamma(t))\gamma_2'(t)
 \end{itemize}
 \end{itemize}
 
-If $\Gamma$ is closed and $\nabla \times F = 0$ in the interior of $\Gamma$ then
+If $\Gamma$ is closed and $\nabla \times F = 0$ in the interior of $\Gamma$ then by Stoke's Theorem
 
 \[
 \int_\Gamma F \cdot d\ell = 0
 \]
-
-(Stokes' theorem).
 
 \section{Complex Line Integrals}
 
@@ -76,13 +75,13 @@ If $-\Gamma$ denotes the curve with opposite orientation then
 -\int_\Gamma f(z)\,dz
 \]
 
-\subsection*{Remark}
+\textbf{Remark}
 
 The value of the line integral does not depend on the parametrization as long as the orientation is preserved.
 
-\section{Examples}
+\paragraph{Examples}
 
-\subsection{Integral of $z^2$ on the unit circle}
+\textbf{Integral of $z^2$ on the unit circle}
 
 Let $\Gamma$ be the unit circle parametrized by
 
@@ -114,7 +113,7 @@ i \int_0^{2\pi} e^{3it}dt
 i \left[\frac{e^{3it}}{3i}\right]_0^{2\pi} = 0
 \]
 
-\subsection{Integral of $\frac{1}{z}$}
+\textbf{Integral of $\frac{1}{z}$}
 
 \[
 \int_\Gamma \frac{1}{z}dz
@@ -127,7 +126,7 @@ i\int_0^{2\pi}dt
 2\pi i
 \]
 
-\subsection{Integral of $\frac{1}{z^2}$}
+\textbf{Integral of $\frac{1}{z^2}$}
 
 \[
 \int_\Gamma \frac{1}{z^2}dz
@@ -258,7 +257,7 @@ This formula is particularly useful to compute integrals of the form
 
 If more than one $z_0$, we can use this formula if only one $z_0$ is inside $\Gamma$, if yes use this formula by using this $z_0$. 
 
-I.e: 
+E.g: 
 \[
 I = \int_{\gamma}^{} \frac{e^z}{(z-1)(z^2 + 4)} dx \quad \gamma = e^{it} \quad t \in [\ 0,2 \pi ]\
 \]

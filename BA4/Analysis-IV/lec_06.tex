@@ -19,7 +19,7 @@ The coefficient $c_{-1}$ of the term $(z-z_0)^{-1}$ is called the \emph{residue}
 
 By the definition of the coefficients in the Laurent series,
 \[
-\operatorname{Res}_{z_0}(f)
+  \operatorname{Res}_{z_0}(f) = c_{-1}
 =
 \frac{1}{2\pi i}\int_{\gamma} f(z)\,dz,
 \]
@@ -47,10 +47,6 @@ since it's already the Laurent series at $0$, hence
 Suppose that $f$ has a pole of order $m$ at $z_0$, so that its Laurent series is
 \[
 f(z)=c_{-m}(z-z_0)^{-m}+\cdots+c_{-1}(z-z_0)^{-1}+c_0+c_1(z-z_0)+\cdots
-\]
-Consider the holomorphic function
-\[
-g(z)=(z-z_0)^m f(z) =c_{-m}+c_{-m+1}(z-z_0)+\cdots+c_{-1}(z-z_0)^{m-1}+c_0(z-z_0)^m+\cdots
 \]
 Therefore,
 \begin{corollary}
@@ -101,6 +97,28 @@ so the limit is
 \[
 \operatorname{Res}_0(f)=1.
 \]
+
+\subsection{Formula for quotient}
+\begin{corollary}[Residue at a simple pole of a quotient]
+  Let $p, q$ be holomorphic in a neighborhood of $z_0$. If
+  \[
+  q(z_0) = 0 \qquad \text{and} \qquad q'(z_0) \neq 0,
+  \]
+  then $f = \dfrac{p}{q}$ has a simple pole at $z_0$ and
+  \[
+  Res_{z_0}\!\left(\frac{p}{q}\right) = \frac{p(z_0)}{q'(z_0)}.
+  \]
+\end{corollary}
+
+\begin{remark}
+  Indeed, since $z_0$ is a simple zero of $q$, we can write $q(z) = (z-z_0)\,\tilde{q}(z)$ with $\tilde{q}(z_0) = q'(z_0) \neq 0$. Hence
+  \[
+  Res_{z_0}\!\left(\frac{p}{q}\right)
+  = \lim_{z \to z_0} (z-z_0)\,\frac{p(z)}{q(z)}
+  = \lim_{z \to z_0} \frac{p(z)}{\tilde{q}(z)}
+  = \frac{p(z_0)}{q'(z_0)}.
+  \]
+\end{remark}
 
 \section{Residue theorem}
 

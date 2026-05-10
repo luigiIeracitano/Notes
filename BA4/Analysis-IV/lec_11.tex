@@ -1,0 +1,299 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\newpage
+
+\lecture{11}{07-05-2026}{Inverse Laplace Transform and Applications to PDEs}{}
+
+\section{Inverse Laplace Transform}
+
+Given $\mathcal{L}[f]$, can we determine $f$ in general?
+
+Recall: if $\gamma_0 \in \mathbb{R}$ is an abscissa of convergence for $f$, then $\mathcal{L}[f]$ is holomorphic (hence without singularities) on $\{\mathrm{Re}(z) > \gamma_0\}$. In fact, the ``opposite'' is also true: if $\mathcal{L}[f]$ is holomorphic on $\{\mathrm{Re}(z) > \gamma_0\}$ and ``doesn't grow'' as $|z| \to \infty$, then $\gamma_0$ is an abscissa of convergence for $f$.
+
+\begin{theorem}[Inverse Laplace transform]
+Assume $f : \mathbb{R}_+ \to \mathbb{C}$ is piecewise continuous, and for some $\gamma \in \mathbb{R}$, $\mathcal{L}[f]$ is holomorphic on $\{\mathrm{Re}(z) \geq \gamma\}$ and
+\[
+\lim_{T \to \infty}\int_{-T}^{T} F(\gamma + is)\,e^{(\gamma + is)t}\,ds
+\]
+exists for all $t \in \mathbb{R}_+$. (Both hold whenever there exists $\gamma_0 < \gamma$ abscissa of convergence.) Then
+\[
+\boxed{f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} \mathcal{L}[f](\gamma + is)\,e^{(\gamma + is)t}\,ds.}
+\]
+\end{theorem}
+
+\begin{remark}
+The integral on the right-hand side need not converge absolutely, so it is understood as
+\[
+\lim_{T \to \infty}\int_{-T}^{T} F(\gamma + is)\,e^{(\gamma + is)t}\,ds.
+\]
+\end{remark}
+
+\subsection*{How to show this formula? (Outlook)}
+
+Extend $f : \mathbb{R}_+ \to \mathbb{C}$ to a function defined on $\mathbb{R}$ by setting it to be $0$ on $(-\infty, 0)$. Let $g(t) = f(t)\,e^{-\gamma t}$. Take the Fourier transform:
+\[
+\hat{g}(a) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} g(t)\,e^{-iat}\,dt
+= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} f(t)\,e^{-(\gamma + ia)t}\,dt.
+\]
+Since $f = 0$ on $(-\infty, 0)$,
+\[
+\hat{g}(a) = \frac{1}{\sqrt{2\pi}}\int_0^{\infty} f(t)\,e^{-(\gamma + ia)t}\,dt = \mathcal{L}[f](\gamma + ia).
+\]
+Taking the inverse Fourier transform,
+\[
+g(t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} \hat{g}(a)\,e^{iat}\,da
+= \frac{1}{2\pi}\int_{-\infty}^{\infty} F(\gamma + ia)\,e^{iat}\,da.
+\]
+Therefore
+\[
+f(t) = e^{\gamma t}\,g(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} F(\gamma + ia)\,e^{(\gamma + ia)t}\,da. \qedhere
+\]
+
+\begin{remark}
+\begin{enumerate}
+\item \textbf{Lerch's theorem:} $f$ is uniquely determined by $\mathcal{L}[f]$ through this formula.
+\item The condition $\lim_{T \to \infty}\int_{-T}^{T} F(\gamma + is)\,e^{(\gamma + is)t}\,ds < \infty$ is automatically true provided $\int_{-\infty}^{\infty} |F(\gamma + is)|\,ds < \infty$.
+\end{enumerate}
+\end{remark}
+
+\subsection{Examples of Inversion}
+
+\paragraph{Example}
+\begin{example}
+Let
+\[
+F(z) = \frac{1}{(z+1)(z+2)^2}.
+\]
+We want to find $f : \mathbb{R}_+ \to \mathbb{C}$ such that $\mathcal{L}[f] = F$. Two ways to do this.
+
+\medskip
+
+\textbf{(1) Partial fraction decomposition.}
+\[
+\frac{1}{(z+1)(z+2)^2}
+= \underbrace{\frac{1}{z+1}}_{=\,\mathcal{L}[e^{-t}]}
+- \underbrace{\frac{1}{z+2}}_{=\,\mathcal{L}[e^{-2t}]}
+- \underbrace{\frac{1}{(z+2)^2}}_{=\,\mathcal{L}[t\,e^{-2t}]}.
+\]
+So
+\[
+f(t) = e^{-t} - e^{-2t} - t\,e^{-2t}.
+\]
+By \textbf{uniqueness} of the Laplace transform, this is enough. Usually this is the fastest way.
+
+\medskip
+
+\textbf{(2) Inverse Laplace transform and residue theorem.}
+\[
+f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} F(\gamma + is)\,e^{(\gamma + is)t}\,ds.
+\]
+Let $h(z) = F(z)\,e^{zt}$. The poles of $h$ are at $z = -1$ and $z = -2$. We choose $\gamma = 0$:
+\begin{itemize}
+\item $F$ is holomorphic on $\{\mathrm{Re}(z) > -1\}$;
+\item $\int_{-\infty}^{\infty} |F(\gamma + is)|\,ds < \infty$.
+\end{itemize}
+The inverse Laplace transform formula reads
+\[
+f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} h(\gamma + is)\,ds = \frac{1}{2\pi i}\int_{-\infty i}^{\infty i} h(z)\,dz.
+\]
+Define the curves
+\[
+L_r : [-r, r] \to \mathbb{C}, \quad s \mapsto si,
+\qquad
+C_r : \left[\tfrac{\pi}{2}, \tfrac{3\pi}{2}\right] \to \mathbb{C}, \quad \vartheta \mapsto r\,e^{i\vartheta},
+\]
+and let $\Gamma = L_r \cup C_r$ oriented counterclockwise (so $C_r$ closes the contour through the \emph{left} half-plane). When $r > 2$, $\Gamma$ encloses all poles of $h$, namely $-1$ and $-2$. By the residue theorem,
+\[
+\int_{\Gamma} h(z)\,dz = 2\pi i \bigl[\mathrm{Res}_{-1}(h) + \mathrm{Res}_{-2}(h)\bigr].
+\]
+
+\textbf{Compute the residues.} Looking at $h$ we find:
+\begin{itemize}
+\item $z = -1$ simple pole:
+\[
+\mathrm{Res}_{-1}(h) = \lim_{z \to -1}\bigl((z+1)\,h(z)\bigr)
+= \lim_{z \to -1}\frac{e^{zt}}{(z+2)^2} = e^{-t}.
+\]
+\item $z = -2$ pole of order $2$:
+\[
+\mathrm{Res}_{-2}(h) = \lim_{z \to -2}\frac{d}{dz}\bigl((z+2)^2\,h(z)\bigr)
+= \lim_{z \to -2}\frac{d}{dz}\left(\frac{e^{zt}}{z+1}\right)
+= -e^{-2t}(t + 1).
+\]
+\end{itemize}
+Hence
+\[
+\int_{\Gamma} h(z)\,dz = 2\pi i\bigl[e^{-t} - e^{-2t} - t\,e^{-2t}\bigr].
+\]
+Now
+\[
+\frac{1}{2\pi i}\int_{\Gamma} h(z)\,dz
+= \underbrace{\frac{1}{2\pi i}\int_{L_r} h(z)\,dz}_{\to\,f(t) \text{ as } r \to \infty}
++ \frac{1}{2\pi i}\int_{C_r} h(z)\,dz,
+\]
+and the left-hand side equals $e^{t} - e^{-2t} - t\,e^{-2t}$.
+
+\medskip
+
+\textbf{Now we want to show $\left|\int_{C_r} h(z)\,dz\right| \to 0$ as $r \to \infty$.}
+\[
+\left|\int_{C_r} h(z)\,dz\right|
+= \left|\int_{\pi/2}^{3\pi/2} h(r\,e^{i\vartheta})\,i\,r\,e^{i\vartheta}\,d\vartheta\right|
+\overset{\Delta\text{-ineq.}}{\leq}
+\int_{\pi/2}^{3\pi/2} \bigl|h(r\,e^{i\vartheta})\bigr|\,r\,d\vartheta
+\]
+(using $|i\,r\,e^{i\vartheta}| = r$)
+\[
+= \int_{\pi/2}^{3\pi/2} \frac{\bigl|e^{r\,e^{i\vartheta}\,t}\bigr|}{\bigl|r\,e^{i\vartheta} + 1\bigr|\,\bigl|r\,e^{i\vartheta} + 2\bigr|^2}\,r\,d\vartheta,
+\]
+where the denominators are of order $\sim r$ and $\sim r^2$ respectively.
+
+\textbf{Notice:}
+\[
+\bigl|e^{r\,e^{i\vartheta}\,t}\bigr|
+= \bigl|e^{r(\cos\vartheta + i\sin\vartheta)t}\bigr|
+= \bigl|e^{r\cos\vartheta\,t}\bigr|\,\underbrace{\bigl|e^{ir\sin\vartheta\,t}\bigr|}_{=\,1}
+= e^{r\cos\vartheta\,t} \leq 1
+\]
+because $\cos\vartheta \leq 0$ for $\vartheta \in [\tfrac{\pi}{2}, \tfrac{3\pi}{2}]$.
+
+Hence $\left|\int_{C_r} h(z)\,dz\right|$ can be bounded from above by a term of order
+\[
+\int_{\pi/2}^{3\pi/2} \frac{1}{r\cdot r^2}\,r\,d\vartheta \to 0 \quad \text{as } r \to \infty.
+\]
+
+\begin{remark}
+We close the \textbf{left half-circle} (for $\mathrm{Re}(z) < \gamma$) because in that region $|e^{zt}| \leq e^{\gamma t}$. This guarantees the control on the exponential term above.
+\end{remark}
+\end{example}
+
+\section{Applications to Partial Differential Equations (PDEs)}
+
+As for ODEs, we will apply the theory of Laplace and Fourier transforms to solve initial-boundary value problems for \textbf{linear} PDEs with \textbf{constant coefficients}, e.g.\ the \textbf{heat equation}:
+\[
+\begin{cases}
+\dfrac{\partial u}{\partial t}(x, t) - \dfrac{\partial^2 u}{\partial x^2}(x, t) = f(x, t)
+& \text{for } t > 0 \text{ and } x \in (0, L), \\[2pt]
+u(x, 0) = u_0(x) & \text{(initial condition),} \\[2pt]
+u(0, t) = 0,\ u(L, t) = 0 & \text{(boundary condition).}
+\end{cases}
+\]
+This describes the evolution of temperature $u$ of a one-dimensional rod of length $L$ with heat source $f$ and fixed temperature at the endpoints $0$ and $L$.
+
+\paragraph{General procedure that we will follow.}
+\begin{itemize}
+\item \textbf{Fourier series} if space or time domain is bounded.
+\item \textbf{Fourier transform} if space or time domain is $\mathbb{R}$.
+\item \textbf{Laplace transform} if space or time domain is $\mathbb{R}_+$.
+\end{itemize}
+
+\subsection{Fourier Series Recapitulation}
+
+We want to decompose $f : [0, L] \to \mathbb{R}$ as an infinite sum of oscillating functions. \textbf{Basis functions:}
+\begin{itemize}
+\item $\sin\!\left(\dfrac{2\pi n}{L}\,x\right)$ where $n \geq 1$,
+\item $\cos\!\left(\dfrac{2\pi n}{L}\,x\right)$ where $n \geq 0$.
+\end{itemize}
+
+\paragraph{Orthogonality.} With the inner product
+\[
+\langle f, g \rangle := \int_0^L f(x)\,g(x)\,dx,
+\]
+one has:
+\begin{itemize}
+\item $\left\langle \sin\!\left(\tfrac{2\pi n}{L}\,x\right), \sin\!\left(\tfrac{2\pi m}{L}\,x\right) \right\rangle =
+\begin{cases}
+L/2 & \text{if } n = m, \\
+0 & \text{otherwise.}
+\end{cases}$
+\item Same for $\left\langle \cos\!\left(\tfrac{2\pi n}{L}\,x\right), \cos\!\left(\tfrac{2\pi m}{L}\,x\right) \right\rangle$.
+\item $\left\langle \sin\!\left(\tfrac{2\pi n}{L}\,x\right), \cos\!\left(\tfrac{2\pi m}{L}\,x\right) \right\rangle = 0$ for all $n, m$.
+\end{itemize}
+
+We will use these facts as an orthogonal basis to decompose other functions via \textbf{trigonometric (Fourier) series}.
+
+Given $f : [0, L] \to \mathbb{R}$ piecewise continuous, can we write
+\[
+f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty}\left[a_n \cos\!\left(\frac{2\pi n}{L}\,x\right) + b_n \sin\!\left(\frac{2\pi n}{L}\,x\right)\right]?
+\]
+(The same considerations apply when $f : \mathbb{R} \to \mathbb{R}$ is $L$-periodic, hence can be thought of as a function on $[0, L]$.)
+
+The answer is \textbf{yes}!
+
+\paragraph{Computing the coefficients.}
+To ``guess'' the form of the coefficients $a_n$ and $b_n$, we assume $f$ already has this form. Then we can (formally) compute the following using orthogonality:
+\begin{itemize}
+\item $\displaystyle\int_0^L f(x)\,dx = \frac{L}{2}\,a_0$,
+\item $\displaystyle\int_0^L f(x)\cos\!\left(\frac{2\pi n}{L}\,x\right)dx = \frac{L}{2}\,a_n$ where $n \geq 1$,
+\item $\displaystyle\int_0^L f(x)\sin\!\left(\frac{2\pi n}{L}\,x\right)dx = \frac{L}{2}\,b_n$ where $n \geq 1$.
+\end{itemize}
+This suggests defining
+\[
+\boxed{
+a_n = \frac{2}{L}\int_0^L f(x)\cos\!\left(\frac{2\pi n}{L}\,x\right)dx \quad \text{where } n \geq 0,}
+\]
+\[
+\boxed{
+b_n = \frac{2}{L}\int_0^L f(x)\sin\!\left(\frac{2\pi n}{L}\,x\right)dx \quad \text{where } n \geq 1.}
+\]
+
+\paragraph{Trigonometric Fourier decomposition.}
+Define $f_N : [0, L] \to \mathbb{R}$ by
+\[
+f_N(x) = \frac{a_0}{2} + \sum_{n=1}^{N}\left[a_n \cos\!\left(\frac{2\pi n}{L}\,x\right) + b_n \sin\!\left(\frac{2\pi n}{L}\,x\right)\right],
+\]
+where $a_n$ and $b_n$ are as above and $f : [0, L] \to \mathbb{R}$ is piecewise continuous. Then:
+\begin{itemize}
+\item $f_N(x) \to f(x)$ as $N \to \infty$ at every $x \in [0, L]$ where $f$ is differentiable;
+\item $f_N(x) \to \dfrac{f(x^+) + f(x^-)}{2}$ when $x$ is a jump discontinuity of $f$;
+\item $\displaystyle\lim_{N \to \infty}\int_0^L |f_N(x) - f(x)|\,dx = 0$.
+\end{itemize}
+
+\subsection{Special Cases: Even and Odd Functions}
+
+\paragraph{Odd functions.}
+Assume $f$ is \textbf{odd} (i.e.\ $f(-x) = -f(x)$ for all $x \in [0, L]$). Then $a_n = 0$ for every $n \geq 0$ and
+\[
+f(x) = \sum_{n=1}^{\infty} b_n \sin\!\left(\frac{2\pi n}{L}\,x\right),
+\]
+where
+\[
+b_n = \frac{2}{L}\int_0^L f(x) \sin\!\left(\frac{2\pi n}{L}\,x\right)dx
+= \frac{2}{L}\int_{-L/2}^{L/2} f(x) \sin\!\left(\frac{2\pi n}{L}\,x\right)dx
+\]
+(shift in domain allowed since all functions involved are $L$-periodic), so
+\[
+b_n = \frac{4}{L}\int_0^{L/2} f(x) \sin\!\left(\frac{2\pi n}{L}\,x\right)dx
+\]
+since $f$ and $\sin\!\left(\tfrac{2\pi n}{L}\,x\right)$ are both odd, so their product is even.
+
+\paragraph{Even functions.}
+Assume $f$ is \textbf{even} (i.e.\ $f(-x) = f(x)$ for all $x \in [0, L]$). Then $b_n = 0$ for all $n \geq 1$ and
+\[
+f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} a_n \cos\!\left(\frac{2\pi n}{L}\,x\right),
+\]
+where
+\[
+a_n = \frac{2}{L}\int_0^L f(x) \cos\!\left(\frac{2\pi n}{L}\,x\right)dx
+= \frac{2}{L}\int_{-L/2}^{L/2} f(x) \cos\!\left(\frac{2\pi n}{L}\,x\right)dx
+\]
+by $L$-periodicity, so
+\[
+a_n = \frac{4}{L}\int_0^{L/2} f(x) \cos\!\left(\frac{2\pi n}{L}\,x\right)dx
+\]
+since $f$ and $\cos\!\left(\tfrac{2\pi n}{L}\,x\right)$ are both even, so their product is even.
+
+\begin{remark}
+\begin{itemize}
+\item The functions $a_n \cos\!\left(\tfrac{2\pi n}{L}\,x\right)$ and $b_n \sin\!\left(\tfrac{2\pi n}{L}\,x\right)$ are sometimes called \textbf{modes}.
+\item The function $e_n(x) = \cos\!\left(\tfrac{2\pi n}{L}\,x\right)$ satisfies \textbf{Neumann boundary conditions}:
+\[
+\boxed{e_n'(0) = 0, \qquad e_n'(L) = 0.}
+\]
+\item The function $h_n(x) = \sin\!\left(\tfrac{2\pi n}{L}\,x\right)$ satisfies \textbf{Dirichlet boundary conditions}:
+\[
+\boxed{h_n(0) = 0, \qquad h_n(L) = 0.}
+\]
+\end{itemize}
+\end{remark}

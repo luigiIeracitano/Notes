@@ -264,6 +264,8 @@ the \textbf{kernel matrix} with entries $K_{ij} = k(x_i, x_j)$.
 
 \subsubsection{From $a$ to projections}
 In theory we could recover $w_{(1)} = \sum_{i=1}^{N} a_i \phi(x_i)$, but this depends on the
+
+
 unknown $\{\phi(x_i)\}$. As in kernel ridge regression, we are not really interested in
 $w_{(1)}$ -- we want the low-dimensional projections $\{y_i\}$. For a 1D representation,
 \[
@@ -296,9 +298,8 @@ the eigenvalue problem on $\tilde{K}$ instead of $K$.
 
   \item \textbf{Concentric spheres in 3D} (one inner ``ball'' of class 2 surrounded by an outer ``shell'' of class 1):
     \begin{center}
-       \includegraphics[width=0.49\linewidth]{images/img_20260505_202034.png}
-\includegraphics[width=0.49\linewidth]{images/img_20260505_202106.png}
-\includegraphics[width=0.5\linewidth]{images/img_20260505_202128.png}
+       \includegraphics[width=0.7\linewidth]{images/img_20260505_202034.png}
+\includegraphics[width=0.7\linewidth]{images/img_20260505_202128.png}
     \end{center}
     
     \begin{itemize}
@@ -317,11 +318,6 @@ the eigenvalue problem on $\tilde{K}$ instead of $K$.
 \end{itemize}
 This raises the question: can we have a \emph{nonlinear} method that \emph{also} provides an
 inverse mapping? The answer leads us to autoencoders.
-
-% --- SCHEMAS À AJOUTER : ---
-% - Slide 47 : Swiss roll (3D -> 2D unrolled)
-% - Slide 56/57 : Swiss roll PCA vs Kernel PCA (RBF)
-% - Slide 58/59/60 : 3D nested spheres, PCA / poly-KPCA / RBF-KPCA
 
 \subsection{Autoencoders}
 \subsubsection{From PCA to autoencoders}

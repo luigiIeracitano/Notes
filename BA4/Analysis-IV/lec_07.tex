@@ -1,274 +1,334 @@
 % !TEX root = master.tex
 % !TEX program = lualatex
-
-\lecture{7}{02-04-2026}{Applications of Residues to Real Integrals}{}
+\lecture{7}{02-04-2026}{Applications of the Residue Theorem}{}
 
 \section{Applications of Residues to Real Integrals}
 
-\subsection{Goal}
-
-Use complex analysis to compute real integrals of the form:
-\[
-\int_{-\infty}^{\infty} R(x)\, dx
-\quad \text{or} \quad
-\int_{-\infty}^{\infty} R(x)\cos(ax)\, dx
-\]
-
-\subsection{Contour Method}
-
-For integral of the form: \[
-  \int_{- \infty}^{\infty}R(x) \, dx
-\]
-with
-\[
-R(x) = \frac{P(x)}{Q(x)}
-\]
-
-Assume:
+The residue theorem can be used to compute integrals over simple closed curves, and sometimes even to compute \emph{real} integrals by replacing them with complex integrals. The strategy is always the same:
 \begin{itemize}
-\item $\deg Q \ge \deg P + 2$
-\item $Q(x) \neq 0$ for all x $\mathbb{R}$
+\item Extend the real integrand to a complex function $f(z)$.
+\item Choose a closed contour $\gamma$ that includes the real axis as part of its boundary.
+\item Apply the residue theorem to compute $\int_\gamma f(z)\,dz$.
+\item Show that the contribution of the non-real part of the contour vanishes in the limit.
+\item Recover the desired real integral.
 \end{itemize}
 
-$R(x) = f(x)$
+\subsection{A motivating example}
 
-The idea is to compute $\int_{-\infty}^{\infty} f(x)\,dx$ by embedding the real line
-into $\mathbb{C}$ and exploiting the residue theorem.
+Let us compute
+\[
+\int_{-\infty}^{\infty} \frac{1}{1+x^2}\,dx.
+\]
+We already know from real analysis that this integral equals $\pi$ (since $\arctan$ is a primitive of $1/(1+x^2)$). Let us recover this result using complex analysis.
 
-\textbf{Step 1 — Build a closed contour.}
-Fix $R > 0$ and define two pieces:
+Set
+\[
+f(z)=\frac{1}{1+z^2}.
+\]
+Given $R>0$, consider:
 \begin{itemize}
-  \item The \textbf{real segment} $[-R, R]$, traversed from left to right.
-  \item The \textbf{semicircular arc} $C_R = \{Re^{it} : t \in [0,\pi]\}$,
-        traversed counterclockwise in the upper half-plane.
+\item the segment $L_R:[-R,R]\to\mathbb{C}$, $L_R(t)=t$;
+\item the upper semicircle $C_R:[0,\pi]\to\mathbb{C}$, $C_R(t)=Re^{it}$.
 \end{itemize}
-Together they form a closed contour $\gamma_R$, so by the residue theorem:
+Let $\gamma_R=L_R\cup C_R$ be the closed counterclockwise oriented contour.
+
+The function $f$ has poles of order $1$ at $z=\pm i$. Only $z=i$ lies in the upper half-plane, so it is the only pole inside $\gamma_R$ (provided $R>1$). By the residue theorem,
 \[
-  \int_{\gamma_R} f(z)\,dz
-  = \int_{-R}^{R} f(x)\,dx + \int_{C_R} f(z)\,dz
-  = 2\pi i \sum_{\substack{z_k \text{ pole of } f \\ \mathrm{Im}(z_k)>0}} \operatorname{Res}_{z_k}(f).
+\int_{\gamma_R} f(z)\,dz = 2\pi i\,\operatorname{Res}_i(f).
 \]
-
-\textbf{Step 2 — Show the arc vanishes.}
-One needs to verify that $\int_{C_R} f(z)\,dz \to 0$ as $R \to \infty$.
-If this holds, taking $R \to \infty$ gives
+The residue is computed via
 \[
-  \int_{-\infty}^{\infty} f(x)\,dx
-  = 2\pi i \sum_{\substack{z_k \text{ pole of } f \\ \mathrm{Im}(z_k)>0}} \operatorname{Res}_{z_k}(f).
+\operatorname{Res}_i(f)
+=\lim_{z\to i}(z-i)f(z)
+=\lim_{z\to i}\frac{1}{z+i}
+=\frac{1}{2i}.
 \]
-
-\begin{remark}[Why the arc vanishes — the key estimate]
-  On $C_R$ we have $|z| = R$, so if $f(z) = P(z)/Q(z)$ with
-  $\deg Q \ge \deg P + 2$, then $|f(z)| \le C/R^2$.
-  Since the length of $C_R$ is $\pi R$, we get
-  \[
-    \left|\int_{C_R} f(z)\,dz\right| \le \frac{C}{R^2} \cdot \pi R = \frac{\pi C}{R} \xrightarrow{R\to\infty} 0.
-  \]
-  This is the standard sufficient condition.
-\end{remark}
-
-\begin{remark}[Choice of half-plane for $e^{iaz}$]
-  When $f(z) = R(z)e^{iaz}$, the exponential factor requires care.
-  For $z = x + iy$:
-  \[
-    |e^{iaz}| = e^{-ay}.
-  \]
-  \begin{itemize}
-    \item If $a > 0$: this decays when $y > 0$ $\Rightarrow$ use the \textbf{upper} half-plane.
-    \item If $a < 0$: this decays when $y < 0$ $\Rightarrow$ use the \textbf{lower} half-plane. 
-    \item If $a = 0$: both choices work.
-  \end{itemize}
-  One must choose the half-plane \emph{after} looking at $a$, not before.
-  This is why such integrals are treated case by case in $a$.
-\end{remark}
-\paragraph{Example}
-\begin{example}
-  Compute $\displaystyle I = \int_{-\infty}^{\infty} \frac{1}{1+x^2}\,dx$.
-
-  \medskip
-  \textbf{Setup.} Consider $f(z) = \dfrac{1}{1+z^2} = \dfrac{1}{(z-i)(z+i)}$.
-  The poles are at $z = i$ (upper half-plane) and $z = -i$ (lower half-plane).
-
-  \medskip
-  \textbf{Contour.} We close in the upper half-plane with $\gamma_R = [-R,R] \cup C_R$.
-
-  \medskip
-  \textbf{Arc estimate.} On $C_R$, $|f(z)| = \dfrac{1}{|1+z^2|} \le \dfrac{1}{R^2 - 1}$,
-  so
-  \[
-    \left|\int_{C_R} f(z)\,dz\right| \le \frac{\pi R}{R^2-1} \xrightarrow{R\to\infty} 0. \checkmark
-  \]
-
-  \textbf{Residue.} Only $z = i$ lies in the upper half-plane:
-  \[
-    \operatorname{Res}_i(f) = \lim_{z \to i}(z-i)f(z) = \frac{1}{i - (-i)} = \frac{1}{2i}.
-  \]
-
-  \textbf{Conclusion.}
-  \[
-    \int_{-\infty}^{\infty} \frac{dx}{1+x^2}
-    = 2\pi i \cdot \frac{1}{2i} = \pi.
-  \]
-  (Consistent with $\arctan(x)\big|_{-\infty}^{+\infty} = \pi$.)
-\end{example}
-
-\subsection{Exponential Trick (Euler)}
-
-Using:
-\[
-e^{iax} = \cos(ax) + i \sin(ax)
-\]
-
-We compute:
-\[
-\int_{-\infty}^{\infty} R(x)e^{iax} dx
-\]
-
-and extract real or imaginary parts.
-
-\paragraph{Example}
-
-We want to compute
-\[
-\int_{-\infty}^{\infty} \frac{x^2}{16 + x^4} \cos x \, dx.
-\]
-
-This is of the form of the previous example with $a=1$, $P(x)=x^2$, $Q(x)=16+x^4$.
-Thus,
-\[
-\int_{-\infty}^{\infty} \frac{x^2}{16 + x^4} \cos x \, dx
-=
-\Re \left( \int_{-\infty}^{\infty} \frac{x^2}{16 + x^4} e^{ix} dx \right)
-\]
-by Euler's formula.
-
-Define
-\[
-f(z) = \frac{z^2}{16 + z^4} e^{iz}.
-\]
-
-The singularities correspond to the complex roots of
-\[
-16 + z^4 = 0.
-\]
-
-Solve:
-\[
-z^4 = -16 = 16 e^{i(\pi + 2k\pi)}, \quad k \in \{0,1,2,3\}.
-\]
-
-Thus
-\[
-z = 2 e^{i\left(\frac{\pi}{4} + \frac{k\pi}{2}\right)}, \quad k=0,1,2,3.
-\]
-
-Explicitly:
-\[
-z_1 = \sqrt{2} + i\sqrt{2}, \quad
-z_2 = -\sqrt{2} + i\sqrt{2},
-\]
-\[
-z_3 = -\sqrt{2} - i\sqrt{2}, \quad
-z_4 = \sqrt{2} - i\sqrt{2}.
-\]
-
 Hence
 \[
-Q(z) = (z - z_1)(z - z_2)(z - z_3)(z - z_4),
+\int_{\gamma_R} f(z)\,dz = 2\pi i\cdot \frac{1}{2i}=\pi.
 \]
-so
+On the other hand, splitting the contour:
 \[
-R(z) = \frac{z^2}{(z - z_1)(z - z_2)(z - z_3)(z - z_4)}.
+\int_{\gamma_R} f(z)\,dz
+=\int_{L_R} f(z)\,dz + \int_{C_R} f(z)\,dz
+=\int_{-R}^R \frac{1}{1+t^2}\,dt + \int_{C_R} f(z)\,dz.
 \]
 
-Each $z_k$ is a simple pole.
-
-\medskip
-
-Only the poles in the upper half-plane contribute:
+It remains to show that the contribution of $C_R$ vanishes as $R\to\infty$. We estimate:
 \[
-z_1, z_2 \quad (\text{since } \Im z_1, \Im z_2 \geq 0).
+\left|\int_{C_R} f(z)\,dz\right|
+=\left|\int_0^\pi \frac{1}{1+R^2 e^{2it}}\,iRe^{it}\,dt\right|
+\leq \int_0^\pi \frac{R}{R^2-1}\,dt
+=\frac{\pi R}{R^2-1}\xrightarrow[R\to\infty]{}0.
 \]
-
-\medskip
-
-Compute residues:
-
+Therefore,
 \[
-\operatorname{Res}_{z_1}(f)
-=
-\lim_{z \to z_1} (z - z_1) f(z)
-=
-\frac{z_1^2 e^{i z_1}}{(z_1 - z_2)(z_1 - z_3)(z_1 - z_4)}.
+\int_{-\infty}^\infty \frac{1}{1+x^2}\,dx = \pi.
 \]
 
+\begin{remark}
+This method works for any integrand that decays \emph{strictly faster} than $1/R$ as $R\to\infty$, which ensures the integral over the arc vanishes.
+\end{remark}
+
+\subsection{Integrals of rational functions times \texorpdfstring{$e^{iax}$}{exp(iax)}}
+
+A more interesting class of integrals concerns functions of the form $R(x)\cos(ax)$ or $R(x)\sin(ax)$, where $R$ is a rational function. These appear naturally in Fourier analysis, in the study of resonances in damped systems, etc.
+
+\begin{theorem}[Real integrals via residues]
+Let $R(x)=\dfrac{P(x)}{Q(x)}$ where $P,Q$ are real polynomials such that:
+\begin{enumerate}
+\item $\deg Q \geq \deg P + 2$;
+\item $Q(x)\neq 0$ for all $x\in\mathbb{R}$.
+\end{enumerate}
+Let $a\geq 0$ and define $f(z)=R(z)e^{iaz}$. Then
 \[
-\operatorname{Res}_{z_2}(f)
-=
-\lim_{z \to z_2} (z - z_2) f(z)
-=
-\frac{z_2^2 e^{i z_2}}{(z_2 - z_1)(z_2 - z_3)(z_2 - z_4)}.
+\int_{-\infty}^{\infty} R(x)e^{iax}\,dx
+=2\pi i \sum_{k} \operatorname{Res}_{z_k}(f),
 \]
+where the sum is taken over the poles $z_k$ of $f$ in the \emph{upper half-plane} $\{\Im z>0\}$.
+\end{theorem}
 
-After simplification (as in the notes), we obtain:
-\[
-\operatorname{Res}_{z_1}(f)
-=
-\frac{e^{-\sqrt{2}} e^{i\sqrt{2}}}{4\sqrt{2}} (1+i),
-\]
-\[
-\operatorname{Res}_{z_2}(f)
-=
-\frac{e^{-\sqrt{2}} e^{-i\sqrt{2}}}{4\sqrt{2}} (1-i).
-\]
-
-\medskip
-
-Thus:
-\[
-\Re \left( \int_{-\infty}^{\infty} \frac{x^2}{16 + x^4} e^{ix} dx \right)
-=
-\Re \left( 2\pi i \big( \operatorname{Res}_{z_1}(f) + \operatorname{Res}_{z_2}(f) \big) \right).
-\]
-
-\medskip
-
-Final result:
-\[
-\int_{-\infty}^{\infty} \frac{x^2}{16 + x^4} \cos x \, dx
-=
-4\pi e^{-\sqrt{2}} \big( \cos(\sqrt{2}) - \sin(\sqrt{2}) \big).
-\]
-\subsection{Trigonometric Integrals}
-
-Using substitution:
-\[
-z = e^{it}
-\]
-
-we transform:
-\[
-\int_0^{2\pi} \frac{P(\cos t, \sin t)}{Q(\cos t, \sin t)} dt
-\]
-
-into a contour integral on the unit circle:
-\[
-\oint f(z)\, dz
-\]
-
-\subsection{Meromorphic Functions}
-
-A function holomorphic except at isolated poles is called \textbf{meromorphic}.
-
-Residue theorem applies directly to such functions.
-
-\subsection{Global Strategy}
-
+\paragraph{Observations}
 \begin{itemize}
-\item Extend real integral to complex plane
-\item Choose appropriate contour
-\item Show arc integral $\to 0$
-\item Identify poles in upper half-plane
-\item Compute residues
-\item Apply residue theorem
+\item The condition $\deg Q\geq \deg P+2$ forces $\deg Q$ to be even (otherwise $Q$ would have a real root).
+\item Since $Q$ has real coefficients, its roots come in pairs of complex conjugates. None of them are real by assumption, so half of them lie in the upper half-plane and the other half in the lower half-plane.
+\item Using Euler's formula $e^{iax}=\cos(ax)+i\sin(ax)$, the real and imaginary parts of the integral give
+\[
+\int_{-\infty}^\infty R(x)\cos(ax)\,dx = \Re\!\left(\int_{-\infty}^\infty R(x)e^{iax}\,dx\right),
+\]
+\[
+\int_{-\infty}^\infty R(x)\sin(ax)\,dx = \Im\!\left(\int_{-\infty}^\infty R(x)e^{iax}\,dx\right).
+\]
 \end{itemize}
+
+\subsubsection*{Why the contour integral over the arc vanishes}
+
+The key estimate is the following: for $z=x+iy$ with $y\geq 0$ and $a\geq 0$,
+\[
+|e^{iaz}|=|e^{ia(x+iy)}|=|e^{iax}|\cdot|e^{-ay}|=e^{-ay}\leq 1.
+\]
+
+\begin{remark}
+Note that $|e^{iaz}|$ is \textbf{not} bounded on all of $\mathbb{C}$: in the lower half-plane ($y<0$), the term $e^{-ay}$ blows up. This is precisely why we must close the contour in the \emph{upper} half-plane when $a\geq 0$. For $a<0$, one would close the contour in the lower half-plane instead.
+\end{remark}
+
+For $z=Re^{i\theta}$ on $C_R$ with $\theta\in[0,\pi]$, we have $\Im z = R\sin\theta\geq 0$, hence
+\[
+|e^{iaRe^{i\theta}}|\leq 1.
+\]
+
+For the rational part, write
+\[
+P(z) = b_m z^m + \cdots, \qquad Q(z)=c_n z^n + \cdots, \qquad n\geq m+2.
+\]
+Then for large $|z|$,
+\[
+|R(z)| = \left|\frac{P(z)}{Q(z)}\right| \leq \frac{C}{|z|^{n-m}}\leq \frac{C}{|z|^2}.
+\]
+Therefore
+\[
+\left|\int_{C_R} f(z)\,dz\right|
+\leq \int_0^\pi |R(Re^{i\theta})|\cdot|e^{iaRe^{i\theta}}|\cdot R\,d\theta
+\leq \int_0^\pi \frac{C}{R^{n-m}}\cdot 1 \cdot R\,d\theta
+=\frac{\pi C}{R^{n-m-1}}\xrightarrow[R\to\infty]{} 0.
+\]
+
+\paragraph{Benefit}
+We compute the residues of $f$ by finding its poles and their orders, without ever computing a Laurent series explicitly.
+
+\subsection{A worked example}
+
+We compute
+\[
+I=\int_{-\infty}^{\infty} \frac{x^2}{16+x^4}\cos x\,dx.
+\]
+This fits the previous setup with $a=1$, $P(x)=x^2$, $Q(x)=16+x^4$. Note $\deg Q=4\geq \deg P+2=4$, and $16+x^4>0$ for all real $x$. By Euler's formula,
+\[
+I=\Re\!\left(\int_{-\infty}^{\infty} \frac{x^2}{16+x^4}e^{ix}\,dx\right).
+\]
+Define
+\[
+f(z)=\frac{z^2}{16+z^4}e^{iz}.
+\]
+
+\paragraph{Finding the poles.}
+The poles of $f$ are the roots of $16+z^4=0$:
+\[
+z^4=-16=16e^{i(\pi+2k\pi)}, \qquad k\in\{0,1,2,3\}.
+\]
+Therefore
+\[
+z_k = 2 e^{i\left(\frac{\pi}{4}+\frac{k\pi}{2}\right)}, \qquad k=0,1,2,3.
+\]
+Explicitly:
+\[
+z_1 = \sqrt{2}+i\sqrt{2}, \quad
+z_2 = -\sqrt{2}+i\sqrt{2}, \quad
+z_3 = -\sqrt{2}-i\sqrt{2}, \quad
+z_4 = \sqrt{2}-i\sqrt{2}.
+\]
+Only $z_1$ and $z_2$ lie in the upper half-plane, hence only these contribute.
+
+\paragraph{Computing the residues.}
+Each $z_k$ is a simple pole. Using the standard trick: if $g(z)=h(z)/Q(z)$ where $Q$ has a simple zero at $z_k$, then
+\[
+\operatorname{Res}_{z_k}(g)=\frac{h(z_k)}{Q'(z_k)}.
+\]
+Here $h(z)=z^2 e^{iz}$ and $Q'(z)=4z^3$, so:
+\[
+\operatorname{Res}_{z_k}(f)
+=\frac{z_k^2 e^{iz_k}}{4 z_k^3}
+=\frac{e^{iz_k}}{4 z_k}.
+\]
+
+For $z_1=\sqrt{2}+i\sqrt{2}=2e^{i\pi/4}$:
+\[
+\frac{1}{4z_1}=\frac{1}{8 e^{i\pi/4}}=\frac{e^{-i\pi/4}}{8}=\frac{1-i}{8\sqrt{2}}.
+\]
+Also $e^{iz_1}=e^{i(\sqrt{2}+i\sqrt{2})}=e^{-\sqrt{2}}e^{i\sqrt{2}}$. Therefore
+\[
+\operatorname{Res}_{z_1}(f)
+=\frac{e^{-\sqrt{2}}e^{i\sqrt{2}}(1-i)}{8\sqrt{2}}.
+\]
+
+For $z_2=-\sqrt{2}+i\sqrt{2}=2e^{i3\pi/4}$:
+\[
+\frac{1}{4z_2}=\frac{e^{-i3\pi/4}}{8}=\frac{-1-i}{8\sqrt{2}}.
+\]
+Also $e^{iz_2}=e^{-\sqrt{2}}e^{-i\sqrt{2}}$. Therefore
+\[
+\operatorname{Res}_{z_2}(f)
+=\frac{e^{-\sqrt{2}}e^{-i\sqrt{2}}(-1-i)}{8\sqrt{2}}.
+\]
+
+\paragraph{Summing.}
+\[
+\operatorname{Res}_{z_1}(f)+\operatorname{Res}_{z_2}(f)
+=\frac{e^{-\sqrt{2}}}{8\sqrt{2}}\left[e^{i\sqrt{2}}(1-i)+e^{-i\sqrt{2}}(-1-i)\right].
+\]
+Expanding using $e^{\pm i\sqrt{2}}=\cos\sqrt{2}\pm i\sin\sqrt{2}$ and collecting terms:
+\[
+e^{i\sqrt{2}}(1-i)+e^{-i\sqrt{2}}(-1-i)
+=2i\sin\sqrt{2}-2i\cos\sqrt{2}
+=2i(\sin\sqrt{2}-\cos\sqrt{2}).
+\]
+Hence
+\[
+\operatorname{Res}_{z_1}(f)+\operatorname{Res}_{z_2}(f)
+=\frac{e^{-\sqrt{2}}}{8\sqrt{2}}\cdot 2i(\sin\sqrt{2}-\cos\sqrt{2})
+=\frac{i\,e^{-\sqrt{2}}}{4\sqrt{2}}(\sin\sqrt{2}-\cos\sqrt{2}).
+\]
+
+\paragraph{Final result.}
+Multiplying by $2\pi i$:
+\[
+2\pi i\bigl(\operatorname{Res}_{z_1}(f)+\operatorname{Res}_{z_2}(f)\bigr)
+=2\pi i \cdot \frac{i\,e^{-\sqrt{2}}}{4\sqrt{2}}(\sin\sqrt{2}-\cos\sqrt{2})
+=\frac{-\pi e^{-\sqrt{2}}}{2\sqrt{2}}(\sin\sqrt{2}-\cos\sqrt{2}).
+\]
+Taking the real part (the result is already real):
+\[
+\boxed{\int_{-\infty}^{\infty} \frac{x^2}{16+x^4}\cos x\,dx
+=\frac{\pi e^{-\sqrt{2}}}{2\sqrt{2}}\bigl(\cos\sqrt{2}-\sin\sqrt{2}\bigr)
+=\frac{\pi\sqrt{2}}{4}\,e^{-\sqrt{2}}\bigl(\cos\sqrt{2}-\sin\sqrt{2}\bigr).}
+\]
+
+\section{Integrals of rational functions of trigonometric functions}
+
+A second important class of real integrals that can be computed via residues are integrals of the form
+\[
+\int_0^{2\pi} \frac{P(\cos t,\sin t)}{Q(\cos t,\sin t)}\,dt,
+\]
+where $P,Q$ are polynomials in two variables and $Q(x,y)\neq 0$ on the unit circle $\{x^2+y^2=1\}$.
+
+\subsection{The substitution \texorpdfstring{$z=e^{it}$}{z = exp(it)}}
+
+The idea is to convert this real integral over $[0,2\pi]$ into a complex contour integral over the unit circle. Recall:
+\[
+\cos t = \frac{e^{it}+e^{-it}}{2}, \qquad \sin t = \frac{e^{it}-e^{-it}}{2i}.
+\]
+If we set $z=e^{it}$ then $dz=ie^{it}\,dt$, so $dt=\dfrac{dz}{iz}$, and:
+\[
+\cos t = \frac{1}{2}\left(z+\frac{1}{z}\right), \qquad
+\sin t = \frac{1}{2i}\left(z-\frac{1}{z}\right).
+\]
+As $t$ runs from $0$ to $2\pi$, $z$ traces the unit circle $\gamma$ once counterclockwise. Hence
+\[
+\int_0^{2\pi} \frac{P(\cos t,\sin t)}{Q(\cos t,\sin t)}\,dt
+=\int_\gamma f(z)\,dz,
+\]
+where
+\[
+f(z)=\frac{P\!\left(\tfrac{z+1/z}{2},\tfrac{z-1/z}{2i}\right)}{Q\!\left(\tfrac{z+1/z}{2},\tfrac{z-1/z}{2i}\right)}\cdot \frac{1}{iz}.
+\]
+
+\begin{definition}[Meromorphic function]
+A function which is holomorphic on an open set $D$ except at isolated singular points (poles) is called \emph{meromorphic} on $D$.
+\end{definition}
+
+Since $P$ and $Q$ are polynomials, $f$ is meromorphic on $\mathbb{C}$. If $z_1,\dots,z_\ell$ are the poles of $f$ inside the unit disk, the residue theorem gives:
+\[
+\int_0^{2\pi} \frac{P(\cos t,\sin t)}{Q(\cos t,\sin t)}\,dt
+=2\pi i\sum_{k=1}^\ell \operatorname{Res}_{z_k}(f).
+\]
+
+\subsection{Example}
+
+Compute
+\[
+J=\int_0^{2\pi} \frac{1}{2+\cos t}\,dt.
+\]
+This fits the framework with $P(x,y)=1$ and $Q(x,y)=2+x$. Substituting $z=e^{it}$:
+\[
+2+\cos t = 2 + \frac{1}{2}\left(z+\frac{1}{z}\right) = \frac{z^2+4z+1}{2z}.
+\]
+Therefore
+\[
+f(z)=\frac{1}{\dfrac{z^2+4z+1}{2z}}\cdot \frac{1}{iz}
+=\frac{2z}{z^2+4z+1}\cdot \frac{1}{iz}
+=\frac{2}{i}\cdot\frac{1}{z^2+4z+1}.
+\]
+
+\paragraph{Finding the poles.}
+We solve $z^2+4z+1=0$:
+\[
+z=\frac{-4\pm\sqrt{16-4}}{2}=-2\pm\sqrt{3}.
+\]
+So the poles are $z_1=-2+\sqrt{3}\approx -0.27$ and $z_2=-2-\sqrt{3}\approx -3.73$. Only $z_1$ lies inside the unit circle (since $|z_1|<1$ but $|z_2|>1$).
+
+\paragraph{Computing the residue.}
+$z_1$ is a simple pole, so:
+\[
+\operatorname{Res}_{z_1}(f)
+=\lim_{z\to z_1}(z-z_1)f(z)
+=\frac{2}{i}\cdot \frac{1}{z_1-z_2}
+=\frac{2}{i}\cdot \frac{1}{2\sqrt{3}}
+=\frac{1}{i\sqrt{3}}.
+\]
+
+\paragraph{Conclusion.}
+\[
+J=2\pi i\cdot \frac{1}{i\sqrt{3}}=\frac{2\pi}{\sqrt{3}}=\frac{2\pi\sqrt{3}}{3}.
+\]
+
+\section{General strategy}
+
+To summarize, the global strategy for applying the residue theorem to real integrals consists in:
+\begin{enumerate}
+\item \textbf{Identifying the type of integral} (rational function on $\mathbb{R}$, rational function times $e^{iax}$, trigonometric integral, \dots).
+\item \textbf{Extending the integrand} to a complex function $f(z)$.
+\item \textbf{Choosing an appropriate closed contour} (semicircle in the upper half-plane, unit circle, \dots).
+\item \textbf{Showing that the auxiliary part of the contour gives a vanishing contribution} in the appropriate limit (using estimates on $|f|$).
+\item \textbf{Identifying the poles} of $f$ inside the contour and computing their residues.
+\item \textbf{Applying the residue theorem} and recovering the desired real integral by taking real or imaginary parts if necessary.
+\end{enumerate}
+
+\begin{remark}
+The choice of contour depends on the integrand:
+\begin{itemize}
+\item For $\int_{-\infty}^\infty R(x)e^{iax}\,dx$ with $a>0$: close in the upper half-plane.
+\item For $a<0$: close in the lower half-plane (the orientation is then clockwise, hence a sign change).
+\item For trigonometric integrals over $[0,2\pi]$: use the unit circle.
+\item For other situations (integrals over $[0,\infty)$, branch cuts, etc.) one may need keyhole contours, sectors, or other shapes — but the principle remains the same.
+\end{itemize}
+\end{remark}

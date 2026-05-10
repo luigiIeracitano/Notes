@@ -1,0 +1,211 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\newpage
+
+\lecture{9}{23-04-2026}{Properties of the Laplace Transform}{}
+
+\section{Properties of the Laplace Transform}
+
+\paragraph{Example}
+\begin{example}
+Let $f : \mathbb{R}_+ \to \mathbb{C}$, $f(t) = t$. By the derivative formula from the previous lecture, when $\mathrm{Re}(z) > 0$,
+\[
+\frac{d}{dz}\mathcal{L}[1](z) = -\mathcal{L}[t](z) = -\mathcal{L}[f](z).
+\]
+Since $\mathcal{L}[1](z) = \tfrac{1}{z}$, we get $\frac{d}{dz}\tfrac{1}{z} = -\tfrac{1}{z^2}$, hence
+\[
+\boxed{\mathcal{L}[t](z) = \frac{1}{z^2}.}
+\]
+\end{example}
+
+Iterating this procedure gives the following.
+
+\begin{theorem}
+For all $n \in \mathbb{N}$ and whenever $\mathrm{Re}(z) > 0$,
+\[
+\boxed{\mathcal{L}[t^n](z) = \frac{n!}{z^{n+1}}.}
+\]
+\end{theorem}
+
+\paragraph{Linearity}
+Let $f, g : \mathbb{R}_+ \to \mathbb{C}$ be such that $\mathcal{L}[f]$ and $\mathcal{L}[g]$ are defined when $\mathrm{Re}(z) > \gamma_0$ for some $\gamma_0 \in \mathbb{R}$. Then for all $\lambda, \mu \in \mathbb{C}$, $\mathcal{L}[\lambda f + \mu g]$ is defined when $\mathrm{Re}(z) > \gamma_0$ and
+\[
+\boxed{\mathcal{L}[\lambda f + \mu g](z) = \lambda\,\mathcal{L}[f](z) + \mu\,\mathcal{L}[g](z).}
+\]
+
+\begin{remark}[Nomenclature]
+We say $f : \mathbb{R}_+ \to \mathbb{C}$ is of class $C^k$, $k \in \mathbb{N}$, if $f$ is $k$-times differentiable and $f, f', f'', \dots, f^{(k)}$ are continuous (it suffices to require that $f^{(k)}$ is continuous).
+\end{remark}
+
+\subsection{Laplace Transform of Derivatives}
+
+\begin{theorem}
+Let $f : \mathbb{R}_+ \to \mathbb{C}$ be of class $C^1$. Assume $\gamma_0 \in \mathbb{R}$ is an abscissa of convergence for $f$ and $f'$. Then for $\mathrm{Re}(z) > \gamma_0$,
+\[
+\boxed{\mathcal{L}[f'](z) = z\,\mathcal{L}[f](z) - f(0).}
+\]
+\end{theorem}
+
+\begin{remark}
+Similarly to the Fourier transform, the Laplace transform converts derivatives into multiplication by $z$ (hence differential equations into algebraic equations). A \textbf{crucial difference} is that the Laplace transform also picks up the ``initial value'' at $0$.
+\end{remark}
+
+\begin{proof}[Outline of the proof]
+By definition,
+\[
+\mathcal{L}[f'](z) = \int_0^{\infty} f'(t)\,e^{-zt}\,dt.
+\]
+We want to integrate by parts to remove the derivative from $f$. We have to be careful to treat the ``boundary term'' at $\infty$ appropriately. Since $\gamma_0$ is an abscissa of convergence for $f'$ and $\mathrm{Re}(z) > \gamma_0$, the integral $\int_0^{\infty} f'(t)\,e^{-zt}\,dt$ converges absolutely. So for any sequence $T_n \to \infty$ as $n \to \infty$,
+\[
+\mathcal{L}[f'](z) = \lim_{n \to \infty}\int_0^{T_n} f'(t)\,e^{-zt}\,dt.
+\]
+Integration by parts gives
+\[
+= \left[f(t)\,e^{-zt}\right]_0^{T_n} - \int_0^{T_n} f(t)(-z)\,e^{-zt}\,dt
+= \lim_{n \to \infty} f(T_n)\,e^{-T_n z} - f(0)\underbrace{e^{-0\cdot z}}_{=1} + z \underbrace{\int_0^{\infty} f(t)\,e^{-zt}\,dt}_{\text{converges absolutely}}.
+\]
+Now choose $T_n$ such that the boundary limit is $0$. This is possible because, since $\gamma_0$ is an abscissa of convergence for $f$ and $\mathrm{Re}(z) > \gamma_0$,
+\[
+\int_0^{\infty} |f(t)|\,|e^{-zt}|\,dt \leq \int_0^{\infty} |f(t)|\,e^{-\mathrm{Re}(z)\,t}\,dt < \infty.
+\]
+Thus there must exist a sequence $T_n \to \infty$ as $n \to \infty$ such that $|f(T_n)|\,|e^{-zT_n}| \to 0$ as $n \to \infty$ (otherwise $|f(t)|\,|e^{-zt}|$ would stay away from $0$ as $t \to \infty$, contradicting the finiteness of $\int_0^{\infty} |f(t)|\,|e^{-zt}|\,dt$). When $T_n$ is chosen that way, the above computations give
+\[
+\mathcal{L}[f'](z) = -f(0) + z\,\mathcal{L}[f](z). \qedhere
+\]
+\end{proof}
+
+As a consequence of iterating this formula: 
+\begin{corollary}
+$f : \mathbb{R}_+ \to \mathbb{C}$ is of class $C^k$ for $k \in \mathbb{N}$ and $\gamma_0 \in \mathbb{R}$ is an abscissa of convergence for $f, f', f'', \dots, f^{(k)}$, then for $\mathrm{Re}(z) > \gamma_0$,
+\[
+\begin{aligned}
+\mathcal{L}[f'](z) &= z\,\mathcal{L}[f](z) - f(0), \\
+\mathcal{L}[f''](z) &= z\,\mathcal{L}[f'](z) - f'(0) = z\bigl[z\,\mathcal{L}[f](z) - f(0)\bigr] - f'(0), \\
+&\vdots \\
+\mathcal{L}[f^{(k)}](z) &= z^k\,\mathcal{L}[f](z) - \sum_{j=0}^{k-1} z^{k-1-j}\,f^{(j)}(0).
+\end{aligned}
+\]
+
+\end{corollary}
+\paragraph{Example}
+\begin{example}
+Consider $f(t) = t^2$, $f'(t) = 2t$, $f''(t) = 2$. Their Laplace transforms are defined when $\mathrm{Re}(z) > 0$:
+\[
+\mathcal{L}[f](z) = \frac{2}{z^3}, \qquad
+\mathcal{L}[f'](z) = \frac{2}{z^2}, \qquad
+\mathcal{L}[f''](z) = \frac{2}{z}.
+\]
+The relations $\mathcal{L}[f'] = z\,\mathcal{L}[f] - f(0)$ and $\mathcal{L}[f''] = z\,\mathcal{L}[f'] - f'(0)$ confirm our previous computations. Note carefully that we used $f(0) = f'(0) = 0$.
+\end{example}
+
+\subsection{Laplace Transform of an Integral}
+
+\begin{theorem}
+Let $f : \mathbb{R}_+ \to \mathbb{C}$ be piecewise continuous and $\gamma_0 \geq 0$ an abscissa of convergence for $f$. Define $g : \mathbb{R}_+ \to \mathbb{C}$ by
+\[
+g(t) = \int_0^t f(s)\,ds.
+\]
+Then when $\mathrm{Re}(z) > \gamma_0$,
+\[
+\boxed{\mathcal{L}[g](z) = \frac{1}{z}\,\mathcal{L}[f](z).}
+\]
+\end{theorem}
+
+\begin{remark}
+In general the abscissa of convergence for $g$ cannot be negative (even if it is for $f$).
+\end{remark}
+
+\begin{proof}[Outline]
+Note $g' = f$ and $g(0) = 0$. By the previous theorem,
+\[
+\mathcal{L}[f](z) = \mathcal{L}[g'](z) = z\,\mathcal{L}[g](z) - \underbrace{g(0)}_{=0},
+\]
+therefore $\mathcal{L}[g](z) = \tfrac{1}{z}\,\mathcal{L}[f](z)$. (We will not show why $\mathcal{L}[g](z)$ is indeed defined for $\mathrm{Re}(z) > \gamma_0$ when $\gamma_0 \geq 0$.)
+\end{proof}
+
+\subsection{Rescaling and Frequency Shift}
+
+\begin{theorem}
+Let $a > 0$ and $b \in \mathbb{R}$. Let $f : \mathbb{R}_+ \to \mathbb{C}$ be piecewise continuous with abscissa of convergence $\gamma_0 \in \mathbb{R}$. Define $g : \mathbb{R}_+ \to \mathbb{C}$ by
+\[
+g(t) = e^{-bt} f(at).
+\]
+Then
+\[
+\boxed{\mathcal{L}[g](z) = \frac{1}{a}\,\mathcal{L}[f]\!\left(\frac{z + b}{a}\right)}
+\]
+holds when $\mathrm{Re}\!\left(\tfrac{z+b}{a}\right) > \gamma_0$ (equivalently, $\mathrm{Re}(z) > a\gamma_0 - b$, since $a > 0$ and $b \in \mathbb{R}$).
+
+In fact $a\gamma_0 - b$ is an abscissa of convergence for $g$ (exercise).
+\end{theorem}
+
+\begin{proof}[Computation]
+\[
+\mathcal{L}[g](z) = \int_0^{\infty} e^{-bt} f(at)\,e^{-zt}\,dt
+= \int_0^{\infty} f(at)\,e^{-(z+b)t}\,dt.
+\]
+Substitute $s = at$, $ds = a\,dt$:
+\[
+= \int_0^{\infty} f(s)\,e^{-(z+b)s/a}\,\frac{ds}{a}
+= \frac{1}{a}\int_0^{\infty} f(s)\,e^{-\frac{z+b}{a}\,s}\,ds
+= \frac{1}{a}\,\mathcal{L}[f]\!\left(\frac{z+b}{a}\right). \qedhere
+\]
+\end{proof}
+
+\begin{remark}
+Compare this formula to the rescaling property of the Fourier transform.
+\end{remark}
+
+\paragraph{Example}
+\begin{example}
+Let $g(t) = e^{ct} = e^{ct}\cdot 1$. Here $a = 1$, $b = -c$. By the above theorem, when $\mathrm{Re}(z) > -b = c$,
+\[
+\mathcal{L}[g](z) = \mathcal{L}[1](z - c) = \frac{1}{z - c}.
+\]
+\end{example}
+
+\begin{remark}
+The fact that $c$ is an abscissa of convergence for $g$ can be shown by hand, without relying on the above theorem.
+\end{remark}
+
+\paragraph{Example}
+\begin{example}
+Find $f : \mathbb{R}_+ \to \mathbb{C}$ such that
+\[
+\mathcal{L}[f](z) = \frac{1}{(z-a)(z-b)}, \qquad a, b \in \mathbb{R},\ a \neq b.
+\]
+We compute
+\[
+\mathcal{L}[f](z) = \frac{1}{b - a}\left[\frac{1}{z - b} - \frac{1}{z - a}\right]
+= \frac{1}{b - a}\bigl[\mathcal{L}[e^{bt}](z) - \mathcal{L}[e^{at}](z)\bigr]
+= \mathcal{L}\!\left[\frac{e^{bt} - e^{at}}{b - a}\right](z)
+\]
+by linearity, defined for $\mathrm{Re}(z) > \max\{a, b\}$. Hence
+\[
+f(t) = \frac{e^{bt} - e^{at}}{b - a}.
+\]
+\end{example}
+
+\subsection{Convolution}
+
+Let $f, g : \mathbb{R}_+ \to \mathbb{C}$ be piecewise continuous. We extend these functions by $0$ on $(-\infty, 0)$. Then
+\[
+(f * g)(t) = \int_{-\infty}^{\infty} f(t - s)\,g(s)\,ds
+= \begin{cases}
+\displaystyle\int_0^t f(t - s)\,g(s)\,ds & \text{if } t > 0, \\
+0 & \text{otherwise.}
+\end{cases}
+\]
+So in particular $f * g$ can be restricted back to $\mathbb{R}_+$, since its values on $(-\infty, 0)$ are trivial. That way we can regard $f * g$ as a function $\mathbb{R}_+ \to \mathbb{C}$ and compute its Laplace transform.
+
+\begin{theorem}
+Let $f, g : \mathbb{R}_+ \to \mathbb{C}$ be piecewise continuous with common abscissa of convergence $\gamma_0 \in \mathbb{R}$. Then $\gamma_0$ is an abscissa of convergence for $f * g$ and when $\mathrm{Re}(z) > \gamma_0$,
+\[
+\boxed{\mathcal{L}[f * g](z) = \mathcal{L}[f](z)\,\mathcal{L}[g](z).}
+\]
+\end{theorem}
+
+\begin{remark}
+As for the Fourier transform, the Laplace transform converts convolutions into products of Laplace transforms. Usually $\mathcal{L}[f]$ and $\mathcal{L}[g]$ are known; one then recovers $f * g$ as a ``preimage''.
+\end{remark}

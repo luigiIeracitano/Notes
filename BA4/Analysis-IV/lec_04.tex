@@ -2,27 +2,7 @@
 % !TEX program = lualatex
 \lecture{4}{12-03-2025}{Laurent series and Taylor series}{}
 
-\subsection{Remark: trick to compute contour integrals}
-
-A useful trick to compute contour integrals is the following.
-
-\begin{itemize}
-\item Find another simple closed curve that surrounds the same point as the complicated curve.
-\item If the function is holomorphic on the region between the two curves, then the integrals along the two curves are equal.
-\end{itemize}
-
-In other words, if $\Gamma_0$ and $\Gamma_1$ are two curves with the same endpoints and orientation, and if $f$ is holomorphic on the region between them, then
-
-\[
-\int_{\Gamma_0} f(z)\,dz
-=
-\int_{\Gamma_1} f(z)\,dz .
-\]
-
-The idea is to apply Cauchy's theorem to the closed contour formed by $\Gamma_0$ and $-\Gamma_1$.
-
 \subsection{Extended Cauchy Integral Formula}
-
 Under the same assumptions, for every integer $n \ge 0$ we have
 
 \begin{corollary}
@@ -33,8 +13,6 @@ f^{(n)}(z_0)
 \int_\Gamma
 \frac{f(z)}{(z-z_0)^{n+1}}\,dz .
 \]
-
- 
 \end{corollary}
 Equivalently,
 
@@ -48,16 +26,8 @@ Equivalently,
 \textbf{Remark.}  
 This formula shows that holomorphic functions are infinitely differentiable.
 
-\subsection{Examples}
-
-\subsubsection*{Example 1}
-
-Let
-
-\[
-f(z)=\frac{\cos z}{z}
-\]
-
+\paragraph{Examples}
+Let $f(z) = \frac{\cos z}{z}$
 and let $\Gamma$ be a positively oriented simple closed curve.
 
 We distinguish three cases:
@@ -85,8 +55,6 @@ by Cauchy's theorem.
 \]
 
 \end{itemize}
-
-\subsubsection*{Example 2}
 
 Let $\Gamma = \{z \in \mathbb{C} : |z-2| = 1\}$ oriented counterclockwise.  
 Compute
@@ -118,57 +86,22 @@ we obtain
 =
 \pi i e^2.
 \]
-\newpage 
 
 \chapter{Laurent series and Taylor series}\label{chap:laurent_series_and_taylor_series} % (fold)
 
-\section{Taylor Polynomial}
+\section{Taylor Series}
 
-Let $f : \mathbb{R} \to \mathbb{R}$ be sufficiently regular (N-times differentiable).  
-For any $x_0 \in \mathbb{R}$, the Taylor polynomial of degree $N$ is
-
-\[
-T^N_{x_0}f(x)
-=
-f(x_0)
-+
-f'(x_0)(x-x_0)
-+
-\cdots
-+
-\frac{f^{(N)}(x_0)}{N!}(x-x_0)^N.
-\]
-
-\subsection{Taylor's Theorem}
-
-If $f \in C^{N+1}$, then for all $x_0$, $x \in \mathbb{R}$ there exists $\vartheta \in (0,1)$ such that
-
-\[
-f(x)
-=
-T^N_{x_0}f(x)
-+
-\frac{f^{(N+1)}(\vartheta x_0+(1-\vartheta)x)}{(N+1)!}(x-x_0)^{N+1}.
-\]
-
-\textbf{Remark.}  
-Taylor's theorem shows that a function can be approximated locally by a polynomial.
-
-\subsection{Taylor Series}
-
-If $f$ has derivatives of all orders, we can define the Taylor series
-
+Let $D \subset C$ open, $z_0 \in D$, and $R > 0$ such, that the disk $\{z \in C : |z - z_0| < r \}$ is contained in $D$. If $f: D \to C$ is holomorphic, it has a Taylor series expansion for every $z \in C$ with $|z - z_0| < R$
 \[
 \sum_{n=0}^{\infty}
 \frac{f^{(n)}(x_0)}{n!}(x-x_0)^n.
 \]
+As Taylor series around a point is unique, one can compute Taylor series using known series expansions.
 
-A natural question is whether this series converges and whether it converges to the function $f$.
+The largest possible $R$ is called \textbf{radius of convergence} (It's the distance between $z_0$ and the nearest singularity (not $z_0$).
 
-\subsection{Example}
-
+\paragraph{Example}
 For the exponential function,
-
 \[
 e^x
 =
@@ -177,7 +110,7 @@ e^x
 \]
 
 This series converges for all $x \in \mathbb{R}$. \\
-\textbf{Remark:} Functions $f$ s.t the Taylor series converges to $f$ in a neighborood of $x_o$ are called \textbf{analytic}. (Not all smooth (continually derivable) functions are analytic)
+\textbf{Remark:} Functions $f$ s.t the Taylor series converges to $f$ in a neighborood of $x_0$ are called \textbf{analytic}.
 
 \subsection{Taylor coefficients}
 \begin{definition}[Taylor Coefficients]
@@ -189,23 +122,7 @@ This series converges for all $x \in \mathbb{R}$. \\
   This comes from assuming $f$ has a power series representation: \[
     f(z) = \sum_{n=0}^{\infty}c_n(z-z_0)^n  
   \]
-  
 \end{definition}
-\section{Taylor series / regular Laurent series for complex functions}
-
-\begin{theorem}[]
-  Let $D \subset \mathbb{C}$ be open and let $z_0 \in D$.  Let $R>0$ such that, the disk $B_R(z_0) = \{z \in \mathbb{C} : \left|z-z_0\right| < R\}$ is contained in D.
-
-If $f : D \to \mathbb{C}$ is holomorphic.
-
-Then for all $z \in B_R(z_0)$
-
-\[
-f(z)=\sum_{n=0}^{\infty} \frac{f^{\left(n\right)}(z_0)}{n!} (z-z_0)^n
-\]
-\end{theorem}
-
-The largest possible $R$ is called \textbf{radius of convergence} (It's the distance between $z_0$ and the nearest singularity (not $z_0$).
 
 \textbf{Remark:}
 
@@ -220,8 +137,7 @@ where \[
   c_n = \frac{f^{\left(n\right)}(z_0)}{n!} = \frac{1}{2 \pi i}\int_{\gamma} \frac{f(\zeta)}{\zeta - z_0} d\zeta
 \]
 for every simple, close curve $\gamma$ aroung $z_0$ with int $\gamma \subset D$ and counterclockwise oriented.
-
-\textbf{Caution:} The Taylor series representation around a given point is unique! In particular in order to compute the Taylor series at a given point, we can use other "tricks".
+\section{Laurent series}
 
 \begin{theorem}[Laurent series]
  Let $D \subset \mathbb{C}$ be open and let $z_0 \in D$.  

@@ -1,0 +1,253 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\lecture{10}{30-04-2026}{Applications of Laplace Analysis to the Cauchy Problem}{}
+
+\section{Applications of Laplace analysis to the Cauchy problem (initial value problem)}
+
+With the formulas from the previous lecture we can ``invert'' the Laplace transform of many functions. (There is a formal definition of the inverse Laplace transform that we will discover later.)
+
+\subsection{ODE with Constant Coefficients}
+
+\paragraph{First order initial value problem.}
+Let $a, y_0 \in \mathbb{R}$ and $f : \mathbb{R}_+ \to \mathbb{R}$ piecewise continuous. \textbf{Task:} find a solution $y : \mathbb{R}_+ \to \mathbb{R}$ solving
+\[
+(1) \qquad
+\begin{cases}
+y'(t) + a\,y(t) = f(t) & \text{for } t > 0, \\
+y(0) = y_0 & \text{(initial condition).}
+\end{cases}
+\]
+
+\textbf{Existence:} finding a solution (Laplace analysis). But before:
+
+\textbf{Uniqueness:} there is a unique solution.
+
+\begin{remark}
+In general, linear initial value problems (i.e.\ no nonlinear dependence on the sought solution $y(t)$ such as $y(t)^2$, $y(t)^3$, etc.) have a unique solution if the number of initial conditions equals the \textbf{order} of the equation (highest appearing derivative).
+\end{remark}
+
+\paragraph{Uniqueness for (1).}
+Let $y_1, y_2 : \mathbb{R}_+ \to \mathbb{R}$ be two solutions of $(1)$. \textbf{Strategy:} show they coincide; we'll do this by showing $w(t) = 0$ for all $t \in \mathbb{R}_+$, where $w(t) = y_1(t) - y_2(t)$.
+
+We know $y_1$ and $y_2$ satisfy $(1)$, so we want to derive a differential equation for $w$. Subtracting $(1)$ for $y_2$ from $(1)$ for $y_1$ yields
+\[
+\begin{cases}
+w'(t) + a\,w(t) = 0, \\
+w(0) = 0.
+\end{cases}
+\]
+Multiply $w$ by $e^{at}$. Then the previous equation gives
+\[
+\bigl(e^{at} w(t)\bigr)' = a\,e^{at} w(t) + e^{at} w'(t)
+= a\,e^{at} w(t) - a\,e^{at} w(t) = 0
+\]
+(using the equation for $w$). Hence $e^{at} w(t)$ is constant in $t \in \mathbb{R}_+$. Therefore
+\[
+e^{at} w(t) = e^{a \cdot 0} w(0) = 0 \quad\Longrightarrow\quad w(t) = 0 \text{ for all } t \in \mathbb{R}_+.
+\]
+
+\paragraph{Existence.}
+Find a solution by taking the Laplace transform of $(1)$:
+\[
+y'(t) + a\,y(t) = f(t)
+\]
+Apply Laplace (formally, assuming ``everything is well-defined''):
+\[
+(2) \qquad \mathcal{L}[y'](z) + a\,\mathcal{L}[y](z) = \mathcal{L}[f](z).
+\]
+Setting $Y = \mathcal{L}[y]$ and $F = \mathcal{L}[f]$ and using the formula for the Laplace transform of derivatives,
+\[
+(2) \;\Longrightarrow\; z\,Y(z) - \underbrace{y(0)}_{=\,y_0} + a\,Y(z) = F(z).
+\]
+Isolating $Y$:
+\[
+Y(z) = \frac{F(z)}{z + a} + \frac{y_0}{z + a}.
+\]
+
+\textbf{Punchline:} derivatives transform into algebraic equations!
+
+Is the right-hand side of the above expression for $Y$ the Laplace transform of something? Recall $\tfrac{1}{z + a} = \mathcal{L}[e^{-at}](z)$. Hence
+\[
+Y(z) = \underbrace{\mathcal{L}[e^{-at}](z)\,\mathcal{L}[f](z)}_{\substack{\text{Laplace transform of convolution}\\ \text{of } e^{-at} \text{ with } f(t)}} + y_0\,\mathcal{L}[e^{-at}](z).
+\]
+Formally inverting both sides:
+\[
+\boxed{y(t) = \int_0^t e^{-a(t - s)} f(s)\,ds + y_0\,e^{-at}.}
+\]
+Indeed, one can verify this is a solution of $(1)$.
+
+\subsection{Second Order Initial Value Problem}
+
+Let $\omega \in \mathbb{R}_+$, $a > 0$, and $f : \mathbb{R}_+ \to \mathbb{R}$ as above. Consider
+\[
+(3) \qquad
+\begin{cases}
+y''(t) + 2a\,y'(t) + \omega^2\,y(t) = f(t) & \text{for } t > 0, \\
+y(0) = y_0, \\
+y'(0) = v_0.
+\end{cases}
+\]
+
+\begin{remark}
+This is the equation satisfied by the \textbf{damped harmonic oscillator}: $f$ is the forcing, $a$ is the damping parameter coming from friction.
+\end{remark}
+
+\paragraph{Uniqueness.}
+Let $y_1, y_2 : \mathbb{R}_+ \to \mathbb{R}$ be two solutions of $(3)$. Set $u(t) = y_1(t) - y_2(t)$. As above we want to show $u(t) = 0$ for all $t \in \mathbb{R}_+$, this time by using the \textbf{energy method}.
+
+Subtracting $(3)$ for $y_2$ from $(3)$ for $y_1$:
+\[
+\begin{cases}
+u''(t) + 2a\,u'(t) + \omega^2\,u(t) = 0, \\
+u(0) = 0, \\
+u'(0) = 0.
+\end{cases}
+\]
+Multiply the equation by $u'$:
+\[
+\underbrace{u''\,u'}_{=\,\frac{1}{2}((u')^2)'} + 2a(u')^2 + \omega^2\,\underbrace{u'\,u}_{=\,\frac{1}{2}(u^2)'} = 0
+\]
+\[
+\Longrightarrow\;
+\left(\tfrac{1}{2}(u')^2\right)' + 2a(u')^2 + \left(\tfrac{1}{2}\omega^2 u^2\right)' = 0
+\]
+\[
+\Longrightarrow\;
+\left(\underbrace{\tfrac{1}{2}(u')^2}_{\text{kinetic energy}} + \underbrace{\tfrac{1}{2}\omega^2 u^2}_{\text{potential energy}}\right)' = -2a(u')^2 \leq 0.
+\]
+This means the energy
+\[
+E(t) = \tfrac{1}{2} u'(t)^2 + \tfrac{1}{2}\omega^2 u(t)^2
+\]
+is \textbf{nonincreasing} (effect of damping). Since
+\begin{itemize}
+\item $E(0) = 0$ (because $u(0) = 0$ and $u'(0) = 0$),
+\item $E(t) \geq 0$ (since it's a sum of squares),
+\end{itemize}
+we get $E(t) = 0$ for all $t \in \mathbb{R}_+$, hence $u(t) = 0$ for all $t \in \mathbb{R}_+$, since
+\[
+0 \leq \tfrac{1}{2}\omega^2 u^2 \leq \tfrac{1}{2}\omega^2 u^2 + \tfrac{1}{2}(u')^2 = E = 0.
+\]
+Both sides of this chain are $0$, which forces $\tfrac{1}{2}\omega^2 u^2 = 0$ and thus $u^2 = 0$, as desired.
+
+\paragraph{Existence.}
+By applying Laplace transform to the equation $y''(t) + 2a\,y'(t) + \omega^2\,y(t) = f(t)$ and using the identities for derivatives:
+\[
+z^2 Y(z) - z\underbrace{y(0)}_{=\,y_0} - \underbrace{y'(0)}_{=\,v_0} + 2a\bigl[z\,Y(z) - y_0\bigr] + \omega^2 Y(z) = F(z).
+\]
+Rearranging:
+\[
+(z^2 + 2az + \omega^2)\,Y(z) = F(z) + (z + a)\,y_0 + a\,y_0 + v_0.
+\]
+Completing the square: $z^2 + 2az + \omega^2 = (z + a)^2 + \omega^2 - a^2$. Hence
+\[
+Y(z) = \frac{F(z)}{(z+a)^2 + \omega^2 - a^2}
++ \frac{z + a}{(z+a)^2 + \omega^2 - a^2}\,y_0
++ \frac{1}{(z+a)^2 + \omega^2 - a^2}\,(a y_0 + v_0).
+\]
+
+We now consider three cases depending on the sign of $\omega^2 - a^2$.
+
+\subsubsection*{Case (1): $a^2 = \omega^2$ (critically damped)}
+
+In this case
+\[
+\frac{1}{(z+a)^2 + \omega^2 - a^2} = \frac{1}{(z+a)^2}, \qquad
+\frac{z+a}{(z+a)^2 + \omega^2 - a^2} = \frac{1}{z+a}.
+\]
+Recall $\mathcal{L}[e^{-at}](z) = \tfrac{1}{z+a}$ and
+\[
+\frac{1}{(z+a)^2} = -\frac{d}{dz}\frac{1}{z+a} = -\frac{d}{dz}\mathcal{L}[e^{-at}](z) = \mathcal{L}[t\,e^{-at}](z).
+\]
+Hence
+\[
+Y(z) = \mathcal{L}[t\,e^{-at}](z)\,\mathcal{L}[f](z) + \mathcal{L}[e^{-at}](z)\,y_0 + \mathcal{L}[t\,e^{-at}](z)\,(a y_0 + v_0),
+\]
+and formally inverting,
+\[
+\boxed{y(t) = \int_0^t (t - s)\,e^{-a(t-s)} f(s)\,ds + e^{-at}\,y_0 + t\,e^{-at}\,(a y_0 + v_0).}
+\]
+
+\subsubsection*{Case (2): $\omega^2 > a^2$ (underdamped)}
+
+We start from
+\[
+\boxed{\mathcal{L}[\cos(\beta t)](z) = \frac{z}{z^2 + \beta^2}, \qquad
+\mathcal{L}[\sin(\beta t)](z) = \frac{\beta}{z^2 + \beta^2}.}
+\]
+
+(\textit{Exercise:} check this is consistent with $\mathcal{L}[e^{-i\beta t}](z) = \tfrac{1}{z + i\beta}$.)
+
+Let $\beta = \sqrt{\omega^2 - a^2}$. Again rewrite the appearing reciprocals:
+\[
+\frac{1}{(z+a)^2 + \underbrace{\omega^2 - a^2}_{=\,\beta^2}}
+= \frac{1}{\beta} \cdot \frac{\beta}{(z+a)^2 + \beta^2}
+= \frac{1}{\beta}\,\mathcal{L}[e^{-at}\sin(\beta t)](z) \qquad \text{(frequency shift),}
+\]
+\[
+\frac{z + a}{(z+a)^2 + \underbrace{\omega^2 - a^2}_{=\,\beta^2}}
+= \mathcal{L}[e^{-at}\cos(\beta t)](z).
+\]
+Hence
+\[
+Y(z) = \mathcal{L}\!\left[\frac{1}{\beta}\,e^{-at}\sin(\beta t)\right](z)\,\mathcal{L}[f](z)
++ \mathcal{L}[e^{-at}\cos(\beta t)](z)\,y_0
++ \mathcal{L}\!\left[\frac{1}{\beta}\,e^{-at}\sin(\beta t)\right](z)\,(a y_0 + v_0).
+\]
+Therefore
+\[
+\boxed{
+\begin{aligned}
+y(t) &= \int_0^t \frac{1}{\sqrt{\omega^2 - a^2}}\,e^{-a(t-s)}\sin\!\left(\sqrt{\omega^2 - a^2}\,(t - s)\right) f(s)\,ds \\
+&\quad + y_0\,e^{-at}\cos\!\left(\sqrt{\omega^2 - a^2}\,t\right) \\
+&\quad + (a y_0 + v_0)\,\frac{1}{\sqrt{\omega^2 - a^2}}\,e^{-at}\sin\!\left(\sqrt{\omega^2 - a^2}\,t\right).
+\end{aligned}}
+\]
+
+\subsubsection*{Case (3): $\omega^2 < a^2$ (overdamped)}
+
+Recall
+\[
+\boxed{\mathcal{L}[\cosh(\beta t)](z) = \frac{z}{z^2 - \beta^2}, \qquad
+\mathcal{L}[\sinh(\beta t)](z) = \frac{\beta}{z^2 - \beta^2}.}
+\]
+
+(\textit{Exercise:} this can be derived from the formulas in case (2) using $\cosh(x) = \cos(ix)$ and $\sinh(x) = -i\sin(ix)$.)
+
+Let $\beta = \sqrt{a^2 - \omega^2}$. Then
+\[
+\frac{1}{(z+a)^2 + \underbrace{\omega^2 - a^2}_{=\,-\beta^2}}
+= \frac{1}{\beta}\cdot\frac{\beta}{(z+a)^2 - \beta^2}
+= \frac{1}{\beta}\,\mathcal{L}[e^{-at}\sinh(\beta t)](z),
+\]
+\[
+\frac{z + a}{(z+a)^2 + \underbrace{\omega^2 - a^2}_{=\,-\beta^2}}
+= \mathcal{L}[e^{-at}\cosh(\beta t)](z).
+\]
+Hence
+\[
+Y(z) = \mathcal{L}\!\left[\frac{1}{\sqrt{a^2 - \omega^2}}\,e^{-at}\sinh\!\left(\sqrt{a^2 - \omega^2}\,t\right)\right](z)\,\mathcal{L}[f](z)
++ \mathcal{L}[e^{-at}\cosh(\sqrt{a^2-\omega^2}\,t)](z)\,y_0
+\]
+\[
++ \mathcal{L}\!\left[\frac{1}{\sqrt{a^2 - \omega^2}}\,e^{-at}\sinh\!\left(\sqrt{a^2 - \omega^2}\,t\right)\right](z)\,(a y_0 + v_0).
+\]
+Therefore
+\[
+\boxed{
+\begin{aligned}
+y(t) &= \int_0^t \frac{1}{\sqrt{a^2 - \omega^2}}\,e^{-a(t-s)}\sinh\!\left(\sqrt{a^2 - \omega^2}\,(t - s)\right) f(s)\,ds \\
+&\quad + y_0\,e^{-at}\cosh\!\left(\sqrt{a^2 - \omega^2}\,t\right) \\
+&\quad + (a y_0 + v_0)\,\frac{1}{\sqrt{a^2 - \omega^2}}\,e^{-at}\sinh\!\left(\sqrt{a^2 - \omega^2}\,t\right).
+\end{aligned}}
+\]
+
+\subsection{General Strategy to Find a Solution}
+
+\begin{enumerate}
+\item Apply Laplace transform to the equation.
+\item Using calculus rules, isolate $\mathcal{L}[y]$.
+\item ``Detect'' known Laplace transforms on the right-hand side.
+\item ``Invert'': $\mathcal{L}[y] = \mathcal{L}[\text{detected function}]$.
+\end{enumerate}

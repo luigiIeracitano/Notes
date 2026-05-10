@@ -86,7 +86,7 @@ In both cases,
 Pictorially, as $\lambda \to \infty$ the graph of $f(\lambda x)$ becomes very concentrated (width $\sim \frac{1}{\lambda}$), while $\frac{1}{|\lambda|}\hat{f}(a/\lambda)$ becomes very spread out. Hence, when $f$ is ``very concentrated'', $\hat{f}$ is very spread out and vice versa. This is a manifestation of the \textbf{uncertainty principle}.
 \end{remark}
 
-\paragraph{(5) Derivatives}
+\paragraph{(5) Derivatives of $f$}
 Let $g(x) = f'(x)$. Then
 \[
 \hat{g}(a) = ia\,\hat{f}(a).
@@ -97,7 +97,42 @@ More generally, for all $n \in \mathbb{N}$,
 \]
 So the Fourier transform converts differential equations with constant coefficients into \textit{algebraic} equations on the frequency domain.
 
-\paragraph{(6) Convolution}
+\paragraph{(6) Derivatives of $\hat{f}$}
+This is the dual property of (5): instead of looking at how the derivative of $f$ affects $\hat{f}$, we look at how the derivative of $\hat{f}$ relates back to $f$. Suppose $f$ is piecewise continuous and that both
+\[
+\int_{-\infty}^{\infty} |f(x)|\,dx < \infty
+\qquad \text{and} \qquad
+\int_{-\infty}^{\infty} |x \cdot f(x)|\,dx < \infty.
+\]
+Then $\hat{f}$ is differentiable and
+\[
+\boxed{\big[\mathcal{F}[f](a)\big]' = -i\,\mathcal{F}[x f(x)](a).}
+\]
+More generally, if $|x^k f(x)|$ is integrable on $\mathbb{R}$ for all $k \leq n$, then
+\[
+\frac{d^n \hat{f}}{da^n}(a) = (-i)^n\,\mathcal{F}[x^n f(x)](a).
+\]
+\begin{proof}[Computation]
+Differentiating under the integral sign,
+\[
+\frac{d}{da}\hat{f}(a)
+= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} \frac{\partial}{\partial a}\!\left(e^{-iax}\right) f(x)\, dx
+= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} (-ix)\,e^{-iax} f(x)\, dx
+= -i\,\mathcal{F}[x f(x)](a).
+\]
+The integrability of $|x f(x)|$ is what justifies differentiating under the integral.
+\end{proof}
+
+\begin{remark}
+Note the duality with property (5):
+\begin{itemize}
+  \item Differentiating in the \emph{physical domain} $\Longleftrightarrow$ multiplying by $ia$ in the \emph{frequency domain}.
+  \item Multiplying by $-ix$ in the \emph{physical domain} $\Longleftrightarrow$ differentiating in the \emph{frequency domain}.
+\end{itemize}
+This symmetry reflects the fact that $x$ and $a$ are conjugate variables under the Fourier transform. The same kind of duality reappears for the Laplace transform: $F'(z) = -\mathcal{L}[t f(t)]$.
+\end{remark}
+
+\paragraph{(7) Convolution}
 Given $f, g : \mathbb{R} \to \mathbb{C}$, the \textbf{convolution} $f * g : \mathbb{R} \to \mathbb{C}$, whenever well-defined, is
 \[
 (f * g)(x) = \int_{-\infty}^{\infty} f(y)\, g(x - y)\, dy.
@@ -131,13 +166,13 @@ which is the local average of $f$ around $x$. As $\varepsilon \to 0$, $(f * g)(x
 \]
 In applications, one can often express $\mathcal{F}[f]$ as a product of known Fourier transforms, which allows one to recover $f$ by convolution.
 
-\paragraph{(7) Gaussian Function}
+\paragraph{(8) Gaussian Function}
 If $f(x) = e^{-x^2/2}$, then
 \[
 \hat{f}(a) = e^{-a^2/2}.
 \]
 
-\paragraph{(8) Plancherel's Theorem}
+\paragraph{(9) Plancherel's Theorem}
 \[
 \int_{-\infty}^{\infty} |f(x)|^2\, dx = \int_{-\infty}^{\infty} |\hat{f}(a)|^2\, da.
 \]
@@ -254,10 +289,14 @@ so any $\gamma_0 > 0$ is an abscissa of convergence, and $\mathcal{L}[f](z)$ is 
 \[
 \mathcal{L}[1](z) = \int_0^{\infty} e^{-zt}\, dt = \left[\frac{e^{-zt}}{-z}\right]_0^{\infty}.
 \]
-Since $\mathrm{Re}(z) > 0$ we have $\lim_{t \to \infty} e^{-zt} = 0$ (
-
-because $|e^{-zt}| = |e^{\mathrm{Re}zt}|  |e^{-\mathrm{Im}zti}|$ (real part $\to 0$ and Im $ = 1$ as $t \to \infty$)
+Since $\mathrm{Re}(z) > 0$ we have $\lim_{t \to \infty} e^{-zt} = 0$ (because $|e^{-zt}| = |e^{\mathrm{Re}zt}|  |e^{-\mathrm{Im}zti}|$ (real part $\to 0$ and Im $ = 1$ as $t \to \infty$)
 \[
 \boxed{\mathcal{L}[1](z) = \frac{1}{z}, \quad \mathrm{Re}(z) > 0.}
 \]
 \end{example}
+
+\paragraph{Laplace transform of $e^{at}$}
+For any $a \in \mathbb{R}$, $\gamma_0 = a$ is an abscissa of convergence for $\mathcal{L}[e^{at}](z)$, and
+\[
+\boxed{\mathcal{L}[e^{at}](z) = \frac{1}{z - a}, \quad \mathrm{Re}(z) > a.}
+\]

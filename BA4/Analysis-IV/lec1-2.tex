@@ -1,5 +1,7 @@
 % !TEX root = master.tex
 % !TEX program = lualatex
+
+\lecture{1}{19-02-2026}{Basics}{}
 \chapter{Review of complex numbers $\mathbb{C}$}\label{chap:}
 
 \section{Basic Definitions}
@@ -25,9 +27,9 @@ e^{i\theta}=\cos\theta+i\sin\theta,
 \section{Polar Coordinates}
 If $z\neq 0$, there exist $r=|z|>0$ and an argument $\theta$ such that
 \[
-z = r e^{i\theta}, \qquad \theta \equiv \Arg(z)\;\;(\mathrm{mod}\;2\pi).
+z = r e^{i\theta}, \qquad \theta \equiv Arg(z)\;\;(\mathrm{mod}\;2\pi).
 \]
-\textbf{Principal argument:} $\Arg(z)\in(-\pi,\pi]$.
+\textbf{Principal argument:} $Arg(z)\in(-\pi,\pi]$.
 
 \textbf{Products/quotients in polar form:} if $z_1=r_1e^{i\theta_1}$, $z_2=r_2e^{i\theta_2}$,
 \[
@@ -42,7 +44,6 @@ To solve $z^k = a$ ($a\neq 0$), write $a=\rho e^{i\alpha}$:
 z = \rho^{1/k} e^{i(\alpha+2\pi m)/k}, \qquad m=0,1,\dots,k-1.
 \]
 Thus there are \textbf{$k$ solutions} (counting multiplicities).
-\chapter{Complex functions}\label{chap:}
 \section{Complex functions}
 A function $f:\Omega\subset\mathbb{C}\to\mathbb{C}$ can be written as
 \[
@@ -92,6 +93,8 @@ Let $\Omega\subset\mathbb{C}$ be \textbf{open}.
 Recall: $\Omega$ is open if $\forall z_0\in\Omega,\ \exists r>0$ such that the disk
 $D_r(z_0)=\{z:|z-z_0|<r\}\subset\Omega$.
 
+
+\lecture{2}{26-02-2026}{C-R and Complex Logarithm}{}
 \section{Cauchy--Riemann Equations}
 
 \subsection{Theorem (C--R)}
@@ -159,19 +162,29 @@ so locally it is a \textbf{scaling} (factor $\sqrt{a^2+b^2}$) followed by a \tex
 \section{Complex Logarithm}
 
 \subsection{Argument and Discontinuity}
-$\Arg(z)$ (principal value) is defined on $\mathbb{C}\setminus\{0\}$ but is \textbf{discontinuous} along the negative real axis
+$Arg(z)$ (principal value) is defined on $\mathbb{C}\setminus\{0\}$ but is \textbf{discontinuous} along the negative real axis
 (jump from $\pi$ to $-\pi$).
 
-\subsection{Definition of the Principal Logarithm}
-For $z\neq 0$,
 \[
-\boxed{Log(z)=\log|z|+i\,\Arg(z)}
+\text{Arg}(z) =
+\begin{cases}
+\arctan\left(\dfrac{y}{x}\right) & \text{if } x > 0 \\[6pt]
+\arctan\left(\dfrac{y}{x}\right) + \pi & \text{if } x < 0 \text{ and } y \ge 0 \\[6pt]
+\arctan\left(\dfrac{y}{x}\right) - \pi & \text{if } x < 0 \text{ and } y < 0 \\[6pt]
+\dfrac{\pi}{2} & \text{if } x = 0 \text{ and } y > 0 \\[6pt]
+-\dfrac{\pi}{2} & \text{if } x = 0 \text{ and } y < 0
+\end{cases}
 \]
-(principal branch).
+
+\subsection{Definition of the Principal Logarithm}
+The principal branch of the complex logarithm is
+\[
+\boxed{Log(z)=\log|z|+i\,Arg(z)}
+\]
+and is defined on $\mathbb{C}^*$ and holomorphic on $\mathbb{C} \setminus \{(-\infty, 0)\}$.
 
 \subsection{Properties and Remarks}
 \begin{itemize}
-\item $Log$ is not defined at $0$ and is not globally continuous (branch cut).
 \item On a domain where a branch is chosen (e.g. $\mathbb{C}\setminus\{x\le 0\}$), $Log$ is holomorphic and
 \[
 (Log z)'=\frac{1}{z}.
