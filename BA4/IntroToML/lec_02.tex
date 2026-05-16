@@ -39,11 +39,11 @@ y = w^{\left(0\right)} + w^{\left(1\right)}x^{\left(1\right)} + w^{\left(2\right
 Whatever the dimension, we can write 
 \[
   y = w^Tx \quad x \in \mathbb{R}^{D+1}
-\] , where the extra dimesion contains a 1 to account for $w^{\left(0\right)}$\\
+\] , where the extra dimension contains a 1 to account for $w^{\left(0\right)}$ (bias).\\
   
 Because the output remains 1D, we can still use the same least square loss function, and write training as 
 \[
-min_w \frac{1}{N}\sum_{i=1}^{N}d^2\left(\hat{y_i}, y_i\right) \iff min_w \frac{1}{N}\sum_{i=1}^{N}\left(x_i^Tw-y_i\right)^2  
+\min_w \frac{1}{N}\sum_{i=1}^{N}d^2\left(\hat{y_i}, y_i\right) \iff \min_w \frac{1}{N}\sum_{i=1}^{N}\left(x_i^Tw-y_i\right)^2  
 \]
 Solving this minimization problem involves computing its derivatives (derivation and gradient) w.r.t the model parameters (w). 
 
@@ -167,7 +167,7 @@ So we use a matrix \textbf{W} $\in \mathbb{R}^{(D+1)\times C}$ s.t
 where each $w_{(j)}$ is a $(D+1)$-dimensional vector, used to predict one output dimension. \\
 The multi-output linear regression is written
 \[
-  R(W) = min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
+  R(W) = \min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
 \]
 where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here $a \in \mathbb{R}^C$).\\
 
@@ -219,7 +219,7 @@ for linear regression can be used:
 \begin{itemize}
   \item Given $N$ pairs {$(x_i, y_i)$}, we can use the least-square loss to write
     \[
-      R(w) = min_w \sum_{i=1}^{N}(x_i^Tw - y_i)^2  
+      R(w) = \min_w \sum_{i=1}^{N}(x_i^Tw - y_i)^2  
     \]
 \end{itemize}
 So because the formulation is the same, the solution too

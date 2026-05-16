@@ -4,7 +4,7 @@
 \lecture{3}{03-03-26}{Linear Models for Classification (Binary classification)}{}
 \subsection{Loss function}
 \begin{definition}[Loss function]
-  The loss function (general ML concept) : $l(\hat{y_i}, yi)$ computes an error value between the prediction and the true value.
+  The loss function (general ML concept) : $\mathcal{L}(\hat{y_i}, yi)$ computes an error value between the prediction and the true value.
 \end{definition}
 In general we use the empirical risk (the mean of the loss on the training or test data) \[
   \hat{R}(w) = \frac{1}{N_t}\sum_{i=1}^{N_t}\mathcal{L}(y_i, \hat{y}_i) 
@@ -56,8 +56,8 @@ To learn the parameters \textbf{w} need a loss function: \\
 \textbf{1D case}
 
 \[
-  R(w) = - \sum_{i = 1}^N  (y_iln(\hat{y_i}) + (1-y_i)ln(1 - \hat{y_i}))
-= - \sum_{i \in positive samples} ln(\hat{y_i}) - \sum_{i \in negative samples} ln(1 - \hat{y_i})
+  R(w) = - \sum_{i = 1}^N  (y_i \ln(\hat{y_i}) + (1-y_i) \ln(1 - \hat{y_i}))
+= - \sum_{i \in positive samples} \ln(\hat{y_i}) - \sum_{i \in negative samples} \ln(1 - \hat{y_i})
 \] \to as $y_i$ is either 0 or 1 \\
 It's a \textbf{convex} function, however, its minimization has no closed-form solution. So we optimize it via gradient descent.\\
 The \textbf{algorithm} for minimization is:
@@ -102,10 +102,10 @@ So to decrease the function we therefore move in the direction opposite to the g
 \end{itemize}
 
 \textbf{Cross-Entropy (multiple outputs)}: \[
-  R(w) = - \sum_{i = 1}^N y_iln \sigma(w^Tx_i) + (1 - y_i)ln(1 - \sigma(w^Tx_i)) 
+  R(w) = - \sum_{i = 1}^N y_i \ln \sigma(w^Tx_i) + (1 - y_i) \ln(1 - \sigma(w^Tx_i)) 
 \]
 \[
-  = - \sum_{i \in positive samples} ln \sigma(w^Tx_i) - \sum_{i \in negative samples} ln(1 - \sigma(w^Tx_i))
+  = - \sum_{i \in positive samples} \ln \sigma(w^Tx_i) - \sum_{i \in negative samples} \ln(1 - \sigma(w^Tx_i))
 \]
 To minimize it via gradient descent we compute its gradient w.r.t \textbf{w} \[
   \nabla_w R(w) = \sum_{i=1}^{N} (\hat{y_i} - y_i) x_i 
