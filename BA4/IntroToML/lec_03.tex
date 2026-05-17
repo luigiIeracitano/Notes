@@ -50,15 +50,14 @@ it can be interpreted as the probability that \textbf{x} belongs to the positive
 \\ Even that the name of this model is logistic \textbf{regression}, this is truly a classification model, not a regression one.
 
 \subsubsection{Training}
-To learn the parameters \textbf{w} need a loss function: \\
+To learn the parameters $w$ need a loss function that works well with probabilities, and keeps the problem convex: \\
 \textbf{Cross-entropy} :
 
 \textbf{1D case}
-
 \[
   R(w) = - \sum_{i = 1}^N  (y_i \ln(\hat{y_i}) + (1-y_i) \ln(1 - \hat{y_i}))
 = - \sum_{i \in positive samples} \ln(\hat{y_i}) - \sum_{i \in negative samples} \ln(1 - \hat{y_i})
-\] \to as $y_i$ is either 0 or 1 \\
+\] as $y_i$ is either 0 or 1 \\
 It's a \textbf{convex} function, however, its minimization has no closed-form solution. So we optimize it via gradient descent.\\
 The \textbf{algorithm} for minimization is:
 \begin{itemize}
@@ -73,12 +72,13 @@ The \textbf{algorithm} for minimization is:
 This algorithm converges because the derivative becomes smaller $(\frac{dR(w)}{dw} \to  0$ ($\nabla w$ becomes smaller)).\\
 The $\eta$ influences the speed of the convergences (doing bigger or smaller steps), but having too large steps may make the algorithm to jumps between two points and never converge. \\
 As the initial $w_0$ is the starting point, having a $w_0$ near the minimum will makes the algorithm converges faster. \\ 
-\\ 
+\\
+\paragraph{Remark}
 To minimize \textbf{non-convex} function the same algorithm can be used. However, different initializations yield to different results because there is more than one point with derivative equal to zero.
 
 \includegraphics[width=0.5\linewidth]{images/img_20260304_200302.png}
 \includegraphics[width=0.5\linewidth]{images/img_20260304_200321.png}
-\textbf{D dimensions case}
+\textbf{D dimensions case }
 As in practice we have more than one parameter (i.e \textbf{w} $\in \mathbb{R}^{D+1}$), we use the function gradient: \[
   \nabla_w R(w) = \begin{pmatrix}
   \frac{\partial R}{\partial w^{(0)}} \\
@@ -88,13 +88,13 @@ As in practice we have more than one parameter (i.e \textbf{w} $\in \mathbb{R}^{
   \end{pmatrix}
   \in \mathbb{R}^D
 \]
-Recap : the gradient at a point $w$ has the direction of the greatest increase of the function at $w$ and its magnitude is the rate of increase in that direction. \\
+\textbf{Recap }  The gradient at a point $w$ has the direction of the greatest increase of the function at $w$ and its magnitude is the rate of increase in that direction. \\
 So to decrease the function we therefore move in the direction opposite to the gradient. 
-\\
+\clearpage 
+
 \textbf{Gradient descent} is used to find the $argmin$ of a function, i.e., we want to find the values of parameters $x$ such that a function $f$ is minimized : \[
   x^* = \operatorname*{argmin}_xf(x)
 \]
-\newpage
 \textbf{Algorithm - gradient descent}
 \begin{itemize}
   \item 1. Initialize $w_0$ (e.g, randomly)
@@ -107,7 +107,7 @@ So to decrease the function we therefore move in the direction opposite to the g
 \[
   = - \sum_{i \in positive samples} \ln \sigma(w^Tx_i) - \sum_{i \in negative samples} \ln(1 - \sigma(w^Tx_i))
 \]
-To minimize it via gradient descent we compute its gradient w.r.t \textbf{w} \[
+To minimize it via gradient descent we compute its gradient w.r.t $w$ \[
   \nabla_w R(w) = \sum_{i=1}^{N} (\hat{y_i} - y_i) x_i 
 \]
 where $y_i$ is the true label for sample $i$, i.e., 1 for positive samples and 0 for negative samples. 

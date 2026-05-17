@@ -82,19 +82,19 @@ View House Numbers
 \section{Notation}
 We denote the $i^{th}$ data sample (input) in the collection of $N$ samples as 
 \[ x_i \in \mathbb{R}^D ,\]
-a column vector of dimension D.\\ 
+a column vector of dimension $D$.\\ 
 We denote the $i^{th}$ label (output) in the collection of $N$ samples as $y_i$.\\
 $y_i$ :
 \begin{itemize}
   \item for classification represents the category the sample belongs to.
-  \item for regression, it can be a single continuous value, or a column vector of dim C.
+  \item for regression, it can be a single continuous value, or a column vector of dim $C$.
 \end{itemize}
 
 Example:
 \begin{center}
 \includegraphics[width=0.5\linewidth]{images/img_20260217_114947.png}\\ 
 \end{center}
-Here, $x_i$ is one 2D point and thus D = 2, $y_i$ is a discrete value indicating the class (color), i.e, 1, 2 or 3.
+Here, $x_i$ is one 2D point and thus $D = 2$, $y_i$ is a discrete value indicating the class (color), i.e, 1, 2 or 3.
 
 \section{Linear Regression}
 \subsection{Training}%
@@ -124,5 +124,5 @@ Training can then be expressed as the least-squared minimization problem:
 Once the best line for the given \textit{N} observations is found, we can use it to predict a $y$ value for a new $x$.\\
 Let $w^{\left(0\right)*}$ and $w^{\left(1\right)*}$ be the best line parameters given the observations. \\ 
 Then 
-\[\hat{y} = w^{\left(0\right)*} + w^{\left(1\right)*}x\] is the estimate value of y for any x.
+\[\hat{y} = w^{\left(0\right)*} + w^{\left(1\right)*}x\] is the estimate value of $y$ for any $x$.
 

@@ -71,7 +71,7 @@ to different (sometimes much worse) clusterings.
   \item Simple algorithm, guaranteed to converge.
   \item Returns exactly $K$ clusters.
   \item Fully unsupervised: only needs the data, no labels. 
-  \item The Euclidean distance works well when all dimensions are \emph{homogeneous}
+  \item The Euclidean distance works well when all dimensions are \emph{homogeneous}.
 \end{itemize}
 
 \textbf{Cons and remedies:}
@@ -104,7 +104,7 @@ interpretability.
 \end{center}
 
 \subsection{Example: color-based image segmentation}
-A natural application of K-means is image segmentation by color (Bishop, Ch.~9.1): each pixel
+A natural application of K-means is image segmentation by color: each pixel
 is treated as a data point $x_i \in \mathbb{R}^3$ encoded by its RGB values, and K-means
 groups pixels with similar colors. Increasing $K$ yields finer segmentations.
 
@@ -119,7 +119,9 @@ RGB pixels in $[0,255]^3$, or human pose vectors where every dimension represent
 type of quantity.
 
 In practice this is not always the case. Different dimensions can have wildly different
-magnitudes \emph{and} represent completely different kinds of information. Consider the
+magnitudes \emph{and} represent completely different kinds of information.
+
+\textbf{Example } Consider the
 \textbf{Wine dataset} (UCI ML repository): 178 wines from 3 producers, each described by 13
 attributes such as alcohol content, malic acid, magnesium. Two samples:
 \[

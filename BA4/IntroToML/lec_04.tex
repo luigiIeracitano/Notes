@@ -48,11 +48,13 @@ But, still two classifiers with the same precision and recall could have a very 
 \end{definition}
 
 \begin{definition}[F1 score]
-Single number that combines precision and recall (good for unbalance data)
-  \[
+Single number that combines precision and recall  \[
     F1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall}
   \]
 \end{definition}
+The F1 score is used as it provides a balanced measure between precision and recall, which is particularly useful when the classes are imbalanced. 
+\paragraph{Example}
+Class A: 990 samples, Class B: 10 samples. With an accuracy of 99\% we don't know if our model recognizes the class B or it predict every samples as class A. But with F1 score this would be detected (poor F1 score).
 
 \subsubsection{ROC curves}
 \begin{wrapfigure}{r}{0.5\linewidth}
@@ -66,8 +68,8 @@ The decision between positive and negative can be computed by thresholding this 
 where $\tau$ is a given threshold
 
 The Receiver Operating Characteristic (ROC) curve plots the true positive rate (recall) as a function of the false positive rate, obtained by varying the score threshold. \\
-This model give a score(probability) to each observation(here Inst#) and make the threshold vary, then compute the TP and FP rate, and plot the curves. \\ 
-A good model as a plot near the top left corner (meaning that the TP rate is high and the FP rate low) as we mesure the quality of the model with the Area under the curve \textbf{(AUC)}(goes from 0 to 1), 1.0 that the model is perfect, 0.5 is the result if the model makes random predictions, and less is worse than randomness. 
+This model give a score (probability) to each observation (here Inst#) and make the threshold vary, then compute the TP and FP rate, and plot the curves. \\ 
+A good model as a plot near the top left corner (high TP rate and low FP rate) as we mesure the quality of the model with the Area under the curve \textbf{(AUC)}(goes from 0 to 1), 1.0 that the model is perfect, 0.5 is the result if the model makes random predictions, and less is worse than randomness. 
 
 \subsection{From binary to multi-class classification}
 What if we have more than two classes? How our three linear models can handle this scenario ?
@@ -78,7 +80,7 @@ What if we have more than two classes? How our three linear models can handle th
 \end{wrapfigure}
 
 First let's update our knowledge on decision boundaries, as here we are not anymore treating binary label. \\ 
-The decision boundary between two classes $k$ and $j$ is defined as the set of points  \textbf{x} such that \[
+The decision boundary between two classes $k$ and $j$ is defined as the set of points $x$ such that \[
  \hat{y}^{\left(k\right)}(x) = \hat{y}^{\left(j\right)}(x)
 \]\\
 This corresponds to the $(D - 1)-$dimensional hyperplane. \\
@@ -104,7 +106,7 @@ each individual class, and then average over the classes.\\
 In this case, each individual class is in turn considered as the “positive” class
 while the others act as the “negative” class.\\
 This does not account for class imbalance (some classes may have many
-more samples than others; more about this in a future lecture).\\
+more samples than others).\\
 This can be handled by weighting the metric for each class by a value
 depending on the proportion of samples from that class.
 
@@ -112,19 +114,19 @@ depending on the proportion of samples from that class.
 The most common approach to modeling a multi-class problem
 consists of encoding the class label as a vector with a single 1
 at the index corresponding to the category and 0s elsewhere. \\
-\textbf{e.g.} in a 5-class problem, a sample in class 2 is represented as:
+\textbf{Example} in a 5-class problem, a sample in class 2 is represented as:
 \[
   y = \begin{pmatrix} 0 \\ 1 \\ 0 \\ 0 \\ 0
   \end{pmatrix}
 \] This is referred as \textbf{one-hot-encoding}.  \\ 
-As this is similar to making the model output multiple (as for multi-output regression), we therefore again use a matrix \textbf{W} $\in \mathbb{R}^{\left(D+1\right)\times C}$, s.t \[
+As this is similar to making the model output multiple values (as for multi-output regression), we therefore again use a matrix \textbf{W} $\in \mathbb{R}^{\left(D+1\right)\times C}$, s.t \[
   \hat{y_i} = W^T x_i = \begin{pmatrix} w_\left(1\right)^T \\ w_\left(2\right)^T \\ \vdots \\ w_\left(C\right)^T
   \end{pmatrix} x_i 
 \]
 where each $w_\left(j\right)$ is a $(D + 1)-$dimensional vector, used to predict one output dimension, i.e., the \textbf{score} for one class.
 \subsubsection{Training}
 We can then write training as \[
-  min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2 
+ \min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2 
 \]
 where each $y_i$ is now a $C-$dimensional vector with a single one at the index corresponding to the class label and zeroes everywhere else.
 \subsubsection{Solution}
@@ -155,20 +157,18 @@ In other words the final label k is obtained as \[
 \]
 That is, the label is the index (position) of the maximum value in the vector $\hat{y}$
 \\
-E.g: if we have \[
+\textbf{Example} if we have \[
   \hat{y} = \begin{pmatrix} \hat{y}^{\left(1\right)} \\ \hat{y}^{\left(2\right)} \\ \hat{y}^{\left(3\right)}\end{pmatrix} = \begin{pmatrix} 2.3 \\ 0.7 \\ -1.5\end{pmatrix}
-\] here the $\operatorname*{argmax}_j$(biggest score) is 2.3, so the label predicted is the label 1.
-\\
+\] here the $\operatorname*{argmax}_j $(biggest score) is 2.3, so the label predicted is the label 1.
 
-(boundary where $\hat{y}_i$ = $\hat{y}_k$ (for 2 different classes))
-Example of success and failure case of 2D inputs and 3 classes least-square classification:
+\paragraph{Example} of success and failure case of 2D inputs and 3 classes least-square classification:
 \begin{center}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_222715.png}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_222727.png}
 \end{center}
 
 \subsubsection{Drawbacks}
-As in the binary case, the multi-class least-square classification suffer from outliers, because it tries to minimize the distance (regression). So we need an other model like the logistic regression one but for multi-class: \textbf{Multi-class logistic regression} :O !!
+As in the binary case, the multi-class least-square classification suffer from outliers, because it tries to minimize the distance (regression). So we need an other model like the logistic regression one but for multi-class: \textbf{Multi-class logistic regression} WOWOWOW !!
 
 \subsection{Multi-class logistic regression}
 We still use the one-hot enconding to represent multi-class labels. \\
@@ -179,12 +179,12 @@ But now, the probability for a class $k$ is given by the \textbf{softmax} functi
 \\
 The empirical risk can then be derived from the multi-class version of the cross entropy, which yields \[
   R(W) = - \sum_{i=1}^{N}\sum_{k=1}^{C}y_i^{\left(k\right)}\ln \hat{y}_i^{\left(k\right)} = - \sum_{i=1}^{N}\ln\hat{y}_i^{\text{(true class of i)}}
-\](i \to go through the samples, k \to go through the classes) 
+\](i \leftarrow  go through the samples, k \leftarrow  go through the classes) 
 \\
 As in the binary case :
 \begin{itemize}
-  \item a single $y_i^{\left(k\right)}$ is 1 for every sample $i$, so we really have one term per training sample. (as if sample $k$ belongs to class $i$ then only the term for this class/label stay in the sum (other are 0))
-  \item training is done by minimizing this empirical risk using gradient descent
+  \item a single $y_i^{\left(k\right)}$ is 1 for every sample $i$, so we really have one term per training sample. (as if sample $k$ belongs to class $i$ then only the term for this class/label stay in the sum (other are 0)).
+  \item training is done by minimizing this empirical risk using gradient descent.
 \end{itemize}
 \subsubsection{Gradient}
 
@@ -202,7 +202,7 @@ Thus the gradient will also be a matrix
 
 \subsubsection{Prediction}
 
-At test time, given a new input sample \textbf{x}, the probability for any class $k$ is computed via the softmax function as \[
+At test time, given a new input sample $x$, the probability for any class $k$ is computed via the softmax function as \[
   \hat{y}^{\left(k\right)}(x) = \frac{\exp((w_{\left(k\right)}^*)^Tx)}{\sum_{j=1}^{C}exp((w_{\left(j\right)}^*)^Tx) } 
 \]
 The final class label is then predicted as \[
@@ -213,14 +213,15 @@ That is, as in least-square classification, the label is the
 index (position) of the maximum value in the vector $\hat{y}$.
 
 \subsubsection{Example}
+\begin{center}
 2D inputs, 3 classes: Logistic regresison results \\
 \includegraphics[width=0.4\linewidth]{images/img_20260311_231537.png}
 \includegraphics[width=0.4\linewidth]{images/img_20260311_231544.png}
-
+\end{center}
 
 \subsection{Dealing with multiple classes}
 SVM cannot be extended to the multi-class scenario. \\
-Instead one can use several binary classifier E.g, one-vs-rest or one-vs-one (however leaves ambiguities and inconsistencies (a sample can be classified being from more that one class at a time))
+Instead one can use several binary classifier (e.g, one-vs-rest or one-vs-one, however leaves ambiguities and inconsistencies as a sample can be classified being from more that one class at a time).
 \includegraphics[width=0.5\linewidth]{images/img_20260311_234308.png}
 \includegraphics[width=0.5\linewidth]{images/img_20260311_234320.png}
 
@@ -230,12 +231,12 @@ In practice, one almost never uses the least-square one (only for pedagogiqual s
 Depending on the data to classify, we may use Logistic regression or SVM as they are both better than the other one depending of the data.
 
 \subsection{Recap - and new challenge}
-Linear regression : Fit a linear model to the observations\\
-Binary linear classification: Use a linear model to separate the positive and negative samples\\
-Multi-class linear classification: Use a linear model to separate the classes, via a one-hot encoding of the label
-
+Linear regression : Fit a linear model to the observations.\\
+Binary linear classification: Use a linear model to separate the positive and negative samples.\\
+Multi-class linear classification: Use a linear model to separate the classes, via a one-hot encoding of the label.
+\begin{center}
 \includegraphics[width=0.3\linewidth]{images/img_20260311_234835.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260311_234923.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260311_234938.png}
-\\
-Unfortunately, no linear model can directly fit non linear data (we will go from linear to non linear model).
+\end{center}
+Unfortunately, no linear model can directly fit non linear data, so we will go from linear to non linear models.

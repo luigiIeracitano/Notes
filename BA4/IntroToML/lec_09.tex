@@ -5,18 +5,24 @@
 \section{Deep Learning}
 So far, all the representations we have used were manually designed. 
 The key idea of neural networks is to \textbf{learn the representation 
-jointly with the classifier}, removing the need for hand-crafted features. 
+jointly with the classifier or with the linear model that comes afterward (same for regression)}, removing the need for hand-crafted features. 
+
 The model is built as a stack of \textbf{layers}, each composed of 
 \textbf{neurons} connected to every neuron of the previous layer. Each 
 neuron computes a weighted sum of its inputs, then passes the result 
 through a \textbf{non-linear activation function} — without this 
 non-linearity, the whole network would collapse into a single linear model. 
+Thus we learn jointly all the weights of the network in a single training pass: the weights of the hidden layers define the representation of the data, while the weights of the last layer correspond to the final linear model.
+
 Depending on the output layer and the loss function used, the same 
 architecture handles both \textbf{regression} (square loss) and 
-\textbf{classification} (softmax + cross-entropy). This framework is 
-referred to as \textit{neural network}, \textit{multilayer perceptron (MLP)}, 
-or \textit{deep learning} when there are at least two hidden layers.\subsection{Parametric feature expansion}
-As we have seen, parametric feature expansion isn't optimal as we need to define manually the polynomial expansion $\phi(x)$ and we would like to learn the representation conjointly with the classifier. 
+\textbf{classification} (softmax + cross-entropy). 
+
+This framework is referred to as \textit{neural network}, \textit{multilayer perceptron (MLP)}, 
+or \textit{deep learning} when there are at least two hidden layers.
+
+\subsection{Parametric feature expansion}
+As we have seen, parametric feature expansion isn't optimal as we need to define manually the polynomial expansion $\phi(x)$ and we would like to learn the representation conjointly with the model. 
 To achieve this goal we have to add \textbf{nonlinearity} in the process. 
 
 We will use a nonlinear function (\textbf{activation function}) $f: \mathbb{R} \to \mathbb{R}$.
@@ -121,7 +127,7 @@ but we can stack multiple layers.
 
 In essence, each hidden layer takes as input the output of the previous layer.
 
-For the first hidden layer ():
+For the first hidden layer:
 \[
   z_{(1)} = f\left(W_{(1)}^T x\right)
 \]
@@ -207,9 +213,9 @@ This gives us a way to compute the gradient at any layer, starting from the last
 \\
 So the training consists of repeating this until convergence: 
 \begin{enumerate}
-  \item \textbf{Forward pass : } propagate $x_i$ through each layer to compute and $z_{(l)}$ 
-  \item \textbf{Backpropagation : } compute each $\delta_{(l)}$, starting from the last layer, and gives us the gradient $\frac{\partial \ell_i}{\partial W_{(l)}^{(k,j)}}$ 
-  \item \textbf{Gradient descent : } use those gradients to update the weights $W_i$
+  \item \textbf{Forward pass :} propagate $x_i$ through each layer to compute and store $z_{(l)}$ 
+  \item \textbf{Backpropagation :} compute each $\delta_{(l)}$, starting from the last layer, and gives us the gradient $\frac{\partial \ell_i}{\partial W_{(l)}^{(k,j)}}$ 
+  \item \textbf{Gradient descent :} use those gradients to update the weights $W_i$
 \end{enumerate}
 
 \subsection{Optimization}
@@ -218,7 +224,7 @@ The standard gradient descent update at iteration $k$:
 \[
   W_k \leftarrow W_{k-1} - \eta \frac{1}{N}\sum_{i=1}^{N} \nabla_W \ell_i(W_{k-1})
 \]
-This is expensive for large $N$. 
+This is expensive for large $N$ as at each iteration we have to compute the gradient over all the samples of the dataset. 
 
 \textbf{Stochastic gradient descent (SGD)} 
 uses a single sample per iteration:
@@ -252,8 +258,7 @@ with $\gamma > 0$, momentum
 \end{center}
 
 
-\paragraph{Adaptive learning rate} Methods such as \textbf{ADAM} 
-(Kingma et al., ICLR 2015) maintain a moving average per coordinate 
+\paragraph{Adaptive learning rate} Methods such as \textbf{ADAM} maintain a moving average per coordinate 
 to rescale each dimension of the gradient separately. 
 \begin{center}  
 \includegraphics[width=0.5\linewidth]{images/img_20260421_141043.png}
@@ -280,7 +285,7 @@ values of the weights is layer dependent.
 Deep networks have many parameters and can overfit. Solutions include:
 \begin{itemize}
   \item $L_1$ / $L_2$ regularization (seen previously)
-  \item \textbf{Dropout} (Srivastava et al., JMLR 2014): randomly remove 
+  \item \textbf{Dropout}: randomly remove 
   units and their connections during training
 \end{itemize}
 

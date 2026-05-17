@@ -2,7 +2,6 @@
 % !TEX program = lualatex
 \lecture{7}{31-03-2026}{Kernel Methods}{}
 \subsection{Kernel function}
-
 When using feature expansion, we realised that we could use any function of the input — but two problems arise:
 \begin{itemize}
   \item \textbf{Choice}: how do we choose a good mapping $\phi(\cdot)$?
@@ -32,7 +31,7 @@ k(x_i, x_j) = \phi(x_i)^T \phi(x_j) = \left\|\phi(x)\right\|^2
 \]
 The mapping $\phi(\cdot)$ may be unknown or computationally expensive, but the kernel function allows us to compute similarities implicitly.
 
-\subsubsection{Example}
+\subsubsection{Examples of kernel functions}
 \textbf{Polynomial kernel}
 \[
   k(x_i,x_j) = (x_i^T x_j + c)^d
@@ -69,7 +68,7 @@ $Visualization$:
 Since a kernel function corresponds to a similarity, as a dot
 product, one can replace any dot product between two
 samples in the solution of an ML algorithm with a kernel
-function \to $kernelizing$ an algorithm (not only for linear model !).
+function. This trick is called $kernelizing$ an algorithm (not only for linear model !).
 
 \subsubsection{Kernelization: Notation}
 The kernel function computes a similarity between two samples, and can be written as $k(x_i, x_j)$. 
@@ -116,7 +115,7 @@ Therefore, the empirical risk : \[
 is re-written as 
 \[
   R(\alpha) = \sum_{i=1}^{N}(\alpha ^T \Phi \phi (x_i) - y_i)^2 = \sum_{i=1}^{N} (\alpha ^T k(X, x_i) - y_i)^2 
-\] (as $\Phi \cdot \phi(x_i)$ is the dot product of all training samples and sample i !)
+\] (as $\Phi \cdot \phi(x_i)$ is the dot product of all training samples and sample $i$ !)
 
 The gradient of the risk w.r.t $\alpha$ is given by \[
   \nabla R(\alpha) = 2 \sum_{i=1}^{N} k(X,x_i)(k(X,x_i)^T \alpha - y_i) = 2KK \alpha - 2 Ky
@@ -148,7 +147,7 @@ Using the Representer theorem, the regularized empirical risk \[
 Can be re-written as \[
   E(\alpha) = \sum_{i=1}^{N} (\alpha ^T \Phi \phi(x_i) - y_i)^2 + \lambda \alpha ^T \Phi \Phi ^T \alpha =  \sum_{i=1}^{N} (\alpha ^T k(X, x_i) - y_i)^2 + \lambda \alpha ^T K \alpha 
 \]
-The gradient become \[
+The gradient becomes \[
   \nabla _a E(\alpha) = 2K (K+ \lambda I_N)\alpha - 2Ky
 \]Setting it to zero yields the solution \[
 \alpha ^* = (K + \lambda I_N)^{-1}y

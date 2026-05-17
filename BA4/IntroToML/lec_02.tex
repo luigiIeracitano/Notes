@@ -32,7 +32,7 @@ Expressed
 \subsection{Hyperplane}%
 \label{sub:Hyperplane}
 This can be generalized to higher dimensions. \\ 
-In dimension D we can write 
+In dimension $D$ we can write 
 \[
 y = w^{\left(0\right)} + w^{\left(1\right)}x^{\left(1\right)} + w^{\left(2\right)}x^{\left(2\right)} + \ldots +  w^{\left(D\right)}x^{\left(D\right)}  = w^T \begin{pmatrix} 1 \\ x^{\left(1\right)} \\ x^{\left(2\right)} \\ \vdots \\x^{\left(D\right)} \end{pmatrix}
 \]
@@ -45,7 +45,7 @@ Because the output remains 1D, we can still use the same least square loss funct
 \[
 \min_w \frac{1}{N}\sum_{i=1}^{N}d^2\left(\hat{y_i}, y_i\right) \iff \min_w \frac{1}{N}\sum_{i=1}^{N}\left(x_i^Tw-y_i\right)^2  
 \]
-Solving this minimization problem involves computing its derivatives (derivation and gradient) w.r.t the model parameters (w). 
+Solving this minimization problem involves computing its derivatives (derivation and gradient) w.r.t the model parameters ($w$). 
 
 \subsection{Minimizing multivariate function}%
 \label{sub:Minimizing multivariate function}
@@ -142,22 +142,22 @@ During this evaluation, one compares the predictions of the model with the true 
 \subsection{Evaluation metrics for regression}
 \textbf{Mean Squared Error (MSE)}: Same as the loss function but for $N_t$ test samples. 
 \[
-  MSE = \frac{1}{N_t}\sum_{i=1}^{N_t}(\hat{y_i} - y_i)^2 
+  \text{MSE} = \frac{1}{N_t}\sum_{i=1}^{N_t}(\hat{y_i} - y_i)^2 
 \]
 where $\hat{y_i}$ is the prediction for the test sample i and $y_i$ the corresponding ground-truth value\\
 
 \textbf{Root Mean Squared Error (RMSE)}: Square-root of the MSE\\
 \textbf{Mean Absolute Error (MAE)}
 \[
-  \frac{1}{N_t}\sum_{i=1}^{N_t}\left|\hat{y_i} - y_i\right|
+  \text{MAE} = \frac{1}{N_t}\sum_{i=1}^{N_t}\left|\hat{y_i} - y_i\right|
 \]
 \textbf{Mean Absolute Percentage Error (MAPE)}
 \[
-  MAPE = \frac{1}{N_t}\sum_{i=1}^{N_t}\left|\frac{\hat{y_i} - y_i}{y_i}\right| 
+  \text{MAPE} = \frac{1}{N_t}\sum_{i=1}^{N_t}\left|\frac{\hat{y_i} - y_i}{y_i}\right| 
 \]
 
 \subsection{Linear regression with multiple output dimensions}
-Example of multiple output: human pose estimation.
+ E.g., human pose estimation.
 \subsubsection{Model}
 The linear model has to be modified to output multiple values (not a vector $w$ anymore because $w^Tx_i$ output a single value) \\
 So we use a matrix \textbf{W} $\in \mathbb{R}^{(D+1)\times C}$ s.t 
@@ -169,7 +169,7 @@ The multi-output linear regression is written
 \[
   R(W) = \min_w \sum_{i=1}^{N}\left\|W^Tx_i - y_i\right\|^2
 \]
-where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here $a \in \mathbb{R}^C$).\\
+where $\left\|a\right\| = \sqrt{\sum_{i=1}^{C}(a^{(i)})^2}$ indicates the norm of a vector (here $a \in \mathbb{R}^C$), it's the equivalent of the least square but for vectors.\\
 
 To compute the gradient of this function, we make use of the following properties: \\
 1. Norm and derivative:
@@ -227,11 +227,9 @@ So because the formulation is the same, the solution too
   w^* = (X^TX)^{-1}X^Ty
 \]
 
-However, this model isn't that good because with some data, the \textbf{decision boundary}(threshold) will not react well and misclassified some samples.  \\
+However, this model isn't that good because with some data, the \textbf{decision boundary} (threshold) will not react well and misclassified some samples.  \\
   \includegraphics[width=0.5\linewidth]{images/img_20260304_185637.png}
   \includegraphics[width=0.5\linewidth]{images/img_20260304_192312.png}
-
-
 So we will introduce an other model the \textbf{logistic regression}.
 \clearpage
 

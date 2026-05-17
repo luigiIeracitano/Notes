@@ -81,22 +81,22 @@ When you have done all points, report the average error.
 \textbf{Downside:} Expensive
 
 \subsubsection{$k$-fold cross-validation}
+\begin{enumerate}
+  \item Randomly split the dataset into $k$ partitions (e.g., $k = 3$, shown with different colors)
 
-Randomly split the dataset into $k$ partitions (e.g., $k = 3$, shown with different colors)
 
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102101.png}
-\begin{itemize}
 \item For the \textcolor{red}{red} partition, train on all the points \textbf{not} in the red partition. Compute the errors on the red points (e.g, with a line). 
 
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102324.png}
 \item Same for the \textcolor{green}{green} and the \textcolor{blue}{blue}
 \item Report the average error on all points
-\end{itemize}
 
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102443.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102454.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260324_102515.png}
 
+\end{enumerate}
 \subsubsection{Which kind of cross-validation?}
 
 \includegraphics[width=0.55\linewidth]{images/img_20260324_102656.png}
@@ -120,13 +120,15 @@ Thus to avoid this problem of overfitting, we will penalize overfitting by addin
 This leads to a new training objective function of the form \[
 E(w) = R(w) + \lambda E_w(w)
 \]
-where $R(w)$ is the empirical risk, $E_w(w)$ the regularizer, $\lambda$ is a hyper-parameter that defines the influence of the regularizer ($\lambda > 0$). So know we want not only to 
-minimize the error on the data but to keep the weight as low as possible too. By adding this constraints, it reduces the complexity of overfitted model by making them simpler (the higher the hyperparameter $\lambda$, the stronger is the constraint, i.e., $\lambda = 1'000'000$ force the weights to be almost zero and results on a flat line ($\hat{y} \approx 0$)).
+where $R(w)$ is the empirical risk, $E_w(w)$ the regularizer, $\lambda$ is a hyper-parameter that defines the influence of the regularizer ($\lambda > 0$). 
+
+So know we want not only to minimize the error on the data but to keep the weight as low as possible too.
+By adding this constraints, it reduces the complexity of overfitted model by making them simpler 
+(the higher the hyperparameter $\lambda$, the stronger is the constraint, e.g., $\lambda = 1'000'000$ force the weights to be almost zero and results on a flat line ($\hat{y} \approx 0$)).
 
 \subsubsection{Example of regularizer}
 \textbf{L1 regularizer : } sum of the absolute values \[
   E_w(w) = \sum_{j} \left|w^{(j)}\right|
-
 \]
 \textbf{L2 regularizer : } sum of squares
 of the weights\[
@@ -135,7 +137,7 @@ of the weights\[
 
 \subsubsection{Regularized linear regression}
 We use the L2 regularizer, this lets us write regularized linear regression as \[
-  min_w \sum_{i=1}^{N}(\phi(x_i)^Tw- y_i)^2 + \lambda w^Tw
+  \min_w \sum_{i=1}^{N}(\phi(x_i)^Tw- y_i)^2 + \lambda w^Tw
 \]
 This remains a convex function (for $\lambda \geq 0$) and so we can still find the solution by zeroing out the gradient. 
 
@@ -165,7 +167,7 @@ When dealing with multiple output dimensions, the
 parameters are expressed in matrix form. 
 
 We can then write multi-output ridge regression as \[
-min_w \sum_{i=1}^{N}\left\|W^T \phi(x_i) - y_i\right\|^2 + \lambda \left\|W\right\|_F^2 
+\min_w \sum_{i=1}^{N}\left\|W^T \phi(x_i) - y_i\right\|^2 + \lambda \left\|W\right\|_F^2 
 \]
 where $\left\|W\right\|_F^2$ is the square Frobenius norm, equivalent to the sum of the square of all values in the matrix \textbf{W}.
 
@@ -180,10 +182,10 @@ Regularization may also be added to the cross-entropy loss used to train the log
 With a convex regularizer, such as the sum of squares, the overall
 regularized risk remains convex. 
 
-In fact, some implementation of the logistic regression has a regularizer by default (i.e : scikit-learn).
+In fact, some implementation of the logistic regression has a regularizer by default (e.g., scikit-learn).
 
 \subsubsection{Regularization and SVM}
-As the SVM training proble is expressed as \[
+As the SVM training problem is expressed as \[
 \min_{w^{(0)}, \tilde{w}} \frac{1}{2C} \lVert \tilde{w} \rVert^2 
 + \sum_{i=1}^{N} \max \left(0,\, 1 - y_i \cdot \left(w^{(0)} + \tilde{w}^T x_i \right)\right)
 \]

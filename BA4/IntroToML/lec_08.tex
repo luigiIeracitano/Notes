@@ -15,8 +15,8 @@ The resulting representations can be directly used as input to an ML algorithm (
 \subsection{Attributes}
 Attributes could be of different types: 
 \begin{itemize}
-  \item Categorical (e.g, sex: M, F, I)
-  \item Real (continuous) (e.g, length in mm)
+  \item Categorical (e.g., sex: M, F, I)
+  \item Real (continuous) (e.g., length in mm)
   \item Integer (discrete)
 \end{itemize}
 
@@ -25,7 +25,7 @@ To represent text document we will use bag of words, it consists of a mapping of
 
 \subsubsection{Constructing a dictionary}
 \begin{enumerate}
-  \item Consider only the words that appear in the dataset (n samples)  
+  \item Consider only the words that appear in the dataset ($n$ samples).  
   \item Do not consider the too common words, e.g., “the”, “a”, “to”,
 “it”, “is”, “for”,…
 \end{enumerate}
@@ -100,10 +100,10 @@ For images we could adapt the BoW, as objects are made of common parts/patches (
 
 \subsection{Data pre-processing}
 Even with a good representation, the data might benefit from
-being pre-processed. (e.g,  Some attribute values are missing/noisy or the feature dimensions are of incommensurate magnitudes)
+being pre-processed (e.g., some attribute values are missing/noisy or the feature dimensions are of incommensurate magnitudes).
 
 \subsubsection{Missing data}
-Attributes values that are not recorded (E.g., the Air Quality UCI dataset contains missing values, which are tagged
+Attributes values that are not recorded (e.g., the Air Quality UCI dataset contains missing values, which are tagged
 with a -200 value)
 
 Potential solutions:
@@ -158,7 +158,7 @@ E.g:
 \item Clustering : Detect outliers as the clusters with too few elements and remove these
 samples
 
-\item Leverage human knowledge: remove values that have non-sense (e.g, Blood pressure cannot be 0, salary cannot be negative).
+\item Leverage human knowledge: remove values that have non-sense (e.g., Blood pressure cannot be 0, salary cannot be negative).
 \end{enumerate}
 
 \subsection{Data normalization}
@@ -243,15 +243,19 @@ Two ways to compensate the lack of data:
 Naive (random) undersampling:
 \begin{itemize}
   \item Randomly remove samples from the largest class until you obtain a
-balanced data set 
+balanced data set
+\begin{itemize}
 \item Drawback: May remove important samples
+\end{itemize}
 \end{itemize}
 
 More clever undersampling:
 \begin{itemize}
   \item Remove the redundant samples 
-  \item Good if the class to undersample is densely populated (e.g., lowdimensional representation because of the curse of dimensionality)
-\begin{center}  
+  \begin{itemize}
+    \item Good if the class to undersample is densely populated (e.g., lowdimensional representation because of the curse of dimensionality)
+  \end{itemize}
+  \begin{center}  
 \includegraphics[width=0.4\linewidth]{images/img_20260414_012315.png}
 \end{center}
 
@@ -260,13 +264,16 @@ More clever undersampling:
 Naive (random) oversampling: \begin{itemize}
   \item Replicate the data samples from the smallest class until you obtain a
 balanced data set 
+\begin{itemize}
 \item Drawback: May lead to overfitting
+\end{itemize}
 \end{itemize}
 
 More clever oversampling:  \begin{itemize}
   \item Create new data samples based on neighboring existing ones 
+\begin{itemize}
   \item This may create noisy samples
-
+\end{itemize}
 \begin{center} 
 \includegraphics[width=0.45\linewidth]{images/img_20260414_012533.png}
 \end{center}
@@ -292,13 +299,15 @@ This gives an empirical risk of the form \[
 \]
 where $\beta_i$ is the weight for sample $i. 
 
-This strategy is quite general (e.g, it applies to least-square classification, logistic regression, SVM (in the three cases, since the weights are fixed during
-optimization, the respective optimization problems remain convex and can thus be solved to optimality)).
+This strategy is quite general. E.g., it applies to least-square classification, logistic regression, SVM (in the three cases, since the weights are fixed during
+optimization, the respective optimization problems remain convex and can thus be solved to optimality).
 
 \subsubsection{From handcrafted representations to learned ones}
 As the representations and data processing strategies we have
-discussed so far were all manually designed, it doesn't guarantee that they are the best
+discussed so far (e.g., feature expansion, kernel methods, bag of (visual) words, \dots) were all manually designed, it doesn't guarantee that they are the best
 representations for the task at hand. 
 
 Ideally, one would therefore like to learn the representation
-jointly with the classifier \to neural networks.
+jointly with the classifier, it leads us to \textbf{neural networks}.
+
+\clearpage

@@ -18,7 +18,7 @@ For $classification$ it consists to give to similar data samples the same label,
 \subsubsection{k-NN: Algorithm}
 \textbf{Classification:}
 \begin{enumerate}
-  \item Compute the distance between the test sample \textbf{x} and all training samples \textbf{\{$x_i$\}}
+  \item Compute the distance between the test sample $x$ and all training samples \textbf{\{$x_i$\}}
   \item Find the $k$ sample $\{ x_{NN1}, \dots, x_{NNK} \}$ with the minimum distances
   \item Find the most common label among these $k$ nearest neighbors (majority vote)
   \item Assign the corresponding label/value \textbf{y}$_{MV}$ to the test sample
@@ -29,35 +29,36 @@ the test sample.
 
 \textbf{Regression:}
 \begin{enumerate}
-  \item Compute the distance between the test sample \textbf{x} and all training samples \textbf{\{$x_i$\}}
+  \item Compute the distance between the test sample $x$ and all training samples \textbf{\{$x_i$\}}
   \item Find the $k$ sample $\{ x_{NN1}, \dots, x_{NNK} \}$ with the minimum distances
   \item Compute the value $\hat{y}$ for the test sample based on that of these $k-$NN
 \end{enumerate}
 
 \subsubsection{k-NN: Properties}
 \begin{itemize}
-  \item The results may change for different distance functions. (assigning to a different class)
+  \item The results may change for different distance functions. (assigning to a different class).
   \item The $k$-NN \textbf{doesn't train a model} (no learning), it only keep the data from the training, and use them to predict the label for the test data. 
-So we need: good data representation, a distance function and a given value $k$ \to the results \textbf{depends} on the value $k$. 
   \item This is refered to as a \textbf{non-parametric} learning method (no parameters to optimize during training) and $k$ is said to be a $hyper-parameter$, set manually.
   
   So we need: good data representation, a distance function and a given value $k$ \to the results \textbf{depends} on the value $k$. 
-\item The features have to be \textbf{normalized} to compute the distance (all features have the same weight).
+\item The features have to be \textbf{normalized} to compute the distance (all features to the same weight).
   \item It is \textbf{computationally expensive} as for each test sample, we need to compute the distances to all training samples. To avoid this problem 
   we could approximate the nearest neighbor by using: Hashing or kd-trees.
-\item \textbf{Curse of dimensionality}, in the real world data tends to be very high dimensional (ex: for an image of 536 x 356 in 3D $x_i \in \mathbb{R}^{536 \cdot 356 \cdot 3}$), in such dimension, all points tend to be far apart. 
+\item \textbf{Curse of dimensionality}, in the real world data tends to be very high dimensional (e.g., for an image of 536 x 356 in 3D $x_i \in \mathbb{R}^{536 \cdot 356 \cdot 3}$), in such dimension, all points tend to be far apart. 
 \end{itemize}
 
 \subsection{Feature expansion}
 To handle some non linear data, we could use a polynomial curve that transform the input and separate our classes. 
 
 And then we can apply a linear model to the resulting variable to find the decision boundary :
-e.g :
 
+\paragraph{Example}
+
+\begin{center}
 \includegraphics[width=0.3\linewidth]{images/img_20260318_163111.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260318_163124.png}
 \includegraphics[width=0.3\linewidth]{images/img_20260318_163348.png}
-
+\end{center}
 
 \begin{wrapfigure}{r}{0.2\linewidth}
 \includegraphics[width=\linewidth]{images/img_20260318_164148.png}
@@ -69,7 +70,7 @@ In general for $D-$ dimensional inputs, we can obtain a large $\phi(x)$ .
 
 \phi(x) is found by mapping the samples from different classes in two different direction. 
 
-E.g: 
+\textbf{Example} 
 \[
   class 1: \left|x\right| < 1.2 \quad class 2: \left|x\right| > 2.0 
   
@@ -79,7 +80,8 @@ E.g:
 For class that need a polynomial of degree bigger than 2, what we can do, is to look 
 where we want our gradient to vanish after the application of $\phi(\cdot)$. Then we start with 
 $(\phi(x))'$ and integrate it to find the appropriate $\phi(x)$. 
-I.e, if our gradient vanish at x = -2, 0, 2 
+
+\textbf{Example} if our gradient vanishes at x = -2, 0, 2 
 \[
   (\phi(x))' = (x+2)(x-0)(x-2) = x(x^2 - 4) = x^3 - 4x \implies \phi(x) = \int \phi(x)' dx 
 \]
@@ -92,7 +94,7 @@ F \gg D$, we can use a linear model in this new space and write \[
 \]where now $w \in \mathbb{R}^F$. 
 
 To use it with linear regresion, we rewrite the least-square loss like this \[
-  min_w \sum_{i=1}^{N}(w^T \phi(x_i) - y_i)^2 \quad w \in \mathbb{R}^F \text{(not $\mathbb{R}^{D+1}$ anymore)}  
+  \min_w \sum_{i=1}^{N}(w^T \phi(x_i) - y_i)^2 \quad w \in \mathbb{R}^F \text{(not $\mathbb{R}^{D+1}$ anymore)}  
 \]
 
 This new function is still convex, and its gradient is given by: \[
