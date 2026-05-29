@@ -18,7 +18,8 @@ Assume $f : \mathbb{R}_+ \to \mathbb{C}$ is piecewise continuous, and for some $
 \]
 exists for all $t \in \mathbb{R}_+$. (Both hold whenever there exists $\gamma_0 < \gamma$ abscissa of convergence.) Then
 \[
-\boxed{f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} \mathcal{L}[f](\gamma + is)\,e^{(\gamma + is)t}\,ds.}
+\boxed{f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} \mathcal{L}[f](\gamma + is)\,e^{(\gamma + is)t}\,ds = 
+\frac{1}{2\pi i}\int_{\gamma - i\infty}^{\gamma + i\infty} \mathcal{L}[f](z)\,e^{zt}\,dz}
 \]
 \end{theorem}
 
@@ -296,4 +297,17 @@ since $f$ and $\cos\!\left(\tfrac{2\pi n}{L}\,x\right)$ are both even, so their 
 \boxed{h_n(0) = 0, \qquad h_n(L) = 0.}
 \]
 \end{itemize}
+\end{remark}
+
+\begin{remark}[Parity and vanishing of coefficients]
+The vanishing of $a_n$ or $b_n$ follows from the parity of the integrand:
+\begin{itemize}
+  \item even $\times$ even $=$ even, \quad odd $\times$ odd $=$ even, \quad even $\times$ odd $=$ odd.  (memo: works exactly like + and -)
+\end{itemize}
+An odd function integrated over a symmetric interval $[-L/2, L/2]$ gives $0$. Hence:
+\begin{itemize}
+  \item $f$ odd: $f \cdot \cos = $ odd $\Rightarrow$ $a_n = 0$.
+  \item $f$ even: $f \cdot \sin = $ odd $\Rightarrow$ $b_n = 0$.
+\end{itemize}
+In both cases, the remaining product is even, and one can restrict the integral to $[0, L/2]$ by doubling.
 \end{remark}

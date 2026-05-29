@@ -1,0 +1,239 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\lecture{13}{28-05-2026}{Heat, Wave, and Schrödinger Equations on Unbounded Domains}{}
+
+\section{Heat Equation on an Unbounded Domain}
+
+When the spatial variable ranges over all of $\mathbb{R}$ (rather than a bounded interval $[0, L]$), we use the \textbf{Fourier transform} instead of Fourier series.
+
+Recall: for $f : \mathbb{R} \to \mathbb{C}$,
+\[
+\mathcal{F}[f](a) = \hat{f}(a) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{-iax}\,f(x)\,dx,
+\]
+well-defined whenever $\int_{-\infty}^{\infty} |f(x)|\,dx < \infty$. We will use two key properties:
+\[
+\mathcal{F}[f'](a) = ia\,\mathcal{F}[f](a), \qquad
+\mathcal{F}[f](a)\,\mathcal{F}[g](a) = \frac{1}{\sqrt{2\pi}}\,\mathcal{F}[f * g](a).
+\]
+
+Consider the heat equation on the whole line:
+\[
+\begin{cases}
+\dfrac{\partial u}{\partial t} - \dfrac{\partial^2 u}{\partial x^2} = f & \text{for } t > 0,\ x \in \mathbb{R}, \\[2pt]
+u(x, 0) = u_0(x) & \text{(initial condition),}
+\end{cases}
+\]
+assuming $\int_{-\infty}^{\infty} |u_0(x)|\,dx < \infty$ and $\int_{-\infty}^{\infty} |f(x, t)|\,dx < \infty$ for every $t > 0$, so that we may take the Fourier transform in $x$.
+
+\paragraph{Fourier transforms in $x$.}
+\[
+\hat{u}(a, t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{-iax}\,u(x, t)\,dx, \qquad
+\hat{u}_0(a) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{-iax}\,u_0(x)\,dx,
+\]
+\[
+\hat{f}(a, t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{-iax}\,f(x, t)\,dx.
+\]
+
+\paragraph{Transforming the PDE.}
+Applying $\mathcal{F}$ in $x$ to the equation and using $\mathcal{F}[\partial_x^2 u] = (ia)^2\,\hat{u} = -a^2\,\hat{u}$,
+\[
+\mathcal{F}\!\left[\frac{\partial u}{\partial t} - \frac{\partial^2 u}{\partial x^2}\right](a, t) = \hat{f}(a, t)
+\;\Longrightarrow\;
+\begin{cases}
+\dfrac{\partial \hat{u}}{\partial t}(a, t) + a^2\,\hat{u}(a, t) = \hat{f}(a, t), \\[4pt]
+\hat{u}(a, 0) = \hat{u}_0(a).
+\end{cases}
+\]
+For each frequency $a \in \mathbb{R}$, this is an \textbf{ODE in time}! Solving it (e.g.\ using the Laplace transform in $t$, as in the previous lectures),
+\[
+\boxed{\hat{u}(a, t) = e^{-a^2 t}\,\hat{u}_0(a) + \int_0^t e^{-a^2(t - s)}\,\hat{f}(a, s)\,ds.}
+\]
+
+\paragraph{Inverting.}
+To recover $u(x, t)$ we apply the inverse Fourier transform. Recall the Gaussian and the rescaling property:
+\[
+\mathcal{F}[e^{-x^2/2}](a) = e^{-a^2/2}, \qquad
+\mathcal{F}[f(\lambda x)](a) = \frac{1}{|\lambda|}\,\hat{f}\!\left(\frac{a}{\lambda}\right).
+\]
+We rewrite $e^{-a^2 t}$ as a Fourier transform. Since $a^2 t = \tfrac{1}{2}\bigl(\sqrt{2t}\,a\bigr)^2$,
+\[
+e^{-a^2 t} = e^{-(\sqrt{2t}\,a)^2/2}
+= \frac{1}{\sqrt{2t}}\,\mathcal{F}\!\left[e^{-(x/\sqrt{2t})^2/2}\right](a)
+= \mathcal{F}\!\left[\frac{1}{\sqrt{2t}}\,e^{-x^2/4t}\right](a),
+\]
+where we used the rescaling property with $\lambda = 1/\sqrt{2t}$. Hence
+\[
+\hat{u}(a, t) = \mathcal{F}\!\left[\tfrac{1}{\sqrt{2t}}e^{-x^2/4t}\right](a)\,\mathcal{F}[u_0](a)
++ \int_0^t \mathcal{F}\!\left[\tfrac{1}{\sqrt{2(t - s)}}e^{-x^2/4(t - s)}\right](a)\,\mathcal{F}[f(\cdot, s)](a)\,ds.
+\]
+Using the convolution property (each product of transforms equals $\tfrac{1}{\sqrt{2\pi}}$ times the transform of a convolution) and inverting,
+\[
+\boxed{
+\begin{aligned}
+u(x, t) &= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} \frac{1}{\sqrt{2t}}\,e^{-(x - y)^2/4t}\,u_0(y)\,dy \\
+&\quad + \frac{1}{\sqrt{2\pi}}\int_0^t\int_{-\infty}^{\infty} \frac{1}{\sqrt{2(t - s)}}\,e^{-(x - y)^2/4(t - s)}\,f(y, s)\,dy\,ds.
+\end{aligned}}
+\]
+
+\begin{remark}
+The function $\dfrac{1}{\sqrt{4\pi t}}\,e^{-(x - y)^2/4t}$ (recall $\tfrac{1}{\sqrt{2\pi}}\cdot\tfrac{1}{\sqrt{2t}} = \tfrac{1}{\sqrt{4\pi t}}$) is the \textbf{heat kernel}. The solution is its convolution against the initial datum, plus a Duhamel term accounting for the source.
+\end{remark}
+
+\section{Wave Equation on an Unbounded Domain}
+
+Consider now the wave equation on the whole line (taking the propagation speed $c = 1$):
+\[
+\begin{cases}
+\dfrac{\partial^2 u}{\partial t^2} - \dfrac{\partial^2 u}{\partial x^2} = f & \text{for } t > 0,\ x \in \mathbb{R}, \\[2pt]
+u(x, 0) = u_0(x) & \text{(initial position),} \\[2pt]
+\dfrac{\partial u}{\partial t}(x, 0) = u_1(x) & \text{(initial velocity).}
+\end{cases}
+\]
+
+\textbf{Strategy} (as for the heat equation): apply the Fourier transform in $x$ to the PDE, obtain an ODE in $t$ for the transforms, solve it, and then invert.
+
+\paragraph{Transforming the PDE.}
+Since $\mathcal{F}[\partial_x^2 u] = -a^2\,\hat{u}$,
+\[
+\mathcal{F}\!\left[\frac{\partial^2 u}{\partial t^2} - \frac{\partial^2 u}{\partial x^2}\right] = \mathcal{F}[f]
+\;\Longrightarrow\;
+\begin{cases}
+\dfrac{\partial^2 \hat{u}}{\partial t^2}(a, t) + a^2\,\hat{u}(a, t) = \hat{f}(a, t) & \text{for } t > 0,\ a \in \mathbb{R}, \\[4pt]
+\hat{u}(a, 0) = \hat{u}_0(a), \\[2pt]
+\dfrac{\partial \hat{u}}{\partial t}(a, 0) = \hat{u}_1(a).
+\end{cases}
+\]
+For each fixed $a$ this is the forced harmonic-oscillator equation. Solving it via the Laplace transform,
+\[
+\boxed{\hat{u}(a, t) = \cos(at)\,\hat{u}_0(a) + \frac{1}{a}\sin(at)\,\hat{u}_1(a) + \int_0^t \frac{1}{a}\sin\!\bigl(a(t - s)\bigr)\,\hat{f}(a, s)\,ds.}
+\]
+
+\paragraph{Inverting.}
+This inversion is trickier than for the heat equation; we treat each term separately.
+
+\smallskip
+\textbf{The term $\cos(at)\,\hat{u}_0(a)$.}
+Recall the shift property $\mathcal{F}[h(x + c)](a) = e^{iac}\,\mathcal{F}[h](a)$. Therefore
+\[
+\hat{u}_0(a)\cos(at)
+= \hat{u}_0(a)\,\frac{e^{iat} + e^{-iat}}{2}
+= \frac{1}{2}\,\mathcal{F}\bigl[u_0(x + t) + u_0(x - t)\bigr](a).
+\]
+
+\smallskip
+\textbf{The term $\tfrac{1}{a}\sin(at)\,\hat{u}_1(a)$.}
+Let $h = \mathbf{1}_{[-1, 1]}$, i.e.
+\[
+h(x) = \begin{cases} 1 & -1 \le x \le 1, \\ 0 & \text{otherwise,}\end{cases}
+\qquad\Longrightarrow\qquad
+\hat{h}(a) = \sqrt{\frac{2}{\pi}}\,\frac{\sin a}{a}.
+\]
+Using the rescaling property together with $h_t(x) = h(x/t)$, where
+\[
+h_t(x) = \begin{cases} 1 & -t \le x \le t, \\ 0 & \text{otherwise,}\end{cases}
+\]
+we compute
+\[
+\boxed{\hat{h}_t(a) = \sqrt{\frac{2}{\pi}}\,\frac{\sin(at)}{a}.}
+\]
+Hence
+\[
+\hat{u}_1(a)\,\frac{\sin(at)}{a}
+= \mathcal{F}[u_1](a)\,\sqrt{\frac{\pi}{2}}\,\mathcal{F}[h_t](a)
+= \frac{1}{2}\,\mathcal{F}[u_1 * h_t](a).
+\]
+Notice that
+\[
+(u_1 * h_t)(x) = \int_{-\infty}^{\infty} h_t(x - y)\,u_1(y)\,dy = \int_{x - t}^{x + t} u_1(y)\,dy,
+\]
+since $h_t(x - y) = 1$ exactly when $x - t \le y \le x + t$.
+
+\smallskip
+The forcing term is handled in the same way, replacing $t$ by $t - s$. Inverting all three terms yields \textbf{d'Alembert's formula} (with a Duhamel term for the source):
+\[
+\boxed{
+\begin{aligned}
+u(x, t) &= \frac{1}{2}\bigl[u_0(x + t) + u_0(x - t)\bigr]
++ \frac{1}{2}\int_{x - t}^{x + t} u_1(y)\,dy \\
+&\quad + \frac{1}{2}\int_0^t\int_{x - (t - s)}^{x + (t - s)} f(y, s)\,dy\,ds.
+\end{aligned}}
+\]
+
+\section{Schrödinger Equation on an Unbounded Domain}
+
+Suppose $u : \mathbb{R} \times (0, \infty) \to \mathbb{C}$ solves
+\[
+i\,\frac{\partial u}{\partial t}(x, t) + \frac{\partial^2 u}{\partial x^2}(x, t) - V(x, t)\,u(x, t) = 0
+\qquad \text{for } t > 0,\ x \in \mathbb{R},
+\]
+the \textbf{Schrödinger equation} with potential $V$.
+\begin{itemize}
+\item The potential $V$ is always assumed to be \textbf{real-valued}.
+\item Consequently $u$ is necessarily \textbf{complex-valued}, because of the imaginary unit $i$ appearing in the equation.
+\end{itemize}
+
+\begin{remark}[Physical interpretation]
+The equation describes the evolution of a quantum particle moving under the influence of a classical potential $V$.
+\end{remark}
+
+\paragraph{Facts.}
+\begin{itemize}
+\item \textbf{Conservation} (probabilistic interpretation): $\displaystyle\int_{-\infty}^{\infty} |u(x, t)|^2\,dx$ is constant in $t$.
+\item \textbf{Uniqueness:} two solutions with the same initial conditions necessarily coincide.
+\item \textbf{Existence:} assuming for simplicity $V = 0$ and arguing by the Fourier transform exactly as for the heat equation, one finds
+\[
+\boxed{
+\begin{aligned}
+u(x, t) &= \frac{1}{\sqrt{4\pi i t}}\int_{-\infty}^{\infty} e^{-(x - y)^2/4it}\,u_0(y)\,dy \\
+&\quad - i\int_0^t \frac{1}{\sqrt{4\pi i(t - s)}}\int_{-\infty}^{\infty} e^{-(x - y)^2/4i(t - s)}\,f(y, s)\,dy\,ds.
+\end{aligned}}
+\]
+\end{itemize}
+
+\begin{remark}
+Compare this with the solution of the heat equation: it is formally obtained by replacing $t$ with $it$. The factor $-i$ in front of the source term comes from solving $i\,u_t + u_{xx} = f$, i.e.\ $u_t = i\,u_{xx} - i\,f$. As verified by direct computation, this is indeed a solution.
+\end{remark}
+
+\subsection{Worked Example: Gaussian Initial Data}
+
+\begin{example}
+Assume $f = 0$ and $u_0(x) = e^{-x^2/2}$. Since $\hat{u}_0(a) = e^{-a^2/2}$ (Fourier transform of a Gaussian),
+\[
+\hat{u}(a, t) = e^{-i a^2 t}\,\hat{u}_0(a) = e^{-i a^2 t}\,e^{-a^2/2} = e^{-(it + 1/2)\,a^2},
+\]
+so that
+\[
+u(x, t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{iax}\,e^{-(it + 1/2)\,a^2}\,da.
+\]
+This integral can be computed explicitly using complex integration; the idea is to reduce it to the known \textbf{Gaussian integral}.
+
+\paragraph{Completing the square.}
+Set
+\[
+z = \left(a - \frac{ix}{2it + 1}\right)\sqrt{2it + 1},
+\qquad\text{so that}\qquad
+e^{iax - (it + 1/2)\,a^2} = e^{-x^2/(4it + 2)}\,e^{-z^2/2}.
+\]
+As $a$ ranges from $-\infty$ to $\infty$, $z = z(a)$ traces a straight line $\gamma$ in $\mathbb{C}$. With $da = dz/\sqrt{2it + 1}$,
+\[
+u(x, t)
+= \frac{1}{\sqrt{2\pi}}\int_\gamma e^{-x^2/(4it + 2)}\,e^{-z^2/2}\,\frac{dz}{\sqrt{2it + 1}}
+= \frac{1}{\sqrt{2\pi}}\,\frac{e^{-x^2/(4it + 2)}}{\sqrt{2it + 1}}\int_\gamma e^{-z^2/2}\,dz.
+\]
+
+\paragraph{Shifting the contour.}
+Since $e^{-z^2/2}$ is entire, Cauchy's theorem lets us move the integration curve from the slanted line $\gamma$ back to the real axis $\mathbb{R}$. Closing the contour with two short connecting segments $\sigma_1, \sigma_2$ near $\pm R$, one checks
+\[
+\int_{\sigma_1} e^{-z^2/2}\,dz \xrightarrow[R \to \infty]{} 0, \qquad
+\int_{\sigma_2} e^{-z^2/2}\,dz \xrightarrow[R \to \infty]{} 0,
+\]
+while
+\[
+\int_{-R}^{R} e^{-z^2/2}\,dz \xrightarrow[R \to \infty]{} \int_{-\infty}^{\infty} e^{-z^2/2}\,dz = \sqrt{2\pi}.
+\]
+Therefore $\int_\gamma e^{-z^2/2}\,dz = \sqrt{2\pi}$, and we obtain the remarkably clean closed form
+\[
+\boxed{u(x, t) = \frac{e^{-x^2/(4it + 2)}}{\sqrt{2it + 1}}.}
+\]
+\end{example}

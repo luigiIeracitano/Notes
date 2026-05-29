@@ -1,0 +1,253 @@
+% !TEX root = master.tex
+% !TEX program = lualatex
+
+\lecture{12}{21-05-2026}{Heat and Wave Equations on a Bounded Domain}{}
+
+\section{Heat Equation on a Bounded Domain}
+
+Return to the 1-dimensional heat equation:
+\[
+\begin{cases}
+\dfrac{\partial u}{\partial t} - \dfrac{\partial^2 u}{\partial x^2} = f & \text{for } t > 0,\ x \in (0, L), \\[2pt]
+u|_{t=0} = u_0 & \text{(initial condition),} \\[2pt]
+u|_{x=0} = u|_{x=L} = 0 & \text{(boundary condition).}
+\end{cases}
+\]
+
+\paragraph{Overview of the method.}
+\begin{itemize}
+\item Decompose the heat equation into Fourier modes.
+\item The PDE becomes an ODE in time for the Fourier coefficients. Solve it.
+\item Find a solution by summing the mode solutions.
+\end{itemize}
+
+\subsection{Uniqueness}
+
+The initial value problem for the heat equation has a unique solution.
+
+Indeed, if $u_1$ and $u_2$ are two solutions, then $v := u_1 - u_2$ solves
+\[
+\begin{cases}
+\dfrac{\partial v}{\partial t} - \dfrac{\partial^2 v}{\partial x^2} = 0 & \text{for } t > 0,\ x \in (0, L), \\[2pt]
+v|_{t=0} = 0, \\[2pt]
+v|_{x=0} = v|_{x=L} = 0.
+\end{cases}
+\]
+
+Again we look for a monotone quantity to infer $v = 0$:
+\[
+\frac{d}{dt}\underbrace{\int_0^L v^2(x, t)\,dx}_{\text{kinetic energy}}
+= 2\int_0^L v(x, t)\,\frac{\partial v}{\partial t}(x, t)\,dx
+\overset{\text{PDE}}{=} 2\int_0^L v(x, t)\,\frac{\partial^2 v}{\partial x^2}(x, t)\,dx
+\]
+\[
+\overset{\text{IBP}}{=} 2\left[v(x, t)\,\frac{\partial v}{\partial x}(x, t)\right]_0^L - 2\int_0^L \left(\frac{\partial v}{\partial x}(x, t)\right)^2 dx
+\overset{\text{Dirichlet BC}}{=} -2\int_0^L \left(\frac{\partial v}{\partial x}(x, t)\right)^2 dx \leq 0.
+\]
+
+So the kinetic energy $\int_0^L v^2(x, t)\,dx$ is \textbf{nonincreasing}. Thus
+\[
+0 \leq \int_0^L v^2(x, t)\,dx \leq \int_0^L v^2(x, 0)\,dx = 0.
+\]
+Therefore $v(x, t) = 0$ for every $t > 0$ and every $x \in (0, L)$.
+
+\subsection{Existence}
+
+In view of uniqueness: if we find a solution in any way, then this is the unique solution. On a bounded interval, we'll find it by decomposing the PDE into Fourier modes.
+
+\paragraph{Trick.}
+Since we want $u|_{x=0} = u|_{x=L} = 0$, we extend $u(t, x)$ in $x$ into a \textbf{$2L$-periodic} function on $\mathbb{R}$ which is \textbf{odd}. Do the same for $u_0$ and $f$.
+
+\begin{remark}
+If $u$ is a $2L$-periodic odd function which is continuous, then necessarily $u|_{x=0} = 0$ and $u|_{x=L} = 0$. So it respects Dirichlet boundary conditions. Ad hoc, for the solution to the heat equation it can be shown: if $f$ is piecewise continuous and $u_0$ is as well, then for $t > 0$, $u(t, x)$ and $\frac{\partial u}{\partial x}(t, x)$ are continuous.
+\end{remark}
+
+\paragraph{Fourier series} (respecting $2L$-periodicity and oddness):
+\[
+u(x, t) = \sum_{n=1}^{\infty} b_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right), \qquad
+b_n(t) = \frac{2}{L}\int_0^L u(x, t)\sin\!\left(\frac{\pi n}{L}\,x\right) dx,
+\]
+\[
+u_0(x) = \sum_{n=1}^{\infty} b_{0n}\sin\!\left(\frac{\pi n}{L}\,x\right), \qquad
+f(x, t) = \sum_{n=1}^{\infty} f_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+\paragraph{Formal differentiation.}
+\[
+\frac{\partial u}{\partial x}(t, x) = \sum_{n=1}^{\infty} b_n(t)\,\frac{\pi n}{L}\cos\!\left(\frac{\pi n}{L}\,x\right),
+\]
+\[
+\frac{\partial^2 u}{\partial x^2}(t, x) = \sum_{n=1}^{\infty} b_n(t)\left(-\frac{\pi^2 n^2}{L^2}\right)\sin\!\left(\frac{\pi n}{L}\,x\right),
+\]
+\[
+\frac{\partial u}{\partial t}(t, x) = \sum_{n=1}^{\infty} b_n'(t)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+So $\dfrac{\partial u}{\partial t} - \dfrac{\partial^2 u}{\partial x^2} = f$ translates into
+\[
+\sum_{n=1}^{\infty}\left[b_n'(t) + \frac{\pi^2 n^2}{L^2}\,b_n(t)\right]\sin\!\left(\frac{\pi n}{L}\,x\right)
+= \sum_{n=1}^{\infty} f_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+By comparison of coefficients:
+\[
+\boxed{b_n'(t) + \frac{\pi^2 n^2}{L^2}\,b_n(t) = f_n(t) \qquad \text{for every } n \geq 1.}
+\]
+
+The initial condition $u(x, 0) = u_0(x)$ translates into
+\[
+\boxed{b_n(0) = b_{0n} \qquad \text{for every } n \geq 1.}
+\]
+
+The above is an initial value problem (ODE) that we know how to solve using the Laplace transform:
+\[
+\boxed{b_n(t) = b_{0n}\,e^{-\frac{\pi^2 n^2}{L^2}\,t} + \int_0^t e^{-\frac{\pi^2 n^2}{L^2}(t - s)}\,f_n(s)\,ds.}
+\]
+
+Reinserting this into the Fourier expansion of $u(x, t)$ yields the desired solution to the heat equation.
+
+\subsection{Remarks and Examples}
+
+\begin{remark}
+If $f = 0$, then
+\[
+u(x, t) = \sum_{n=1}^{\infty} b_{0n}\,e^{-\frac{\pi^2 n^2}{L^2}\,t}\sin\!\left(\frac{\pi n}{L}\,x\right),
+\]
+which \textbf{decays exponentially fast to $0$} as $t \to \infty$.
+\end{remark}
+
+\begin{example}
+If $u_0 = 0$ and $f(x, t) = \sin\!\left(\dfrac{\pi}{L}\,x\right)$, then
+\[
+f_n(t) = \begin{cases} 1 & \text{if } n = 1, \\ 0 & \text{otherwise,} \end{cases}
+\]
+and so
+\[
+b_n(t) = \begin{cases}
+\dfrac{L^2}{\pi^2}\left[1 - e^{-\frac{\pi^2}{L^2}\,t}\right] & \text{if } n = 1, \\[6pt]
+0 & \text{otherwise.}
+\end{cases}
+\]
+In particular,
+\[
+u(x, t) = \frac{L^2}{\pi^2}\left[1 - e^{-\frac{\pi^2}{L^2}\,t}\right]\sin\!\left(\frac{\pi}{L}\,x\right).
+\]
+\end{example}
+
+\begin{remark}[Neumann boundary conditions]
+If we wanted \textbf{Neumann boundary conditions} (namely $\frac{\partial u}{\partial x}|_{x=0} = 0$ and $\frac{\partial u}{\partial x}|_{x=L} = 0$), we would extend $u$ as an \textbf{even} $2L$-periodic function. In this case,
+\[
+u(x, t) = \frac{a_0(t)}{2} + \sum_{n=1}^{\infty} a_n(t)\cos\!\left(\frac{\pi n}{L}\,x\right).
+\]
+\end{remark}
+
+\section{Wave Equation on a Bounded Domain}
+
+\[
+\begin{cases}
+\dfrac{\partial^2 u}{\partial t^2} - c^2\,\dfrac{\partial^2 u}{\partial x^2} = f & \text{for } t > 0,\ x \in (0, L), \\[2pt]
+u|_{t=0} = u_0 & \text{(initial condition),} \\[2pt]
+\dfrac{\partial u}{\partial t}\Big|_{t=0} = u_1 & \text{(initial velocity),} \\[2pt]
+u|_{x=0} = u|_{x=L} = 0 & \text{(boundary condition),}
+\end{cases}
+\]
+where $c$ is the \textbf{speed of propagation}.
+
+\subsection{Uniqueness}
+
+\paragraph{Energy conservation.}
+Define
+\[
+E[u](t) = \frac{1}{2}\int_0^L \underbrace{\left(\frac{\partial u}{\partial t}\right)^2(x, t)}_{\text{kinetic term}} + \underbrace{c^2\left(\frac{\partial u}{\partial x}\right)^2(x, t)}_{\text{potential energy}}\,dx.
+\]
+
+\paragraph{Exercise.}
+\[
+\frac{d}{dt}E[u](t) = \int_0^L \frac{\partial u}{\partial t}(x, t)\,f(x, t)\,dx.
+\]
+
+This implies uniqueness of solutions: if $u_1$ and $u_2$ are two solutions, then $v := u_1 - u_2$ solves
+\[
+\begin{cases}
+\dfrac{\partial^2 v}{\partial t^2} - c^2\,\dfrac{\partial^2 v}{\partial x^2} = 0, \\[2pt]
+v|_{t=0} = 0, \\[2pt]
+\dfrac{\partial v}{\partial t}\Big|_{t=0} = 0, \\[2pt]
+v|_{x=0} = v|_{x=L} = 0.
+\end{cases}
+\]
+
+By conservation of energy, $E[v](t)$ is constant in $t$, i.e.\ $E[v](t) = E[v](0)$. But $v|_{t=0}$ and $\frac{\partial v}{\partial t}|_{t=0}$ both vanish, so $E[v](0) = 0$. In turn this means
+\[
+\frac{\partial v}{\partial t} = 0 \qquad \text{and} \qquad \frac{\partial v}{\partial x} = 0.
+\]
+
+Hence $v$ is constant. Since $v|_{t=0} = 0$, this means $v = 0$.
+
+\subsection{Existence}
+
+As for the heat equation, extend $u(x, t)$, $f(x, t)$, $u_0(x)$, $u_1(x)$ as \textbf{odd}, $2L$-periodic functions on all of $\mathbb{R}$. Their Fourier series will only contain sine terms:
+\[
+u(x, t) = \sum_{n=1}^{\infty} b_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right), \qquad
+u_0(x) = \sum_{n=1}^{\infty} b_{0n}\sin\!\left(\frac{\pi n}{L}\,x\right),
+\]
+\[
+u_1(x) = \sum_{n=1}^{\infty} b_{1n}\sin\!\left(\frac{\pi n}{L}\,x\right), \qquad
+f(x, t) = \sum_{n=1}^{\infty} f_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+\paragraph{Formal differentiation.}
+\[
+\frac{\partial^2 u}{\partial t^2}(x, t) = \sum_{n=1}^{\infty} b_n''(t)\sin\!\left(\frac{\pi n}{L}\,x\right),
+\]
+\[
+\frac{\partial^2 u}{\partial x^2}(x, t) = \sum_{n=1}^{\infty} b_n(t)\left(-\frac{\pi^2 n^2}{L^2}\right)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+So $\dfrac{\partial^2 u}{\partial t^2} - c^2\,\dfrac{\partial^2 u}{\partial x^2} = f$ gives
+\[
+\sum_{n=1}^{\infty}\left[b_n''(t) + c^2\,\frac{\pi^2 n^2}{L^2}\,b_n(t)\right]\sin\!\left(\frac{\pi n}{L}\,x\right) = \sum_{n=1}^{\infty} f_n(t)\sin\!\left(\frac{\pi n}{L}\,x\right).
+\]
+
+Comparing coefficients gives, for every $n \geq 1$,
+\[
+\boxed{
+\begin{aligned}
+b_n''(t) + c^2\,\frac{\pi^2 n^2}{L^2}\,b_n(t) &= f_n(t), \\
+b_n(0) &= b_{0n} && \text{from } u|_{t=0} = u_0, \\
+b_n'(0) &= b_{1n} && \text{from } \tfrac{\partial u}{\partial t}\big|_{t=0} = u_1.
+\end{aligned}}
+\]
+
+We can solve this ODE using the Laplace transform and get
+\[
+\boxed{b_n(t) = b_{0n}\cos\!\left(\frac{c\pi n}{L}\,t\right) + \frac{L\,b_{1n}}{c\pi n}\sin\!\left(\frac{c\pi n}{L}\,t\right) + \int_0^t \frac{L}{c\pi n}\sin\!\left(\frac{c\pi n}{L}(t - s)\right) f_n(s)\,ds.}
+\]
+
+\section{Generalizations}
+
+\begin{remark}
+The above methods apply to more general initial-boundary value problems for \textbf{linear PDEs} with $t > 0$ and $x \in (0, L)$ (bounded domain).
+
+\begin{enumerate}
+\item We ``need'' the coefficients of the PDE to be \textbf{constant}. (It works beyond that, but then the resulting ODEs become much more complicated.)
+
+\item One can address more general classes of boundary conditions, e.g.\ \textbf{periodic boundary conditions} $u|_{x=0} = u|_{x=L}$ or $\frac{\partial u}{\partial x}|_{x=0} = \frac{\partial u}{\partial x}|_{x=L}$. In this case
+\[
+u(x, t) = \frac{a_0(t)}{2} + \sum_{n=1}^{\infty}\left[a_n(t)\cos\!\left(\frac{2\pi n}{L}\,x\right) + b_n(t)\sin\!\left(\frac{2\pi n}{L}\,x\right)\right],
+\]
+and we solve ODEs for both $a_n$ and $b_n$.
+
+\item \textbf{Inhomogeneous boundary conditions} can also be handled.
+
+\item More generally: initial-boundary value problems of the form
+\[
+\begin{cases}
+\dfrac{\partial u}{\partial t} + Pu = 0, \\[2pt]
+u|_{t=0} = u_0, \\[2pt]
+u|_{x=0} = u|_{x=L} = 0,
+\end{cases}
+\qquad P = c_k(x)\,\frac{\partial^k}{\partial x^k} + \cdots + c_1(x)\,\frac{\partial}{\partial x} + c_0(x),
+\]
+require decomposing $u(x, t)$ into a sum of \textbf{eigenfunctions} of the operator $P$ (\textbf{Sturm--Liouville problem}). We will not consider this in this class (only trigonometric series).
+\end{enumerate}
+\end{remark}

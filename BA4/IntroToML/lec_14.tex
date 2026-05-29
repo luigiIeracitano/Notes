@@ -1,0 +1,309 @@
+%! TeX root = master.tex
+% !TEX program = lualatex
+
+\lecture{14}{26-05-2026}{Review}{}
+
+\chapter{Review}
+This chapter ties together the whole course. The point is not to re-derive
+anything, but to see the \textbf{connections}: most of the supervised methods
+share a single linear model and differ only by their loss, kernelization is the
+same trick applied to many algorithms, and deep learning is the idea of learning
+the representation instead of designing it. The same backbone reappears
+everywhere.
+
+\section{The machine learning pipeline}
+Machine learning = Data \textrightarrow{} Algorithms \textrightarrow{} Insight.
+\begin{itemize}
+  \item \textbf{Data} can be tabular attributes, text, speech/sound or images.
+  In all algorithms seen, a sample is a vector $x_i \in \mathbb{R}^D$.
+  \item \textbf{Insight} can be a category, a description, a vector-valued
+  quantity or a different (lower-dimensional) representation.
+  \item \textbf{Algorithms} split into \textbf{supervised learning} (relies on
+  annotated data, the annotations being the desired insight) and
+  \textbf{unsupervised learning} (analyzes or transforms unlabeled data).
+\end{itemize}
+
+\section{Supervised learning}
+\subsection{Setting}
+Supervised learning has two stages: \textbf{training}, where data with
+ground-truth labels is used to optimize the model parameters by minimizing a
+loss, and \textbf{testing}, where the fixed model predicts the output of a new
+sample. Two problem types:
+\begin{itemize}
+  \item \textbf{Classification}: predict one discrete (unordered) label.
+  \item \textbf{Regression}: predict continuous (ordered) value(s).
+\end{itemize}
+
+\subsection{The linear model}
+The output varies linearly with the inputs. Absorbing the bias by appending a
+$1$ to $x$ (so $x \in \mathbb{R}^{D+1}$), a single-output model is
+\[
+  y = w^{(0)} + \sum_{j=1}^{D} w^{(j)} x^{(j)} = w^T x .
+\]
+For $C$ output dimensions we use a matrix $W \in \mathbb{R}^{(D+1)\times C}$ and
+\[
+  \hat{y} = W^T x ,
+\]
+where each column $w_{(k)}$ predicts one output dimension.
+
+\subsection{Linear regression}
+``Best fit'' is encoded as minimizing the squared residuals:
+\[
+  \min_{w} \sum_{i=1}^{N} \left(x_i^T w - y_i\right)^2 .
+\]
+This is convex and has a \textbf{closed-form} solution (zero the gradient).
+Prediction for a new sample is $\hat{y} = (w^*)^T x$.
+
+\subsubsection{Overfitting and ridge regression}
+Increasing model complexity always lowers the training error but eventually
+raises the test error \textrightarrow{} \textbf{overfitting}. A standard remedy
+is to add a regularizer penalizing the weight norm:
+\[
+  \min_{w} \sum_{i=1}^{N} \left(x_i^T w - y_i\right)^2 + \lambda\, w^T w .
+\]
+For $\lambda > 0$ this stays convex. The multi-output version uses the squared
+Frobenius norm:
+\[
+  \min_{W} \sum_{i=1}^{N} \|W^T x_i - y_i\|^2 + \lambda \|W\|_F^2 .
+\]
+
+\subsection{Linear classification}
+\subsubsection{Classification as regression, and its failure}
+A binary label can be predicted with a line, $\hat{y} = w^{(0)} + w^{(1)} x$, and
+a sample assigned by thresholding. Multiple classes are handled with one-hot
+labels and a multi-output least-square fit, assigning
+$k = \arg\max_j \hat{y}^{(j)}$. This \textbf{least-square classification} fails:
+a single far-away sample produces a huge residual that drags the line and
+misclassifies easy points. The cause is fitting a line to inherently nonlinear
+(0/1) data.
+
+\subsubsection{Logistic regression}
+We would like a discrete output; we approximate it by squashing the linear score
+through a \textbf{sigmoid},
+\[
+  \hat{y}(x) = \sigma(w^T x) = \frac{1}{1 + \exp(-w^T x)} .
+\]
+For $C$ classes we use the \textbf{softmax}, giving a probability per class,
+\[
+  \hat{y}^{(k)} = \frac{\exp(w_{(k)}^T x)}{\sum_{j=1}^{C} \exp(w_{(j)}^T x)} ,
+\]
+and train by minimizing the \textbf{cross-entropy} empirical risk
+\[
+  R(W) = -\sum_{i=1}^{N} \sum_{k=1}^{C} y_i^{(k)} \ln \hat{y}_i^{(k)} ,
+\]
+via gradient descent (no closed form).
+
+\subsubsection{Margin and the SVM}
+Different classifiers give different decision boundaries, so what makes one
+good? The \textbf{margin} is the orthogonal distance between the boundary and the
+nearest sample; a good boundary maximizes it. The \textbf{Support Vector
+Machine} is a binary classifier on the same linear model $\hat{y} = w^T x$ that
+maximizes the margin while enforcing correct classification. It is written as
+the convex problem
+\[
+  \min_{w^{(0)},\,\tilde{w}} \;
+  \tfrac{1}{2}C\|\tilde{w}\|^2
+  + \sum_{i=1}^{N} \max\!\left(0,\, 1 - y_i\,(w^{(0)} + \tilde{w}^T x_i)\right) ,
+\]
+where the $\max(\cdot)$ term is the \textbf{hinge loss} (encourages correct
+classification) and $\|\tilde{w}\|^2$ is the inverse margin (minimizing it
+maximizes the margin).
+
+\subsubsection{The key insight}
+\begin{definition}[Same model, different loss]
+  Least-square classification, logistic regression and the SVM all rely on the
+  \textit{same} linear model. What distinguishes them is only the
+  \textbf{loss function}: square, logistic and hinge respectively, each
+  approximating the ideal but non-differentiable $0$--$1$ loss. The choice of
+  loss is what shapes the resulting algorithm.
+\end{definition}
+
+\subsection{Dealing with nonlinear data}
+\subsubsection{Feature expansion}
+Linear models fail on nonlinear data, but a fixed nonlinear \textbf{feature map}
+$\phi(x)$ can make it separable (e.g.\ $x \to [x, x^2]$). The polynomial
+expansion stacks the constant, linear, quadratic, \dots, $M$-th power terms and
+cross-products, and the expanded features are then used in any algorithm,
+regression or classification. The drawback: one must pick the degree (and which
+functions), the number of choices grows combinatorially, and high degrees
+overfit.
+
+\subsubsection{Kernels}
+Many algorithms ultimately depend only on dot products $x_i^T x_j$, which encode
+similarity ($x_i^T x_j \propto \cos\angle(x_i,x_j)$). After expansion they become
+$\phi(x_i)^T \phi(x_j)$. Instead of choosing $\phi$ explicitly, we directly
+define a \textbf{kernel function}
+\[
+  k(x_i, x_j) = \phi(x_i)^T \phi(x_j) ,
+\]
+which corresponds to \textit{some} mapping $\phi(\cdot)$ that may be unknown.
+
+\subsubsection{Representer theorem and kernel ridge regression}
+The \textbf{representer theorem} states that the minimizer of a regularized
+empirical risk is a linear combination of the training points in feature space,
+\[
+  w^* = \sum_{i=1}^{N} \alpha_i \phi(x_i) = \Phi^T \alpha .
+\]
+Substituting into ridge regression rewrites the risk purely in terms of the
+kernel,
+\[
+  R(\alpha) = \sum_{i=1}^{N} \left(\alpha^T k(X, x_i) - y_i\right)^2
+  + \lambda\, \alpha^T K \alpha ,
+\]
+and prediction for a new sample never needs $\Phi$ explicitly:
+\[
+  \hat{y} = y^T (K + \lambda I_N)^{-1} k(X, x) .
+\]
+The same \textbf{kernel trick} kernelizes the SVM (via its dual), logistic
+regression, and later PCA. Kernel methods handle nonlinear data with often nice
+(closed-form, convex) solutions, but depend on the choice of kernel and scale
+with the number of samples.
+
+\subsection{Neural networks}
+Rather than design $\phi$ by hand, neural networks \textbf{learn the
+representation jointly} with the final model. A layer applies a linear map
+followed by an elementwise nonlinear \textbf{activation} $f$ (sigmoid, tanh,
+ReLU). With the convention that $a$ is the \textbf{pre-activation} and $z$ the
+\textbf{post-activation}, one hidden layer gives
+\[
+  z_{(1)} = f\!\left(W_{(1)}^T x\right), \qquad
+  \hat{y} = f_{(2)}\!\left(W_{(2)}^T z_{(1)}\right) .
+\]
+Stacking layers yields a \textbf{multilayer perceptron (MLP)}; each layer has its
+own parameters. Training minimizes the square loss (regression) or cross-entropy
+(classification) by \textbf{stochastic gradient descent}, with gradients
+computed efficiently by \textbf{backpropagation}.
+
+\subsection{Convolutional neural networks}
+Treating an image as one big vector is wasteful: it gives a huge parameter
+count, ignores that nearby pixels share structure, and is not translation
+robust. \textbf{Convolutions} fix this by reducing parameters and adding
+translation robustness. A \textbf{CNN} stacks convolution and pooling blocks
+(varying the number of channels and filter sizes), then vectorizes the final
+feature map and appends fully-connected layer(s) to output a vector (class
+probabilities, joint coordinates, \dots). The weights are learned exactly as in
+an MLP.
+
+\subsection{Sequences and text}
+Words are mapped to dense \textbf{word embeddings}, real-valued vectors whose
+similarity reflects similarity of meaning. To model a whole sentence as a
+sequence:
+\begin{itemize}
+  \item \textbf{RNNs} process the sequence step by step, carrying a hidden state
+  $h_t$ via feedback loops; unrolling them across time gives the full
+  computation graph and lets them learn from history of any length.
+  \item \textbf{Attention} lets the decoder focus on the relevant encoder
+  outputs at each step instead of a single fixed summary vector.
+  \item \textbf{Transformers} drop recurrence entirely and encode sequences with
+  \textbf{multi-head self-attention} plus feedforward layers, in cascaded
+  encoder and decoder blocks.
+  \item The same idea returns to vision in the \textbf{Vision Transformer}, which
+  treats image patches as a sequence of tokens.
+\end{itemize}
+
+\subsection{k-Nearest Neighbors}
+A simple nonparametric baseline: compute the distance from the test sample $x$
+to all training samples, find the nearest $x_{NN}$, and predict its label
+$\hat{y} = y_{NN}$ (or a vote/average over the $k$ nearest). No training, yet
+very competitive on tasks such as MNIST.
+
+\section{Unsupervised learning}
+Unsupervised learning is a single stage: analyze the whole dataset, or transform
+it for further analysis, without labels.
+
+\subsection{Clustering}
+\subsubsection{K-means}
+Identify $K$ groups so that within-cluster distances are small and across-cluster
+distances are large, encoded via distances to cluster centers
+$\{\mu_1, \dots, \mu_K\}$. The algorithm alternates until convergence:
+\begin{enumerate}
+  \item assign each point to the nearest center;
+  \item update each center as the mean of its assigned points.
+\end{enumerate}
+
+\subsubsection{Compactness vs.\ connectivity}
+K-means exploits \textbf{compactness} and fails on non-compact shapes (e.g.\
+concentric rings). There, clusters are better defined by \textbf{connectivity}.
+
+\subsubsection{Spectral clustering}
+Encode the data as a graph with a similarity matrix $W \in \mathbb{R}^{N\times N}$
+and a diagonal degree matrix $D$ with $D_{ii} = \sum_j W_{ij}$. Strong edges
+should stay together, weak ones can be cut. The \textbf{normalized cut} is
+relaxed to a generalized eigenvalue problem
+\[
+  (D - W)\,y = \lambda D y ,
+\]
+and the partition is read off the eigenvector with the \textbf{second smallest}
+eigenvalue.
+
+\subsection{Dimensionality reduction}
+\subsubsection{PCA}
+Real data lives on a low-dimensional manifold inside a huge ambient space. PCA
+projects
+\[
+  y_i = W^T(x_i - \bar{x}), \qquad \text{s.t. } W^T W = I_d ,
+\]
+keeping the ``important'' signal by finding directions of \textbf{large
+variance}. For a 1D output,
+\[
+  \max_{w_{(1)}} w_{(1)}^T C\, w_{(1)} \quad \text{s.t. } w_{(1)}^T w_{(1)} = 1 ,
+\]
+solved by the eigenvector of the covariance $C$ with the largest eigenvalue;
+more dimensions take the next-largest eigenvectors. PCA also gives a mapping
+\textbf{back} to the high-dimensional space, $\hat{x} = \bar{x} + W y$, which
+constrains $\hat{x}$ to a subspace and thus regularizes.
+
+\subsubsection{Kernel PCA}
+Applying the kernel trick to PCA leads to the eigenvalue problem
+$K a = \lambda_1 N a$, and the low-dimensional projections depend only on the
+kernel,
+\[
+  y_i = \sum_{j=1}^{N} a_j\, k(x_i, x_j) ,
+\]
+so $w_{(1)}$ (which depends on the unknown $\phi$) is never needed explicitly.
+
+\subsubsection{Fisher LDA}
+PCA is unsupervised and may discard class information. Using labels, Fisher
+\textbf{LDA} seeks a projection where samples of the same class cluster and
+different classes separate (the same intuition as K-means, but supervised). For
+a 1D projection,
+\[
+  \max_{w_{(1)}} w_{(1)}^T S_B\, w_{(1)} \quad \text{s.t. } w_{(1)}^T S_W\, w_{(1)} = 1 ,
+\]
+with $S_B$ the between-class and $S_W$ the within-class scatter matrices; the
+solution is again a generalized eigenvalue problem.
+
+\subsubsection{Autoencoders}
+PCA's encode/decode pair ($y = W^T(x - \bar{x})$, $\hat{x} = \bar{x} + W y$)
+generalizes to an \textbf{autoencoder}: there is no reason to keep the encoder
+and decoder linear or single-layer. Stacking nonlinear layers gives a
+\textbf{deep autoencoder}, and using transposed (upsampling) convolutions gives a
+\textbf{convolutional autoencoder}. It is trained by minimizing the
+reconstruction error
+\[
+  R(\{W_{(j)}\}) = \frac{1}{N} \sum_{i=1}^{N} \|\hat{x}_i(\{W_{(j)}\}) - x_i\|^2 ,
+\]
+non-convex and optimized by SGD, just like supervised deep networks.
+
+\section{Cross-cutting concepts}
+\subsection{Data representation}
+Real data is often large and heterogeneous (e.g.\ documents of different
+lengths). A good representation makes it compact and homogeneous, e.g.\
+\textbf{bag-of-words} histograms of fixed length. Even then, data usually needs
+pre-processing: filling in missing values, cleaning noise, and \textbf{normalizing}
+features that have incommensurate magnitudes.
+
+\subsection{Cross-validation}
+Most algorithms have hyper-parameters; tuning them on the training loss favors
+complex models and overfits, yet the test set must not be touched. \textbf{Cross-
+validation} estimates generalization by holding out part of the training data.
+The trade-offs:
+\begin{itemize}
+  \item \textbf{Validation set}: cheap, but an unreliable estimate.
+  \item \textbf{$k$-fold} (e.g.\ 10-fold): only ``wastes'' $1/k$ of the data and
+  is $k$ times the cost of a single validation set; fewer folds (3-fold) are
+  cheaper but noisier.
+  \item \textbf{Leave-one-out} ($N$-fold): wastes no data but is expensive.
+\end{itemize}
+There is no ideal solution \textrightarrow{} the choice is a cost/reliability
+trade-off.

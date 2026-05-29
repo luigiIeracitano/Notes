@@ -712,10 +712,10 @@ assistant, feeds the user's message as the start of the dialogue, and lets the m
 what such an assistant ``would say next'' (the extra fine-tuning step discussed below is what
 makes this behave well).
 
-\textbf{Remark.} The model can only attend over a fixed number of tokens at once -- its
-\textbf{context size} (the $512$-token window above). This is why a very long conversation can
-make a model appear to ``lose the thread'': content that falls outside the context window is
-simply no longer visible to it.
+\textbf{Remark.} The model is limited by his context size, because if it is too big then it becomes very costly to compute the self attention
+as the complexity of the self attention depend on the input sequence (and the size of the embedding).
+This is why a very long conversation can make a model appear to ``lose the thread'': content that falls outside the context window is
+simply no longer visible to it (not the same as RNN, RNN has no limits but the information of the first tokens are diluted by more recent ones).
 
 \subsubsection{From input to output: assembling the blocks}
 We can now assemble all the pieces into the complete journey of a piece of text through a
