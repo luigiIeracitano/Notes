@@ -1,0 +1,263 @@
+%! TeX root = master.tex
+% !TEX program = lualatex
+
+\lecture{1}{2026-09-10}{Basics}{}
+\chapter{Introduction to Computer Security}
+\label{ch:intro-security}
+
+\section{Why a course on computer security?}
+
+When designing "classical" systems or programs, we usually aim to guarantee three properties:
+
+\begin{itemize}
+    \item \textbf{Correctness}: for a given input, the program provides the expected output.
+    \item \textbf{Safety}: well-formed programs cannot produce bad (even dangerous) outputs.
+    \item \textbf{Robustness}: the system copes with errors, both in the input and during execution.
+\end{itemize}
+
+In all these cases, we try to anticipate what could go wrong and take it into account in the design. Computer security differs from these disciplines by one extra ingredient: the presence of an \textbf{adversary}, i.e., an entity that \emph{actively and intelligently} tries to make the system fail, as opposed to a random fault or accidental error.
+
+\section{What is computer security?}
+
+\begin{definition}[Computer security]
+Properties of a computer system must hold \textbf{in the presence of a resourced strategic adversary}.
+\end{definition}
+
+Two elements are therefore central to any security analysis:
+\begin{enumerate}
+    \item \textbf{Which properties} must be guaranteed?
+    \item \textbf{Against which adversary} (with which capabilities) must they be guaranteed?
+\end{enumerate}
+
+\subsection{Traditional properties: the CIA triad}
+
+\begin{definition}[Confidentiality]
+Prevention of unauthorized disclosure of information.\\
+\emph{Example: the adversary should not be able to read my bank statement.}
+\end{definition}
+
+\begin{definition}[Integrity]
+Prevention of unauthorized modification of information.\\
+\emph{Example: the adversary should not be able to change my bank balance.}
+\end{definition}
+
+\begin{definition}[Availability]
+Prevention of unauthorized denial of service.\\
+\emph{Example: the adversary should not be able to prevent me from accessing my bank account.}
+\end{definition}
+
+These three properties form the \textbf{CIA triad} (\emph{Confidentiality, Integrity, Availability}), which must be known by heart: it comes up in almost every exercise in this course.
+
+\subsection{Not-so-traditional (but important) properties}
+
+Modern security goes well beyond the CIA triad. Notable examples include:
+
+\begin{itemize}
+    \item \textbf{Authenticity}: guaranteeing that a piece of information or an entity is indeed what it claims to be.
+    \item \textbf{Anonymity}: preventing the identification of the principal behind an action.
+    \item \textbf{Isolation}: preventing one component of the system from affecting another.
+    \item \textbf{Non-repudiation}: preventing a principal from denying having performed an action.
+\end{itemize}
+
+\begin{remark}
+These properties will be revisited and formalized in later chapters (authentication, anonymity, etc.). The list above is not exhaustive — there are many more complex properties relevant to modern security.
+\end{remark}
+
+\section{The security policy}
+
+To precisely define a security property, we must specify \emph{what} it applies to. Two notions are introduced for this:
+
+\begin{definition}[Assets / objects]
+Anything with value (data, files, memory, etc.) that needs to be protected.
+\end{definition}
+
+\begin{definition}[Principals / subjects]
+People, computer programs, services, etc. that interact with the system. A principal \textbf{may not} contain the adversary.
+\end{definition}
+
+\begin{definition}[Security policy]
+A high-level description of the security properties that must hold in the system, in relation to assets and principals.
+\end{definition}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}p{2.7cm}p{5cm}p{5cm}@{}}
+\toprule
+\textbf{Property} & \textbf{General definition} & \textbf{Example (principals / assets)} \\
+\midrule
+Confidentiality & Prevention of unauthorized disclosure of information & authorized users may read a file \\
+Integrity & Prevention of unauthorized modification of information & authorized programs may write a file \\
+Availability & Prevention of unauthorized denial of service & authorized services can access a file \\
+\bottomrule
+\end{tabular}
+\caption{Examples of security properties expressed in terms of principals and assets.}
+\end{table}
+
+\section{The adversary and the threat model}
+
+\begin{definition}[Threat model]
+Describes the resources available to the adversary and their capabilities (observe, influence, corrupt, \dots).
+\end{definition}
+
+A key point of the course: the adversary is \textbf{strategic}. This means they will choose \emph{the best possible way} to use their resources to mount an attack that violates the security properties — one should never assume the adversary will act sub-optimally.
+
+\begin{remark}
+Threat modelling is a \textbf{very hard task} in practice: underestimating the adversary's capabilities invalidates the security argument, while overestimating them can make the system impossible or too costly to build.
+\end{remark}
+
+\subsection{Key vocabulary to talk about the adversary}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}p{2.3cm}p{5.7cm}p{5cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} & \textbf{Examples} \\
+\midrule
+\textbf{Threat} & The feared event, the goal of the adversary that we don't want to see materialize &
+A hacker wants to retrieve money by breaking into the bank's system; a student wants to learn my password by looking over my shoulder \\[4pt]
+\textbf{Threat model} & Technical term defining the adversary's capabilities &
+The adversary can observe my connection; the adversary can corrupt my machine; the adversary controls a bank employee \\[4pt]
+\textbf{Harm} & The bad thing that happens when the threat materializes &
+The adversary steals money; the adversary blocks access to the bank; the adversary learns my password; the adversary reads the message \\[4pt]
+\textbf{Vulnerability} & A specific weakness that could be exploited by adversaries interested in a variety of different assets &
+The banking API is not protected; the password appears in plain text on my screen \\
+\bottomrule
+\end{tabular}
+\caption{Basic vocabulary for describing an adversary.}
+\end{table}
+
+\begin{remark}[Putting it all together]
+Computer security means guaranteeing that properties (defined by the \textbf{security policy}) hold in the presence of an adversary (described by the \textbf{threat model}). If the properties hold within that threat model, it means there is no exploitable \textbf{vulnerability} that could materialize a \textbf{threat}, and hence no \textbf{harm} occurs.
+\end{remark}
+
+\section{Securing a system: security mechanisms}
+
+\begin{definition}[Security mechanism]
+A technical mechanism used to ensure that the security policy is not violated by an adversary within the threat model.
+\end{definition}
+
+A security mechanism can combine:
+\begin{itemize}
+    \item \textbf{Software} (programs),
+    \item \textbf{Hardware},
+    \item \textbf{Maths} (cryptography),
+    \item \textbf{Distributed systems}, \textbf{people}, and \textbf{procedures}.
+\end{itemize}
+
+\begin{remark}
+Security mechanisms can be \emph{engineered}, just like any other part of a system.
+\end{remark}
+
+\begin{example}
+\textbf{Example 1 — } Policy: ensure the log of transactions is not tampered with by a single employee.\\
+Mechanism: keep a copy of the log on multiple computers, such that no single employee has access to all of them.
+
+\medskip
+\textbf{Example 2 — } Policy: ensure messages cannot be read by anyone but the sender and the receiver.\\
+Mechanism: encrypt the message before sending it.
+\end{example}
+
+\subsection{Composing multiple mechanisms}
+
+Real systems are large and often require \textbf{several} security mechanisms combined together. There are two fundamentally different ways of composing them, and distinguishing them clearly is crucial:
+
+\begin{definition}[Defence in depth]
+The security policy is maintained \textbf{as long as at least one} mechanism remains effective ("OR" composition).
+\end{definition}
+
+\begin{definition}[Weakest link]
+The security policy is violated \textbf{if any one} mechanism fails ("AND" composition).
+\end{definition}
+
+\begin{remark}
+Important point for exercises: \textbf{security does not necessarily increase linearly with the number of mechanisms}. Depending on how mechanisms are composed, adding one can either strengthen the system (defence in depth) or introduce a new point of failure (weakest link) — e.g., a poorly designed mechanism added "in series" can weaken an otherwise solid system.
+\end{remark}
+
+\subsection{Humans are part of the system}
+
+Humans are an integral part of the system, and are often directly targeted by the adversary:
+
+\begin{itemize}
+    \item \textbf{Phishing} attacks and \textbf{social engineering}.
+    \item Bad use of passwords: \textbf{weak} passwords, passwords \textbf{written down}, or passwords \textbf{repeated} across services.
+\end{itemize}
+
+\begin{remark}
+The fact that humans are often the "weakest link" does \textbf{not} mean the rest of the system should be neglected: all mechanisms must remain robust.
+\end{remark}
+
+\section{How do we show systems are secure?}
+
+A very important, asymmetric way of reasoning about security:
+
+\begin{itemize}
+    \item \textbf{Attacker}: it is enough to find \textbf{one single} way to violate \textbf{one single} security property (within the threat model) to "win".
+    \item \textbf{Defender}: must show that \textbf{no} adversary strategy can violate the security policy.
+\end{itemize}
+
+This asymmetry is what makes security hard: the defender must cover \emph{every} case, while the attacker only needs \emph{one} success.
+
+\begin{quote}
+"One of the major problems right now is script kiddies. These are people who just download open source tools that are meant for good, and they point them at whatever they want, press 'Go,' and it fires a suite of exploits at a system hoping one of them will work." — Richard Moore, Security Specialist (IBM)
+\end{quote}
+
+\begin{definition}[A "secure" system]
+A system is said to be \textbf{secure} if an adversary constrained by a specific \emph{threat model} \textbf{cannot} violate the security policy.
+\end{definition}
+
+\begin{remark}
+The security of a system is therefore never absolute: it is always \textbf{relative to a given threat model}. A system may be secure against a weak adversary and no longer secure against a stronger one.
+\end{remark}
+
+\begin{definition}[Security argument]
+A rigorous argument (verbal or mathematical) that the security mechanisms in place are indeed effective in maintaining the security policy, subject to the assumptions of the threat model.
+\end{definition}
+
+\begin{remark}[For a threat model to be useful]
+The model \textbf{must constrain} the adversary — otherwise no security argument is possible (an adversary with unlimited capabilities can always break the system).
+\end{remark}
+
+\begin{remark}
+Security arguments for the \textbf{composition} of several mechanisms are particularly hard to get right (cf. \emph{defence in depth} vs \emph{weakest link} above).
+\end{remark}
+
+\section{Security engineering}
+
+Designing a secure system typically follows three steps:
+
+\begin{enumerate}
+    \item \textbf{High-level specification}
+    \begin{itemize}
+        \item Define the architecture of the system (e.g., a high-level block diagram).
+        \item Define the security policy (principals, assets, security properties).
+        \item Define the threat model.
+    \end{itemize}
+    \item \textbf{Security design}
+    \begin{itemize}
+        \item Select / design security mechanisms.
+        \item State the security argument: which controls maintain which properties?
+    \end{itemize}
+    \item \textbf{Secure implementation}
+    \begin{itemize}
+        \item Implement the mechanisms.
+        \item Ensure they conform to the design model.
+        \item Security testing.
+    \end{itemize}
+\end{enumerate}
+
+\begin{remark}
+Following this order (specify \emph{before} implementing) is essential: a mechanism added without a clear threat model and security argument risks protecting against nothing precise, or creating a false sense of security.
+\end{remark}
+
+\section{Summary}
+
+\begin{itemize}
+    \item Security problems always involve an \textbf{adversary}.
+    \item The adversary is \textbf{strategic}: they will take the most damaging approach possible.
+    \item The adversary's \textbf{capabilities} define a \textbf{threat model}.
+    \item \textbf{Security mechanisms} aim at fulfilling a \textbf{security policy} within a given threat model.
+    \item Showing that a system is secure requires providing a \textbf{security argument}.
+    \item \textbf{Composition} of mechanisms is not trivial (\emph{defence in depth} vs \emph{weakest link}).
+    \item Security is always \textbf{relative} to the adversary considered.
+\end{itemize}
+
