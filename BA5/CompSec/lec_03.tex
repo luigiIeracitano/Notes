@@ -88,7 +88,6 @@ if ( subject.isPermitted("user:delete:jsmith") ) {
 }
 \end{verbatim}
 The application does not contain the policy: it only asks the monitor.
-\end{example}
 
 \begin{remark}
 The reference monitor is how \textbf{complete mediation} is put in practice (every access goes through the monitor), and keeping it small and central follows \textbf{economy of mechanism}. The slides ask, with a question mark, whether this violates \textbf{least common mechanism}: a central monitor \emph{is} a mechanism shared by all users. This is a typical example of \emph{tension between principles}, which must be weighed explicitly rather than ticked off blindly.
@@ -233,7 +232,7 @@ Systems have \textbf{too many subjects}, and they come and go. This leads to lar
     \item \textbf{Assign permissions to roles};
     \item \textbf{assign roles to subjects};
     \item subjects \textbf{select an active role}: they hold the permissions of the active role.
-
+\end{enumerate}
 \end{definition}
 
 Roles add a level of indirection: when an employee changes job, we change their role assignment rather than editing the ACL of every object.
