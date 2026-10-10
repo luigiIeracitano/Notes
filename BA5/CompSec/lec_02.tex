@@ -1,0 +1,293 @@
+%! TeX root = master.tex
+% !TEX program = lualatex
+
+\lecture{2}{2026-09-17}{Principles}{}
+\chapter{Principles of Computer Security}
+\label{ch:principles}
+
+\section{Motivation}
+
+Since we cannot, in practice, prove that a system is free of flaws, the field of computer security relies instead on a set of \textbf{design principles}: rules of thumb that, when followed, tend to reduce both the number and the severity of security flaws.
+
+\begin{remark}[Historical reference]
+The principles presented in this chapter were introduced by J.\ Saltzer and M.\ Schroeder in \emph{The Protection of Information in Computer Systems}, Proceedings of the IEEE (1975). Despite their age, they remain the foundation of modern security engineering practice: for example, they were used in 2018 by N.\ Papernot (Google Brain) to structure the threat model of machine learning systems in \emph{A Marauder's Map of Security and Privacy in Machine Learning}.
+\end{remark}
+
+There are \textbf{8} core principles from Saltzer and Schroeder, plus \textbf{2} extra principles borrowed from physical security that are also commonly used in computer security.
+
+\begin{remark}
+These principles are \textbf{not} a blind checklist to tick off. They are tools to help weigh design decisions and trade-offs. Most real-world security failures come from a principle being improperly evaluated or ignored, rather than from a fundamentally new kind of attack.
+\end{remark}
+
+\subsection{Motivating example: the Heartbleed bug}
+
+\begin{example}[Heartbleed, CVE-2014-0160]
+In 2014, a critical vulnerability was found in OpenSSL, the library used to encrypt HTTPS traffic.
+\begin{itemize}
+    \item The \emph{Heartbeat} extension of TLS lets a client send a small piece of data and ask the server to echo it back, simply to check that the connection is still alive.
+    \item The client also sends the \emph{claimed length} of the data it is sending.
+    \item \textbf{Bug}: the server never checked that the claimed length matched the actual length of the data received. An attacker could send $1$ byte while claiming to send $64\,000$ bytes; the server would reply with the attacker's byte \emph{plus} the next $63\,999$ bytes of whatever happened to sit in its private memory (potentially including private keys, passwords, or other users' data).
+    \item The missing fix was a single bounds check: \verb|if (request_size < actual_size) { error; }|.
+\end{itemize}
+Two structural reasons let this bug survive undetected for two years:
+\begin{enumerate}
+    \item \textbf{Feature complexity}: the Heartbeat extension was a non-essential feature bolted onto TLS, creating a new attack surface that did not need to exist for the core function of TLS.
+    \item \textbf{Codebase complexity}: OpenSSL is a huge codebase (hundreds of thousands of lines of C and Perl), which makes manual audit extremely difficult.
+\end{enumerate}
+\end{example}
+
+This example already illustrates the first, and arguably most fundamental, principle: \textbf{keep it simple}.
+
+\section{The eight core principles}
+
+\subsection{1 -- Economy of mechanism}
+
+\begin{definition}[Economy of mechanism]
+Keep the design of a security mechanism (and its implementation) \textbf{as simple and small as possible}.
+\end{definition}
+
+\textbf{Why?} A security mechanism must be easy to \textbf{audit and verify}. Note that \emph{operational testing is not appropriate to evaluate security}: passing functional tests only shows the system behaves correctly on the inputs tested, not that no adversarial input can break it (although penetration testing remains valuable as one tool among others).
+
+\begin{definition}[Trusted Computing Base (TCB)]
+Every component of the system (hardware, firmware, software) on which the security policy relies.
+\end{definition}
+
+The TCB is the only thing that must be \emph{trusted} to operate correctly for the security policy to hold. This gives the only proper technical use of the verb ``to trust'' in security engineering: \emph{``X trusts Y will do Z.''}
+
+\begin{remark}
+If something goes wrong \textbf{within} the TCB, the security policy may be violated. If something goes wrong \textbf{outside} the TCB, the security policy should still hold. The TCB must therefore be kept as small as possible, both to ease verification (economy of mechanism) and to reduce the attack surface.
+\end{remark}
+
+\subsection{2 -- Fail-safe defaults}
+
+\begin{definition}[Fail-safe defaults]
+Base access decisions on explicit \textbf{permission} rather than on \textbf{exclusion}.
+\end{definition}
+
+In other words: if a decision procedure fails, is uncertain, or an error occurs, the system should default to the \textbf{safe} state (deny access), not attempt to ``fix'' the situation on the fly. Concretely, this means using a \textbf{whitelist} approach rather than a \textbf{blacklist} approach: a lack of permission is easy to detect and does not require anticipating every possible way something could go wrong.
+
+\begin{example}
+\begin{itemize}
+    \item \textbf{Security door}: if no permission was granted, the door does not open.
+    \item \textbf{Form input}: if a user has no permission to write into field $X$, the system does not silently write elsewhere; it refuses.
+\end{itemize}
+\end{example}
+
+\begin{example}[MongoDB defaults]
+For a while, MongoDB's out-of-the-box installation had authentication \textbf{disabled by default} and bound to \textbf{all} network interfaces (\texttt{0.0.0.0}) instead of only the local loop-back (\texttt{127.0.0.1}). Attackers scanned the internet for open instances, connected without a password, stole or encrypted the data, and left ransom notes. This is a textbook violation of fail-safe defaults: the default configuration favored ease of use over safety, and many administrators never changed it.
+\end{example}
+
+\begin{remark}[Ransomware]
+Ransomware denies the victim access to their own data (typically by encrypting it) and demands payment for the decryption key. The very first documented ransomware dates back to 1989 (the ``AIDS Information'' floppy disk attack); the phenomenon exploded with the arrival of cryptocurrencies, which make anonymous payment easy. Many ransomware epidemics (e.g., around 2017) directly exploited unsafe defaults such as the MongoDB case above.
+\end{remark}
+
+\subsection{3 -- Complete mediation}
+
+\begin{definition}[Complete mediation]
+\textbf{Every} access to \textbf{every} object must be checked for authority.
+\end{definition}
+
+This principle is usually phrased in terms of a \textbf{reference monitor}: a component that mediates \emph{all} actions of subjects on objects, checks them against the security policy, and may log them to an audit log.
+
+\begin{example}[Streaming service authorization]
+Consider a streaming platform where users can subscribe to a ``Gold'' tier granting access to exclusive content.
+\begin{itemize}
+    \item \textbf{Naive (fast) implementation}: the user's Gold status is checked only \textbf{once}, at login. The server then issues a session cookie such as \texttt{\{'user': 'Alice', 'status': 'paid'\}}, and every subsequent request only reads this cookie.
+    \item \textbf{Attack}: Alice subscribes for one day, logs in (cookie says \texttt{paid}), then immediately unsubscribes. The database is correctly updated to \texttt{unpaid}, but her cookie is not re-checked. Alice can keep watching premium content until her session expires.
+\end{itemize}
+This is a direct violation of complete mediation: not \emph{every} access to the object (the video) was checked against the current policy.
+\end{example}
+
+\begin{remark}[Why complete mediation is hard to implement]
+\begin{itemize}
+    \item \textbf{Performance}: checking every single access can be very slow; there is an inherent trade-off between the time spent checking and the time spent actually using the resource.
+    \item \textbf{Modern distributed systems}: a reference monitor can only mediate what it \emph{sees} --- if part of the system bypasses it (as in the caching example above), mediation is incomplete.
+\end{itemize}
+\end{remark}
+
+\subsection{4 -- Open design}
+
+\begin{definition}[Open design]
+The design of a security mechanism should \textbf{not} need to be secret.
+\end{definition}
+
+This principle has a long history predating computer security:
+\begin{itemize}
+    \item \textbf{Kerckhoffs} (\emph{La Cryptographie Militaire}, 1883): ``The design of a system should not require secrecy.''
+    \item \textbf{Shannon} (\emph{Communication Theory of Secrecy Systems}, 1949): ``The enemy knows the system''; one should design systems assuming the adversary will immediately gain full familiarity with them.
+    \item \textbf{Baran} (\emph{Security, secrecy, and tamper-free considerations}, 1964): the ``Paradox of the Secrecy About Secrecy'' --- without the freedom to expose a design to widespread scrutiny by people with diverse expertise, one increases the risk that significant weaknesses go unnoticed.
+\end{itemize}
+
+\begin{remark}
+Open design does \textbf{not} mean nothing is kept secret: it means the \emph{algorithm} is public, while only well-defined, easily replaceable \textbf{key material} is kept secret. For example:
+\begin{itemize}
+    \item \textbf{Cryptography}: only the key is kept secret, not the algorithm.
+    \item \textbf{Authentication}: only the password is kept secret, not the authentication protocol.
+    \item \textbf{Obfuscation}: only the random noise used is kept secret, not the obfuscation method.
+\end{itemize}
+\end{remark}
+
+Open design leads to better and easier auditing:
+\begin{quote}
+\textbf{Linus' law} (E.\ Raymond, \emph{The Cathedral and the Bazaar}, 1997): ``Given enough eyeballs, all bugs are shallow.''
+\end{quote}
+This is more of a mantra than a guarantee: it requires genuinely many competent eyeballs, since the density of defects in real software is high. Relying on secrecy instead is unrealistic in practice and is a common way to end up with a bad threat model (\emph{security through obscurity}). A famous failure of closed design is GSM encryption, whose secret algorithms were reverse-engineered and found to be weak.
+
+\begin{example}[Deep Root Analytics leak, 2017]
+The personal data (names, addresses, birthdates, political profiling) of 198 million US voters, compiled by data firm Deep Root Analytics, was exposed online in a publicly accessible server with \textbf{no password and no authentication}. The only ``protection'' was that the URL was semi-secret. A security researcher found the URL and disclosed the issue; the 1.1\,TB database had effectively been open to anyone on the internet. This is a direct case of security through obscurity failing.
+\end{example}
+
+\begin{example}[Scanning the whole internet is cheap]
+There are only $2^{32} \approx 4$ billion IPv4 addresses. As early as 2013, it was possible to scan every IPv4 address on a given port in about 3 minutes. Consequently, picking a ``random'' or non-standard port for a service does not hide it from a motivated adversary --- it only adds negligible cost.
+\end{example}
+
+\subsection{5 -- Separation of privilege}
+
+\begin{definition}[Separation of privilege]
+No single accident, deception, or breach of trust should be sufficient to compromise the protected information; \textbf{multiple, independent conditions} should be required to perform a sensitive action.
+\end{definition}
+
+\begin{remark}
+A \textbf{privilege} is the ability granted to a user to perform an action with security consequences (e.g., create a file, access a device, write to a network socket).
+\end{remark}
+
+\begin{example}
+Requiring two keys to open a safe, or two independent factors to authenticate, are classic instances of separation of privilege. This comes with trade-offs: \textbf{availability} (what if one key-holder is unavailable?), \textbf{responsibility} (who is accountable?), and added \textbf{complexity}.
+\end{example}
+
+\begin{example}[Corporate payment system]
+Consider a business payment system with principals \emph{Employees} (submit orders), \emph{Vendors}, and \emph{Managers} (who can approve new vendors and approve orders, and inherit Employee rights). The security goal is that an attacker must not be able to steal money, under a threat model where the adversary can corrupt \textbf{at most one} principal.
+
+If a single corrupted employee can (1) create a fake vendor, (2) submit a fake order for that vendor, and (3) approve the payment themselves, the entire attack can be carried out by one corrupted principal --- there is no separation of privilege.
+
+\textbf{Fix}: split the roles so that no single role can complete the whole attack chain:
+\begin{itemize}
+    \item \emph{Procurement} role: can only create/approve new vendors, cannot approve payments.
+    \item \emph{Finance Manager} role: can only approve payments for vendors already registered, cannot create new vendors.
+\end{itemize}
+\end{example}
+
+\begin{remark}
+Separation of privilege is reminiscent of the ``separation of powers'' / ``checks and balances'' principle in political science.
+\end{remark}
+
+\subsection{6 -- Least privilege}
+
+\begin{definition}[Least privilege]
+Every program and every user of the system should operate using the \textbf{least} set of privileges necessary to complete the job.
+\end{definition}
+
+Concretely: rights should be granted \textbf{as needed} and discarded \textbf{after use}. This limits damage control and minimizes high-privilege actions and interactions --- it is the security analogue of the ``need-to-know'' principle.
+
+\begin{example}
+Guest accounts at EPFL (limited-duration, limited-scope access), and the \emph{data minimization} principle in data protection law (collect and retain only the data strictly necessary for the stated purpose), are both direct applications of least privilege.
+\end{example}
+
+\subsection{7 -- Least common mechanism}
+
+\begin{definition}[Least common mechanism]
+Minimize the amount of mechanism common to, and depended on by, more than one user.
+\end{definition}
+
+\begin{remark}
+This is closely related to economy of mechanism, but focuses specifically on \textbf{shared} mechanisms: ``every shared mechanism represents a potential information path between users, and must be designed with great care so that it does not unintentionally compromise security.''
+\begin{itemize}
+    \item At the \textbf{design} level, interactions between users through a shared mechanism make the security design harder to validate.
+    \item At the \textbf{implementation} level, interactions may lead to unintentional information leaks through \emph{unintended channels}, e.g., a shared \texttt{/tmp} directory or a shared cache.
+\end{itemize}
+This principle concerns \emph{mechanisms}, not \emph{code}: reusable, well-tested code is generally good for security. The issue is the sharing (lack of isolation) of \emph{data and state}, not code reuse itself.
+\end{remark}
+
+\begin{remark}[Reminder: symbolic links]
+A symbolic link (``symlink'') is a shortcut file: when the operating system accesses it, it is automatically redirected to the real file or directory it points to.
+\end{remark}
+
+\begin{example}[Violation via a shared \texttt{/tmp} directory]
+Consider three principals: (1) a root/admin program that predictably writes a log file with \texttt{echo "Service is starting..." > /tmp/starting.log}; (2) the root/admin logging subsystem; (3) an unprivileged user who can also write to \texttt{/tmp}. The security goal is to preserve the integrity of the logs written by the logging subsystem, under a threat model where the adversary can corrupt principal (3).
+
+\textbf{Attack}: the unprivileged user creates, ahead of time, a symlink \verb|ln -s /var/log/dmesg /tmp/starting.log|. When the root program later writes to \texttt{/tmp/starting.log}, it actually (over)writes \texttt{/var/log/dmesg}, an unrelated privileged log file.
+
+This works because \texttt{/tmp} is a mechanism \textbf{shared} between low-privilege and high-privilege processes: exactly the setting least common mechanism warns against. (Modern Linux systems mitigate this specific \texttt{/tmp} case, but the same attack works if the shared, writable directory is elsewhere, e.g., under \texttt{/home/user}.)
+\end{example}
+
+\subsection{8 -- Psychological acceptability}
+
+\begin{definition}[Psychological acceptability]
+The human interface must be designed for ease of use, so that users \textbf{routinely and automatically} apply the protection mechanisms correctly.
+\end{definition}
+
+Three consequences:
+\begin{itemize}
+    \item Security mechanisms should \textbf{not} make a resource harder to access than if the mechanism were absent (hide complexity).
+    \item The (honest) user's \textbf{mental model} of the system must match the actual security policy and mechanisms.
+    \item \textbf{Cultural acceptability}: not every mechanism is acceptable everywhere, e.g., face-recognition authentication is unsuitable in cultures where faces are covered, and requiring a register of everyone sleeping in a dorm raises different acceptability concerns depending on context.
+\end{itemize}
+
+\begin{example}[Amazon S3 permission confusion]
+Amazon S3 (``Simple Storage Service'') stores data as objects inside containers called \emph{buckets}. Psychological acceptability is not only about end users: system administrators configuring a bucket are also ``users'' of a UI, and that UI can mislead them.
+
+S3's permission UI historically offered an option to grant access to ``Any Authenticated AWS User.'' Administrators commonly read this as ``any authenticated user of \emph{my} organization/account,'' while it actually meant ``any person on Earth with \emph{any} AWS account,'' which is free to create. This mismatch between the mental model and the actual policy caused several major data leaks starting in 2017. Amazon later (2023) introduced an additional layer of fail-safe defaults, blocking public access by default.
+\end{example}
+
+\begin{remark}[Safer defaults are not free]
+Tightening defaults for security (e.g., Amazon's 2023 change) can break workflows that legitimately relied on the old, more permissive behavior, generating user frustration. This illustrates that fail-safe defaults and psychological acceptability can be in tension, and trade-offs must be weighed explicitly.
+\end{remark}
+
+\section{Two extra principles (from physical security)}
+
+\subsection{9 -- Work factor}
+
+\begin{definition}[Work factor]
+Compare the \textbf{cost} of circumventing a security mechanism with the \textbf{resources} available to a potential attacker.
+\end{definition}
+
+This principle helps refine the threat model: a mechanism need not resist an unlimited adversary, only one bounded by the threat model. In practice, quantifying the work factor is difficult: how does one price the cost of bribing/compromising an insider, the cost of finding a given bug, or the monetary value an attacker could extract?
+
+\subsection{10 -- Compromise recording}
+
+\begin{definition}[Compromise recording]
+Reliably record that a compromise has occurred, in place of (or in addition to) more elaborate mechanisms that try to completely prevent loss.
+\end{definition}
+
+Keeping tamper-evident logs can enable recovery of integrity even when prevention fails. However, logging is not a silver bullet:
+\begin{itemize}
+    \item Logging does not guarantee the compromise is detected.
+    \item If confidentiality mechanisms were the ones compromised, logging does not help recover what was already leaked.
+    \item Logs themselves must maintain integrity (what stops the log from being tampered with?).
+    \item Logs can themselves become a vulnerability, e.g., a privacy risk if they contain sensitive data.
+    \item Logging the logs raises its own availability concerns.
+\end{itemize}
+
+\section{Applying the principles: a machine learning example}
+
+As a sign of how durable these 1975 principles are, they are routinely reused to structure entirely new domains. For instance, N.\ Papernot's 2018 threat-modeling of machine learning security maps directly onto several of them:
+\begin{itemize}
+    \item \textbf{Least privilege}: let a model learn as little as possible, so that sensitive information cannot later be extracted from it.
+    \item \textbf{Least common mechanism}: obtain labelled samples from diverse, independent origins rather than a single shared source.
+    \item \textbf{Psychological acceptability}: users must be able to understand \emph{why} a model classifies or misclassifies a given input.
+    \item \textbf{Work factor}: the cost of an attack (e.g., number of queries to an API) determines its practical relevance.
+    \item \textbf{Compromise recording}: ideally, one would like to log all internal steps of the algorithm to detect compromise.
+\end{itemize}
+
+\section{Summary}
+
+\begin{quote}
+``Since no one knows how to build a system without flaws, the alternative is to rely on eight design principles, which tend to reduce both the number and the seriousness of any flaws: economy of mechanism, fail-safe defaults, complete mediation, open design, separation of privilege, least privilege, least common mechanism, and psychological acceptability.'' --- Saltzer and Schroeder, 1975
+\end{quote}
+
+\begin{itemize}
+    \item \textbf{Economy of mechanism}: keep the design (and implementation) as simple and small as possible; keep the TCB small.
+    \item \textbf{Fail-safe defaults}: base access on permission (whitelist), not exclusion; on failure, default to the safe state.
+    \item \textbf{Complete mediation}: verify \emph{every} access to \emph{every} object, every time.
+    \item \textbf{Open design}: the design should not need to be secret; only well-defined key material should be.
+    \item \textbf{Separation of privilege}: no single compromised principal should be able to complete a sensitive action alone.
+    \item \textbf{Least privilege}: operate with the minimum privileges necessary, granted as needed and revoked after use.
+    \item \textbf{Least common mechanism}: minimize mechanisms shared between users, to avoid unintended information paths.
+    \item \textbf{Psychological acceptability}: the security mechanism must be easy enough to use that honest users apply it correctly and routinely.
+    \item \textbf{(Extra) Work factor}: weigh the cost of an attack against the attacker's resources.
+    \item \textbf{(Extra) Compromise recording}: when prevention fails, at least reliably detect and record that a compromise occurred.
+\end{itemize}
+
+\begin{remark}
+These principles are guidelines, not proofs. Use them as tools to identify and weigh design trade-offs when building or auditing a security mechanism --- not as a checklist that, once ticked, guarantees security.
+\end{remark}
