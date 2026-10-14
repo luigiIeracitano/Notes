@@ -33,6 +33,26 @@ The issue: nothing is done \emph{during} the trial. What if, after only a short 
 
 This motivates a \emph{sequential} approach, where decisions can be updated as data comes in, rather than fixed in advance.
 
+\newpage
+\begin{parag}{Reminder: p-value}
+    A hypothesis test is a probabilistic proof by contradiction. We fix a \textbf{null hypothesis} $H_0$ (the status quo, e.g.\ ``the new treatment is no better than the old one'') and an \textbf{alternative hypothesis} $H_1$ (what we want to show, e.g.\ ``the new treatment is better'').
+
+    Given a test statistic $T$ (e.g.\ the number of cured patients) with observed value $t_{\text{obs}}$, the \textbf{p-value} is the probability, \textit{assuming $H_0$ is true}, of observing a result at least as extreme as the one we observed:
+    \[p = \prob\left(T \geq t_{\text{obs}} \mid H_0\right)\]
+
+    \textbf{Decision rule.} We fix a significance level $\alpha$ \textit{before} looking at the data (typically $\alpha = 0.05$):
+    \begin{itemize}
+        \item If $p \leq \alpha$: we \textbf{reject $H_0$}, and the result is statistically significant.
+        \item If $p > \alpha$: we \textbf{fail to reject $H_0$}. This does \textit{not} mean that $H_0$ is true, only that the data does not provide enough evidence against it.
+    \end{itemize}
+
+    \textbf{Errors.}
+    \begin{itemize}
+        \item \textbf{Type I error} (false positive): rejecting $H_0$ while it is true. By construction, this happens with probability $\alpha$.
+        \item \textbf{Type II error} (false negative): not rejecting $H_0$ while it is false. This happens with probability $\beta$, and $1 - \beta$ is called the \textbf{power} of the test.
+    \end{itemize}
+\end{parag}
+
 \subsection{Stochastic bandits: definitions, assumptions, vocabulary}
 
 The basic interaction loop is as follows: the \textbf{learner/agent} takes actions $A_i$, and the \textbf{environment} generates rewards $X_i$, over a \textbf{horizon} $n$:
@@ -74,6 +94,17 @@ Intuitively, an unstructured bandit is one where pulling one arm provides no inf
 \]
 where $\mathcal{M}_a$ is a family (set) of possible distributions $P_a$ for action $a$. In other words, $\mathcal{E} = \bigtimes_{a \in \mathcal{A}} \mathcal{M}_a$ is a \emph{product space}: any combination of elements from the $\mathcal{M}_a$'s is possible. This ensures that knowing anything about $P_a$ provides no information about $P_{a'}$ for $a' \neq a$.
 \end{definition}
+
+\begin{framedremark}
+    The objects in this definition live at different levels:
+    \begin{itemize}
+        \item $P_a$ is \textbf{one} distribution: the true (unknown) reward distribution of arm $a$, e.g.\ $\text{Ber}(0.7)$.
+        \item $\mathcal{M}_a$ is a \textbf{set} of distributions: all candidates that $P_a$ could be, i.e.\ what we assume about arm $a$ before playing. For instance, $\mathcal{M}_a = \{\text{Ber}(p) : p \in [0,1]\}$ (binary rewards), $\mathcal{M}_a = \{\mathcal{N}(\mu, 1) : \mu \in \R\}$ (Gaussian with known variance), or all distributions supported on $[0,1]$ (bounded rewards).
+        \item $\nu = (P_a : a \in \mathcal{A})$ is a \textbf{tuple} of distributions, one per arm: it is \textit{one} specific environment, e.g.\ $\nu = (\text{Ber}(0.7), \text{Ber}(0.4))$.
+        \item $\mathcal{E}$ is a \textbf{set} of environments: all those consistent with our assumptions.
+    \end{itemize}
+    The learner does not know $\nu$ (this is what it must learn), it only knows that $\nu \in \mathcal{E}$. Learning amounts to progressively narrowing down the candidates in each $\mathcal{M}_a$ until $P_a$ is identified well enough. The guarantees of an algorithm hold only if the true $P_a$ indeed belongs to the assumed $\mathcal{M}_a$.
+\end{framedremark}
 
 \subsubsection*{Examples of unstructured bandit classes}
 
