@@ -1,0 +1,490 @@
+%! TeX root = master.tex
+% !TEX program = lualatex
+
+\lecture{4}{2026-09-30}{Adaptive Explore-then-Commit and the Upper Confidence Bound Algorithm}{}
+
+At the end of the previous lecture, we saw that Explore-then-Commit (ETC) reaches a good regret only if the exploration length $m$ is tuned with the knowledge of the suboptimality gap $\Delta$, which is unknown in practice. This lecture answers the question raised there: \emph{can we decide adaptively, from the data, when we have explored enough?} We first make ETC adaptive using confidence intervals, extend it to $k > 2$ arms (sequential elimination), and then introduce the main algorithm of the lecture: the \textbf{Upper Confidence Bound (UCB)} algorithm, which is based on the principle of \emph{optimism in the face of uncertainty}.
+
+\section{Recap}
+
+\subsection{Multi-armed bandits}
+
+\begin{itemize}
+    \item \textbf{Problem setup}: $k$ arms, each arm generates random rewards. Arm $i$ has reward distribution $P_i$ with mean $\mu_i$; the best arm has mean $\mu^* = \max_i \mu_i$. The reward distributions are \emph{unknown} to the learner at the beginning.
+    \item \textbf{Algorithm}: at time $t$, take action $A_t \in \{1, 2, \dots, k\}$, observe the reward $X_t \sim P_{A_t}$, and continue for $t = 1, 2, \dots, n$. This is a sequential decision-making process: $A_t$ may depend on all the past actions and rewards.
+    \item \textbf{Goal}: achieve \emph{sublinear} regret, i.e., eventually pull the best arm (almost) every time.
+\end{itemize}
+
+\subsection{Regret}
+
+\begin{itemize}
+    \item \textbf{Instantaneous regret} at round $t$: $r_t = \mu^* - \mu_{A_t} = \Delta_{A_t}$. It measures the (expected) suboptimality of arm $A_t$: bad arm $\Leftrightarrow$ large regret, good arm $\Leftrightarrow$ small regret, best arm $\Leftrightarrow$ zero regret.
+    \item \textbf{Cumulative regret}: $R_n = \sum_{t=1}^n \mathbb{E}[r_t]$.
+    \item \textbf{Regret decomposition}: $R_n = \sum_{t=1}^n \mathbb{E}[r_t] = \sum_{a \in \mathcal{A}} \Delta_a\, \mathbb{E}[T_a(n)]$.
+    \item Sublinear cumulative regret $\Leftrightarrow$ vanishing instantaneous regret.
+\end{itemize}
+Hence, to minimize regret, we must eliminate bad arms quickly and eventually identify (and keep pulling) the best arm(s). The difficulty: due to randomness, we can \emph{never} identify good and bad arms with certainty.
+
+\subsection{Explore-then-Commit}
+
+\begin{itemize}
+    \item \textbf{Overview}: explore (round robin) until a fixed time $mk$; this gives an estimate $\hat{\mu}_i$ of $\mu_i$ for every arm $i$. If $\hat{\mu}_i \approx \mu_i$, picking $i^* = \arg\max_i \hat{\mu}_i$ identifies the best arm. Then commit to (keep pulling) $i^*$ for rounds $mk+1$ to $n$.
+    \item \textbf{Intuition}: if the best arm is correctly identified, there is no regret during the commit phase, so $R_n \propto m$: great! If a suboptimal arm is chosen, we pay a constant positive regret at all remaining rounds, so $R_n \propto n$: bad!
+    \item \textbf{Tradeoff}: very short exploration $\Rightarrow$ $|\hat{\mu}_i - \mu_i|$ large $\Rightarrow$ likely to choose a suboptimal arm $\Rightarrow$ large regret. Very long exploration $\Rightarrow$ excessive exploration $\Rightarrow$ large regret.
+\end{itemize}
+
+\section{Adaptive Explore-then-Commit}
+
+\subsection{Idea: the exploration length as a stopping time}
+
+\textbf{Key idea}: think of $m$ as a \textbf{stopping time}.
+\begin{itemize}
+    \item $m$ is now \emph{random} and can depend on past data.
+    \item It signals when to stop exploring and start exploiting.
+    \item Ideally, we stop as soon as we are sufficiently confident about which arm is optimal.
+\end{itemize}
+
+With a \emph{fixed} $m$, two things can go wrong:
+\begin{itemize}
+    \item we may still not be sure about the optimal arm at time $mk$ (\textbf{under-exploration});
+    \item or we may have been very sure about the optimal arm much earlier (\textbf{over-exploration}).
+\end{itemize}
+
+\textbf{Idea}: decide when to stop by looking at the data. Keep pulling all arms equally often and computing the $\hat{\mu}_i$, until we are (reasonably) certain that one arm is better than all the others. How do we quantify certainty? With \textbf{confidence intervals}!
+
+\subsection{Confidence intervals}
+
+Let $X_1, X_2, \dots, X_n$ be i.i.d.\ samples of a random variable with unknown mean $\mu$, and $\hat{\mu}_n = \frac{1}{n}\sum_{i} X_i$ the estimate of $\mu$. Typically, $\hat{\mu}_n$ is close to $\mu$, but not exactly equal to it. What we can say is
+\[
+|\hat{\mu}_n - \mu| \leq \epsilon \quad \text{with probability at least } 1 - \delta,
+\]
+or equivalently, $\mu \in [\hat{\mu}_n - \epsilon, \hat{\mu}_n + \epsilon]$ with high probability. There are two quantities in this statement: the \textbf{confidence interval} (half-width $\epsilon$) and the \textbf{confidence level} (error probability $\delta$).
+
+If the $X_i - \mu$ are $\sigma$-subgaussian (with the abuse of notation of the previous lecture, we simply say that the $X_i$ are $\sigma$-subgaussian), the concentration inequality of the previous lecture gives
+\[
+\mathbb{P}\big(|\hat{\mu}_n - \mu| \geq \epsilon\big) \leq 2\exp\left(-\frac{n\epsilon^2}{2\sigma^2}\right) =: \delta.
+\]
+\begin{itemize}
+    \item Given $\epsilon$, we can compute $\delta$ with this inequality; alternatively, we fix $\delta$ and compute $\epsilon$:
+    \[
+    \epsilon = \sigma\sqrt{\frac{2\ln(2/\delta)}{n}}, \qquad \text{or equivalently} \qquad n = \frac{2\sigma^2\ln(2/\delta)}{\epsilon^2}.
+    \]
+    \item For fixed $\delta$, $\epsilon$ decreases as $n$ increases (as $1/\sqrt{n}$).
+    \item For fixed $n$, $\epsilon$ decreases as $\delta$ increases (we accept a larger error probability in exchange for a tighter interval).
+    \item $\epsilon$ grows linearly with the subgaussian parameter $\sigma$: noisier rewards need more samples ($n \propto \sigma^2$) for the same precision.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.4\linewidth]{images/img_20261021_131035.png}
+\end{center}
+
+\subsection{Using confidence intervals to decide when to commit}
+
+How can we confidently decide when one arm is better than the other?
+\begin{itemize}
+    \item Pretend that each arm's mean reward lies in its confidence interval \emph{with certainty}.
+    \item If the confidence intervals \textbf{overlap}, the best arm is undecided.
+    \item If the confidence intervals are \textbf{disjoint}, the best arm is clear!
+\end{itemize}
+\textbf{Strategy}: keep exploring until the confidence intervals separate.
+
+\begin{center}
+\includegraphics[width=0.707\linewidth]{images/img_20261021_131344.png}
+\end{center}
+
+This makes $m$ \textbf{data-dependent}:
+\begin{itemize}
+    \item With sufficient exploration, the confidence intervals eventually separate (their width goes to $0$ as $1/\sqrt{m}$).
+    \item When $\mu_1 - \mu_2$ is large, the confidence intervals separate early, so $\mathbb{E}[m]$ is small.
+    \item When $\mu_1 - \mu_2$ is small, the confidence intervals separate only after a long time, so $\mathbb{E}[m]$ is large.
+\end{itemize}
+The exploration time is chosen from the data, not fixed a priori.
+
+\begin{definition}[Upper and lower confidence bounds]
+For an arm with $n$ samples and empirical mean $\hat{\mu}_n$, starting from $\mathbb{P}\big(|\hat{\mu}_n - \mu| \geq \epsilon\big) \leq 2\exp\big(-n\epsilon^2/(2\sigma^2)\big)$ and solving for $\epsilon$:
+\[
+UCB(n, \delta) = \hat{\mu}_n + \sigma\sqrt{\frac{2\ln(2/\delta)}{n}}, \qquad LCB(n, \delta) = \hat{\mu}_n - \sigma\sqrt{\frac{2\ln(2/\delta)}{n}}.
+\]
+$UCB$ is the \textbf{Upper Confidence Bound} ($\hat{\mu} + \epsilon$), $LCB$ the \textbf{Lower Confidence Bound} ($\hat{\mu} - \epsilon$). With probability at least $1 - \delta$, $\mu \in [LCB(n,\delta), UCB(n,\delta)]$.
+\end{definition}
+
+\subsection{Algorithm}
+
+\begin{definition}[Adaptive ETC (ETC with confidence intervals)]
+Hyperparameters: confidence level $\delta \in (0,1)$ and a minimum number of pulls per arm $m_0$.
+
+\begin{tabbing}
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\kill
+\textbf{Initialize}: $T_a(0) = 0$, $\hat{\mu}_a(0) = 0$ for all arms $a \in \mathcal{A}$; \texttt{committed\_arm} $=$ \texttt{None}. \\
+\textbf{for} $t = 1, 2, \dots, n$ \textbf{do}: \\
+\> \textbf{if} \texttt{committed\_arm} $\neq$ \texttt{None}: $A_t = $ \texttt{committed\_arm} \\
+\> \textbf{else}: $A_t = (t \bmod k) + 1$ \\
+\> \> \textbf{check for commitment if} $t \geq m_0 k$: \\
+\> \> \> compute $\hat{\mu}_a(t)$ for all $a \in \mathcal{A}$, and $a^*_t = \arg\max_a \hat{\mu}_a(t)$; \\
+\> \> \> compute $UCB_a(t, \delta)$ and $LCB_a(t, \delta)$ for all $a \in \mathcal{A}$; \\
+\> \> \> \textbf{if} $LCB_{a^*_t}(t, \delta) > UCB_a(t, \delta)$ for all $a \neq a^*_t$: \texttt{committed\_arm} $= a^*_t$.
+\end{tabbing}
+Here $UCB_a(t,\delta)$ and $LCB_a(t,\delta)$ are the bounds of arm $a$ computed with its $T_a(t)$ samples.
+\end{definition}
+
+\begin{remark}
+\begin{itemize}
+    \item The commitment rule is exactly ``the confidence interval of the empirically best arm is entirely above the confidence intervals of all other arms''.
+    \item $m_0$ forces every arm to be sampled a minimum number of times before any commitment is even considered.
+    \item Compared to ETC, the only parameter is now $\delta$ (and $m_0$); no knowledge of $\Delta$ is needed.
+\end{itemize}
+\end{remark}
+
+\subsection{Simulations}
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/img_20261021_153200.png}
+\\
+\includegraphics[width=0.9\linewidth]{images/img_20261021_153302.png}
+\end{center}
+
+\textbf{Salient features}:
+\begin{itemize}
+    \item The exploration period is random (each trajectory commits at a different time).
+    \item The expected cumulative regret is sublinear.
+    \item Larger $\Delta$ $\Rightarrow$ the algorithm commits earlier.
+    \item As for fixed ETC, the regret is highest for moderate $\Delta$ (here $\Delta = 0.1$): small $\Delta$ makes mistakes cheap, large $\Delta$ makes the arms easy to distinguish.
+\end{itemize}
+
+\subsubsection*{Importance of the hyperparameter $\delta$}
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{images/img_20261021_154058.png}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{Very small $\delta$} $\Rightarrow$ wide intervals, too conservative: over-exploration.
+    \item \textbf{Very large $\delta$} $\Rightarrow$ narrow intervals, too optimistic: some trajectories commit to the wrong arm, and then pay linear regret.
+    \item \textbf{Rule of thumb}: the larger the horizon $n$, the smaller $\delta$ should be, because a mistaken commitment costs regret at each of the (many) remaining rounds.
+\end{itemize}
+
+\begin{remark}
+  A wrong commitment costs up to $\Delta \cdot n$, and happens with a probability of order $\delta$. If $\delta$ stays fixed while $n$ grows, this term is linear in $n$; this is why $\delta$ must decrease with $n$ (we will see the choice $\delta = 1/n^2$ for UCB).
+\end{remark}
+
+\section{More than two arms: Sequential Elimination}
+
+\subsection{ETC for $k > 2$ arms}
+
+How can we extend the (adaptive) ETC principle to multi-armed bandits? As for two arms, we need to pull each arm a few times to estimate its reward: exploration of all arms is necessary. With more exploration, the confidence interval of each arm keeps shrinking; eventually the intervals become disjoint and the best arm becomes clear.
+
+There are two different interpretations of ETC for $k > 2$:
+\begin{itemize}
+    \item \textbf{View 1}: keep exploring until the best arm is identified. Commit to arm $i$ once its confidence interval dominates the confidence intervals of \emph{all} other arms.
+    \item \textbf{View 2}: keep eliminating arms that are clearly not the best. If the confidence interval of some arm $i$ dominates that of arm $j$ (i.e.\ $LCB_i > UCB_j$), stop pulling arm $j$.
+\end{itemize}
+The two views are \textbf{equivalent with two arms}, but \textbf{different in the multi-armed case}!
+
+\subsection{From ETC to sequential elimination}
+
+\textbf{Algorithm from View 1} (adaptive ETC): all arms are pulled equally often until the commit time $mk$. Likely behavior: the worse arms clearly separate out long before the competitive ones do, but we keep pulling them anyway. This is wasteful exploration on bad arms, hence a large regret.
+
+\textbf{Algorithm from View 2}: \textbf{Sequential Elimination (SE)}.
+\begin{itemize}
+    \item Initially, all arms are pulled in round robin.
+    \item The algorithm proceeds in \emph{phases}, eliminating one arm per phase: a phase ends when the confidence interval of some remaining arm becomes dominated by that of another remaining arm; the dominated arm is removed and the round robin continues on the remaining ones.
+    \item The length of each phase is random.
+    \item The instantaneous regret decreases from phase to phase (the worst arms are removed first).
+    \item Eventually, we are left with only the best arm.
+\end{itemize}
+Sequential elimination is the ``right'' extension of ETC to multi-armed bandits.
+
+\subsection{Simulations: adaptive ETC versus sequential elimination}
+
+Setting: $4$-armed Bernoulli bandit with mean rewards $[0.2, 0.4, 0.6, 0.8]$.
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/img_20261021_154920.png}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{Regret}: with adaptive ETC, there is no commitment at all in some runs (within the horizon), so the regret keeps growing linearly for those runs. With SE, the regret slope decreases in phases, each time an arm is eliminated.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/img_20261021_155043.png}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{Confidence intervals}: with adaptive ETC, all confidence intervals have the same length (all arms are pulled equally often), and there can still be some overlap between the competitive arms. With SE, the better arms have smaller confidence intervals: the remaining samples are spent on the arms that still matter.
+\end{itemize}
+
+\section{The Upper Confidence Bound (UCB) algorithm}
+
+\subsection{Algorithm}
+
+UCB is a very popular algorithm for multi-armed bandits. It uses confidence bounds, like adaptive ETC and sequential elimination, but in a different way, which leads to better regret in practice.
+
+\textbf{Notation} (``at time $t$'' means after $t$ overall pulls):
+\begin{itemize}
+    \item $\hat{\mu}_a(t)$: estimate of the mean reward of arm $a$ at time $t$;
+    \item $T_a(t)$: number of pulls of arm $a$ at time $t$;
+    \item upper confidence bound of arm $a$ at time $t$ (assuming $1$-subgaussian rewards):
+    \[
+    UCB_a(t, \delta) = \hat{\mu}_a(t) + \sqrt{\frac{2\ln(1/\delta)}{T_a(t)}},
+    \]
+    with $UCB_a(t, \delta) = \infty$ when $T_a(t) = 0$.
+\end{itemize}
+
+\begin{definition}\textbf{(UCB algorithm).}
+\begin{tabbing}
+\hspace{1.5em}\=\kill
+\textbf{for} $t = 1, 2, \dots, n$ \textbf{do}: \\
+\> choose $A_t = \arg\max_a UCB_a(t-1, \delta)$; \\
+\> observe $X_t$ and update $UCB_a(t, \delta)$.
+\end{tabbing}
+\end{definition}
+
+\begin{remark}
+\begin{itemize}
+    \item Since $UCB_a = \infty$ initially, every arm is pulled once during the first $k$ rounds.
+    \item Here the bound is \emph{one-sided} (only the upper bound matters), hence $\ln(1/\delta)$ instead of $\ln(2/\delta)$; and $\sigma = 1$. By the concentration inequality, for a fixed number $s$ of samples, $\mathbb{P}\big(\mu \geq \hat{\mu}_s + \sqrt{2\ln(1/\delta)/s}\big) \leq \delta$.
+    \item Unlike ETC, there are no separate phases: the same rule is applied at every round.
+\end{itemize}
+\end{remark}
+
+\subsection{Exploration-exploitation tradeoff in UCB}
+
+The UCB index is the sum of two terms:
+\[
+UCB_a(t, \delta) = \underbrace{\hat{\mu}_a(t)}_{\text{empirical mean}} + \underbrace{\sqrt{\frac{2\ln(1/\delta)}{T_a(t)}}}_{\text{exploration bonus}}.
+\]
+The algorithm pulls an arm more often if it is
+\begin{itemize}
+    \item either \textbf{promising}: its empirical mean $\hat{\mu}_a(t)$ is large (exploitation);
+    \item or \textbf{not well explored}: $T_a(t)$ is small, so the exploration bonus is large (exploration).
+\end{itemize}
+
+\textbf{Why is this a reasonable strategy?}
+\begin{itemize}
+    \item With high probability, $UCB_{a^*}(t, \delta) > \mu_{a^*}$ at all times.
+    \item If a suboptimal arm $a \neq a^*$ is pulled, then $UCB_a(t, \delta) > UCB_{a^*}(t, \delta)$.
+    \item With enough pulls, $UCB_a(t, \delta) \approx \mu_a$, and $\mu_a < \mu_{a^*} < UCB_{a^*}(t, \delta)$, so $a$ stops being chosen.
+    \item Hence suboptimal arms are not pulled too many times! Heuristically, arm $a$ stops being pulled once its bonus is smaller than its gap, $\sqrt{2\ln(1/\delta)/T_a} \lesssim \Delta_a$, i.e.\ after about $T_a \approx 2\ln(1/\delta)/\Delta_a^2$ pulls. The regret bound below makes this precise.
+\end{itemize}
+
+\subsection{Optimism in the face of uncertainty: UCB versus ETC}
+
+UCB follows the \textbf{Optimism in the Face of Uncertainty (OFU)} principle:
+\begin{itemize}
+    \item UCB plays assuming the arm rewards are the highest they can reasonably be, i.e., it pretends $\mu_a = UCB_a(t, \delta)$ (the top of the confidence interval).
+\end{itemize}
+
+ETC (and sequential elimination) is more \textbf{conservative}: it takes a worst-case approach, where arm rewards could be anything in their respective confidence intervals.
+\begin{itemize}
+    \item It only commits to the best arm if it is ``sure'' that it is the best: its confidence interval must dominate all the others.
+    \item Likewise, it only eliminates a bad arm if it is ``sure'' that this arm is not the best.
+\end{itemize}
+
+\textbf{Transition from exploration to exploitation}:
+\begin{itemize}
+    \item UCB has a \textbf{soft} transition: exploration gradually fades out but never stops completely.
+    \item ETC has a \textbf{hard} transition: explore phase versus commit phase. If one makes a mistake (commits to or eliminates the wrong arm), it is difficult (impossible) to correct it.
+\end{itemize}
+
+\subsection{Simulations}
+
+\begin{center}
+\includegraphics[width=\linewidth]{images/img_20261021_165253.png}
+\end{center}
+
+Points to note:
+\begin{itemize}
+    \item For each sample path, the regret growth (slope) decays gently with time; contrast with ETC, where each trajectory has a kink at the commitment time and is flat (or linear, if the commitment was wrong) afterwards.
+    \item Exploration never stops completely.
+    \item The mean regret is sublinear. What is its growth rate: $O(\sqrt{n})$? $O(\ln n)$? This is answered by the theorem below: $O(\ln n)$ for a fixed instance.
+\end{itemize}
+
+\section{Regret bound for UCB}
+
+\begin{theorem}[Regret of UCB]
+Consider the UCB algorithm applied to a stochastic $1$-subgaussian bandit with $k$ arms, with error tolerance $\delta = 1/n^2$. Then the regret satisfies
+\[
+R_n \leq 3\sum_{i=1}^k \Delta_i + \sum_{i : \Delta_i > 0} \frac{16\ln n}{\Delta_i}.
+\]
+\end{theorem}
+
+\begin{remark}
+\begin{itemize}
+    \item The regret is \textbf{logarithmic} in $n$: much better than the $\sqrt{n}$ worst-case behavior of ETC.
+    \item It is a \textbf{problem-dependent} bound: it depends on the gaps $\Delta_i$ of the instance. It blows up as $\Delta_i \to 0$, but arms with tiny gaps also cost little per pull.
+    \item Unlike ETC, the algorithm does \textbf{not} need to know the gaps: the only parameter is $\delta$, which depends only on $n$.
+\end{itemize}
+\end{remark}
+
+\subsection{Proof outline}
+
+Assume without loss of generality that arm $1$ is optimal ($\mu_1 = \mu^*$). By the regret decomposition $R_n = \sum_i \Delta_i\,\mathbb{E}[T_i(n)]$, it suffices to show that, for every suboptimal arm $i$,
+\[
+\mathbb{E}[T_i(n)] \leq 3 + \frac{16\ln n}{\Delta_i^2}.
+\]
+Multiplying by $\Delta_i$ and summing over $i$ gives the theorem. 
+
+The proof proceeds in four steps:
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/img_20261021_171447.png}
+\end{center}
+
+
+\subsection{Notation: $\hat{\mu}_i(t)$ versus $\hat{\mu}_{is}$}
+
+\begin{itemize}
+    \item $\hat{\mu}_i(t)$: estimator of the mean of arm $i$ at \emph{time} $t$.
+    \item $\hat{\mu}_{is}$: estimator after $s$ \emph{pulls} of arm $i$, i.e., the average of the first $s$ i.i.d.\ samples of arm $i$.
+    \item They are related by $\hat{\mu}_i(t) = \hat{\mu}_{i T_i(t)}$. Remember that $T_i(t) \leq t$ for all $t$.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{images/img_20261021_170756.png}
+\end{center}
+
+\begin{remark}[Why this distinction matters]
+  $T_i(t)$ is random and depends on the past rewards, so $\hat{\mu}_i(t)$ is \emph{not} an average of a fixed number of i.i.d.\ samples, and the concentration inequality cannot be applied to it directly. In contrast, $\hat{\mu}_{is}$, for a \emph{fixed} $s$, is an average of $s$ i.i.d.\ $1$-subgaussian samples, so $\hat{\mu}_{is} - \mu_i$ is $1/\sqrt{s}$-subgaussian. The proof therefore works with $\hat{\mu}_{is}$, and handles all possible values of $s$ with a union bound.
+\end{remark}
+
+\subsection{Step 1: the good event}
+
+\begin{definition}[Good event]
+For a suboptimal arm $i$ and an integer $u_i$ (to be chosen), let
+\[
+G_i = \left\{\mu_1 < \min_{t \in [n]} UCB_1(t, \delta)\right\} \cap \left\{\hat{\mu}_{iu_i} + \sqrt{\frac{2}{u_i}\ln\frac{1}{\delta}} < \mu_1\right\}.
+\]
+The first event says that $\mu_1$ always stays inside its confidence interval (more precisely: below its UCB). The second says that once arm $i$ has been pulled $u_i$ times, its UCB does not exceed $\mu_1$.
+\end{definition}
+
+\textbf{Bound on $\mathbb{E}[T_i(n)]$.} Splitting on $G_i$ and using $T_i(n) \leq u_i$ on $G_i$ (step 2) and $T_i(n) \leq n$ always:
+\[
+\mathbb{E}[T_i(n)] = \mathbb{E}\big[\mathbb{I}\{G_i\}\, T_i(n)\big] + \mathbb{E}\big[\mathbb{I}\{G_i^c\}\, T_i(n)\big] \leq u_i + \mathbb{P}(G_i^c)\, n.
+\]
+We will need to choose $u_i$ wisely, because there is a tradeoff:
+\begin{itemize}
+    \item $u_i$ too large $\Rightarrow$ the first term, hence the regret bound, is too large;
+    \item $u_i$ too small $\Rightarrow$ $\mathbb{P}(G_i^c)$ is too large $\Rightarrow$ the second term, hence the regret bound, is too large.
+\end{itemize}
+
+\subsection{Step 2: on $G_i$, $T_i(n) \leq u_i$}
+
+\begin{lemma}
+If $G_i$ holds, then $T_i(n) \leq u_i$.
+\end{lemma}
+
+\begin{proof}
+By contradiction: assume $G_i$ holds and $T_i(n) > u_i$. Then arm $i$ was pulled more than $u_i$ times before $n$, so there must be a round $t$ at which arm $i$ was pulled for the $(u_i + 1)$-th time; at that round, $T_i(t-1) = u_i$. We use this to relate $UCB_i$ to $UCB_1$:
+\begin{align*}
+UCB_i(t-1, \delta) &= \hat{\mu}_i(t-1) + \sqrt{\frac{2\ln(1/\delta)}{T_i(t-1)}} \\
+&= \hat{\mu}_{iu_i} + \sqrt{\frac{2}{u_i}\ln\frac{1}{\delta}} &&\text{since } T_i(t-1) = u_i \\
+&< \mu_1 &&\text{by definition of } G_i \text{ (second event)} \\
+&< UCB_1(t-1, \delta) &&\text{by definition of } G_i \text{ (first event)}.
+\end{align*}
+So arm $1$ had a strictly larger UCB than arm $i$ at time $t-1$, and UCB could not have chosen $A_t = i$: contradiction.
+\end{proof}
+
+\subsection{Step 3: $G_i$ is likely if $u_i$ is large enough}
+
+By De Morgan,
+\[
+G_i^c = \left\{\mu_1 \geq \min_{t \in [n]} UCB_1(t, \delta)\right\} \cup \left\{\hat{\mu}_{iu_i} + \sqrt{\frac{2}{u_i}\ln\frac{1}{\delta}} \geq \mu_1\right\},
+\]
+and we bound the probability of each event separately.
+
+\subsubsection*{First event: $\mu_1$ exceeds its own UCB at some time}
+
+At any time $t$, $UCB_1(t, \delta) = \hat{\mu}_{1s} + \sqrt{\frac{2}{s}\ln\frac{1}{\delta}}$ with $s = T_1(t)$ (and $UCB_1 = \infty$ if $s = 0$). The minimum over $t \in [n]$ only ranges over the values of $s$ actually reached by $T_1(t)$, whereas the minimum over all $s \in [n]$ ranges over all $n$ values; taking the min over more terms can only lower it. Hence
+\[
+\left\{\mu_1 \geq \min_{t \in [n]} UCB_1(t, \delta)\right\} \subseteq \left\{\mu_1 \geq \min_{s \in [n]} \left(\hat{\mu}_{1s} + \sqrt{\frac{2}{s}\ln\frac{1}{\delta}}\right)\right\} = \bigcup_{s \in [n]} \left\{\mu_1 \geq \hat{\mu}_{1s} + \sqrt{\frac{2}{s}\ln\frac{1}{\delta}}\right\}.
+\]
+Using the union bound, then the concentration inequality for the average of $s$ i.i.d.\ $1$-subgaussian samples (confidence interval with error probability $\delta$):
+\[
+\mathbb{P}\left(\mu_1 \geq \min_{t \in [n]} UCB_1(t, \delta)\right) \leq \sum_{s=1}^n \mathbb{P}\left(\mu_1 \geq \hat{\mu}_{1s} + \sqrt{\frac{2}{s}\ln\frac{1}{\delta}}\right) \leq n\delta.
+\]
+
+\subsubsection*{Second event: arm $i$'s UCB after $u_i$ pulls is above $\mu_1$}
+
+To bound the second event, we need an assumption on $u_i$: assume $u_i$ is large enough so that
+\[
+\Delta_i - \sqrt{\frac{2\ln(1/\delta)}{u_i}} \geq c\Delta_i \qquad \text{for some constant } 0 < c < 1.
+\]
+Using $\mu_1 = \mu_i + \Delta_i$,
+\begin{align*}
+\mathbb{P}\left(\hat{\mu}_{iu_i} + \sqrt{\frac{2}{u_i}\ln\frac{1}{\delta}} \geq \mu_1\right) &= \mathbb{P}\left(\hat{\mu}_{iu_i} - \mu_i \geq \Delta_i - \sqrt{\frac{2}{u_i}\ln\frac{1}{\delta}}\right) \\
+&\leq \mathbb{P}\big(\hat{\mu}_{iu_i} - \mu_i \geq c\Delta_i\big) \\
+&\leq \exp\left(-\frac{u_i c^2 \Delta_i^2}{2}\right),
+\end{align*}
+where the last step is the Chernoff bound for subgaussian sums: $\hat{\mu}_{iu_i}$ is the average of $u_i$ terms, so $\hat{\mu}_{iu_i} - \mu_i$ is $1/\sqrt{u_i}$-subgaussian.
+
+\subsubsection*{Combining}
+
+By the union bound,
+\[
+\mathbb{P}(G_i^c) \leq n\delta + \exp\left(-\frac{u_i c^2\Delta_i^2}{2}\right).
+\]
+
+\subsection{Step 4: choice of $u_i$ and conclusion}
+
+Back to the bound of step 1:
+\[
+\mathbb{E}[T_i(n)] \leq u_i + \mathbb{P}(G_i^c)\, n \leq u_i + n\left(n\delta + \exp\left(-\frac{u_i c^2\Delta_i^2}{2}\right)\right).
+\]
+We set $u_i$ as small as possible given the constraint $\Delta_i - \sqrt{2\ln(1/\delta)/u_i} \geq c\Delta_i$, i.e., $\sqrt{2\ln(1/\delta)/u_i} \leq (1-c)\Delta_i$:
+\[
+u_i = \left\lceil \frac{2\ln(1/\delta)}{(1-c)^2\Delta_i^2} \right\rceil.
+\]
+Note that there is no guarantee that $u_i \leq n$; but if it is not, the bound on $\mathbb{E}[T_i(n)]$ holds trivially since $T_i(n) \leq n$.
+
+Recall $\delta = 1/n^2$, so $n \cdot n\delta = 1$ and $\ln(1/\delta) = 2\ln n$. For the exponential term,
+\[
+\exp\left(-\frac{u_i c^2\Delta_i^2}{2}\right) \leq \exp\left(-\frac{2\ln(1/\delta)\, c^2}{2(1-c)^2}\right) = \exp\left(-\frac{2\ln(n)\, c^2}{(1-c)^2}\right) = n^{-\frac{2c^2}{(1-c)^2}}
+\]
+Therefore
+\[
+\mathbb{E}[T_i(n)] \leq \left\lceil \frac{2\ln(1/\delta)}{(1-c)^2\Delta_i^2}  \right\rceil+ 1 + n^{1 - \frac{2c^2}{(1-c)^2}},
+\]
+We choose $c$ such that the last term does not blow up with $n$ (we need $2c^2 \geq (1-c)^2$, i.e.\ $c \geq \sqrt{2} - 1$); e.g., $c = 1/2$, for which $\frac{2c^2}{(1-c)^2} = 2$ and the last term is $n^{-1} \leq 1$. With $c = 1/2$, $\frac{2\ln(1/\delta)}{(1-c)^2\Delta_i^2} = \frac{4\ln n}{\Delta_i^2/4} = \frac{16\ln n}{\Delta_i^2}$, so
+\[
+\mathbb{E}[T_i(n)] \leq 3 + \frac{16\ln n}{\Delta_i^2}.
+\]
+Plugging into $R_n = \sum_i \Delta_i\,\mathbb{E}[T_i(n)]$ (with $\Delta_1 = 0$) concludes the proof. \hfill $\square$
+
+\subsection{Simulations and comparison with ETC}
+
+\subsubsection*{Variation with $\Delta$}
+
+Setting: Bernoulli rewards with means $[0.5 - \frac{\Delta}{2},\, 0.5 + \frac{\Delta}{2}]$.
+
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/img_20261021_175736.png}
+\end{center}
+
+\begin{itemize}
+    \item Sublinear regret for all values of $\Delta$, with a \emph{fixed} hyperparameter $\delta$.
+    \item The cumulative regret increases inversely with $\Delta$ (consistent with the $\frac{\ln n}{\Delta}$ term of the bound).
+    \item The slope gradually decreases with time, signifying the shift from exploration to exploitation.
+    \item The initial regret slope is higher for large $\Delta$, due to expensive exploration (each pull of the bad arm costs $\Delta$).
+\end{itemize}
+
+\subsubsection*{UCB versus ETC}
+
+\begin{center}
+\includegraphics[width=0.6\linewidth]{images/img_20261021_175903.png}
+\end{center}
+
+UCB performs similarly to ETC with an optimally tuned $m$, \emph{without} knowing the optimal $m$ (i.e., without knowing the suboptimality gap). Figure from Chapter 7 of Lattimore \& Szepesvári.
+
+\begin{remark}[Comparison of the bounds for $k = 2$]
+  For ETC with the optimal $m = \frac{4}{\Delta^2}\ln\frac{n\Delta^2}{4}$ (previous lecture), plugging into $R_n \leq m\Delta + n\Delta\exp(-m\Delta^2/4)$ gives $R_n \lesssim \frac{4}{\Delta}\left(1 + \ln\frac{n\Delta^2}{4}\right)$, also of order $\frac{\ln n}{\Delta}$. UCB achieves the same order, $\frac{16\ln n}{\Delta} + 3\Delta$, but with a parameter $\delta = 1/n^2$ that does not depend on $\Delta$.
+\end{remark}
+
+\section{Summary}
+
+\begin{itemize}
+    \item \textbf{Adaptive Explore-then-Commit}: the exploration length becomes a data-dependent stopping time. Explore in round robin until the confidence interval of the empirically best arm separates from all the others ($LCB_{a^*} > UCB_a$ for all $a \neq a^*$), then commit. Gives sublinear regret in practice; $\delta$ must be small enough (decreasing with $n$) to avoid mistaken commitments, but not too small to avoid over-exploration.
+    \item \textbf{Confidence bounds}: for $\sigma$-subgaussian rewards and $n$ samples, $UCB/LCB = \hat{\mu}_n \pm \sigma\sqrt{2\ln(2/\delta)/n}$.
+    \item \textbf{Sequential elimination}: the right extension of ETC to $k > 2$ arms: instead of waiting for the best arm to dominate all others, eliminate any arm whose confidence interval is dominated. Proceeds in phases of random length, with decreasing instantaneous regret.
+    \item \textbf{UCB algorithm}: $A_t = \arg\max_a \hat{\mu}_a(t-1) + \sqrt{2\ln(1/\delta)/T_a(t-1)}$. It quantifies uncertainty with confidence intervals and acts \emph{optimistically in the face of uncertainty}; it has a smooth transition from exploration to exploitation (exploration never stops completely, but fades out).
+    \item \textbf{Regret bound}: for a $1$-subgaussian bandit and $\delta = 1/n^2$, $\mathbb{E}[T_i(n)] \leq 3 + \frac{16\ln n}{\Delta_i^2}$, hence $R_n \leq 3\sum_i\Delta_i + \sum_{i:\Delta_i > 0}\frac{16\ln n}{\Delta_i}$: logarithmic regret without knowing the gaps. Proof technique: good event $G_i$ ($\mu_1$ below its UCB at all times, and arm $i$'s UCB below $\mu_1$ after $u_i$ pulls), $T_i(n) \leq u_i$ on $G_i$, union bound + concentration for $\mathbb{P}(G_i^c)$, and tuning of $u_i$.
+\end{itemize}
