@@ -109,21 +109,33 @@
   }
 }
 
+% --- Styles : titre seul sur sa ligne ---
+\newtheoremstyle{defbreak}
+  {}{}{\normalfont}{}{\bfseries}{.}{ }{}
+\newtheoremstyle{plainbreak}
+  {}{}{\itshape}{}{\bfseries}{.}{ }{}
+
 % --- Define theorem-like envs normally ---
-\theoremstyle{definition}
+\theoremstyle{defbreak}
 \newtheorem{definition}{Definition}
 \newtheorem{remark}{Remark}
 \newtheorem{resume1}{Résumé}
 \newtheorem{savoir}{Truc}
 
-\theoremstyle{plain}
+\theoremstyle{plainbreak}
 \newtheorem{theoreme}{Theorem}
 \newtheorem{prop}{Prop}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 
-\theoremstyle{definition}
+\theoremstyle{defbreak}
 \newtheorem{exemple}{Exemple}
+
+% --- Retour à la ligne après le titre (marche aussi avec itemize) ---
+\RequirePackage{etoolbox}
+\makeatletter
+\apptocmd{\@begintheorem}{\leavevmode\par\nobreak}{}{}
+\makeatother
 
 % --- Now: BOX them automatically ---
 \tcolorboxenvironment{definition}{basebox,colback=green!10,colframe=green!25}
@@ -141,7 +153,7 @@
 \NewDocumentEnvironment{truc}{}{\begin{savoir}}{\end{savoir}}
 
 % Optional: also support \begin{theorem} ... \end{theorem}
-\theoremstyle{plain}
+\theoremstyle{plainbreak}
 \newtheorem{theorem}{Theorem}
 \tcolorboxenvironment{theorem}{basebox,colback=blue!7,colframe=blue!25}
 
