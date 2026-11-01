@@ -569,18 +569,3 @@ ACEs are evaluated \emph{in order}, and \textbf{negative ACEs are placed first}:
 \caption{DAC in UNIX and Windows.}
 \end{table}
 
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{Access control} ensures that all accesses of principals on objects are within the security policy; it is the \textbf{first line of defence} and is used at every layer (application, middleware, OS, hardware).
-    \item It is split into \textbf{authentication} (bind the actor to a principal) and \textbf{authorization} (decide whether the principal may act); both are in the \textbf{TCB}.
-    \item Do not write ``checks soup'': call a \textbf{reference monitor} (complete mediation, economy of mechanism).
-    \item \textbf{DAC}: owners decide the permissions (Windows, Linux, macOS, social networks). \textbf{MAC}: a central policy decides.
-    \item The \textbf{access control matrix} (subjects $\times$ objects $\to$ rights) is an abstract model, too big and sparse to implement directly.
-    \item \textbf{ACLs}: permissions attached to objects (easy to see who accesses a resource, hard to audit a user). \textbf{Capabilities}: permissions attached to subjects (easy to audit and delegate, hard to revoke).
-    \item \textbf{RBAC} (roles, one active role) and \textbf{groups} (union of all groups, negative permissions checked first) reduce the management cost of many subjects. RBAC suffers from role explosion, limited expressiveness and difficult separation of duty.
-    \item \textbf{Ambient authority} is convenient but makes least privilege harder and causes the \textbf{confused deputy problem}. Solutions: re-check authorization in the privileged process, or use capabilities.
-    \item \textbf{UNIX}: UIDs/GIDs, 9 permission bits (owner, group, other), check order owner $\to$ group $\to$ other, root never denied, directories have different semantics (list/add/traverse), \textbf{suid/sgid} (run with the owner's privileges; dangerous, in the TCB), \textbf{sticky bit} (restricted deletion, e.g., \texttt{/tmp}), \textbf{nobody} (safe user for untrusted code).
-    \item \textbf{Windows}: DACL = list of ACEs (negative/positive, principal, fine-grained permissions), compared with the access token of the process; negative entries first.
-\end{itemize}
-

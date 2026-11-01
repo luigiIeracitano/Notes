@@ -542,19 +542,3 @@ Why? If she writes into IBM files with her knowledge of Pepsi, Bob can read them
 \subsection{Multilateral security}
 
 BLP and BIBA are \emph{multilevel}: flows are vertical between ordered levels. The Chinese Wall is an example of \textbf{multilateral security}: the constraints are \emph{between} parties at the same level (lateral), whose interests and security properties conflict with each other. It protects both confidentiality (Pepsi's secrets do not reach Coca-Cola) and integrity (advice to Coca-Cola is not influenced by Pepsi's interests).
-
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{MAC}: a central policy decides, and it must hold even against subjects trying to subvert it. \textbf{Security models} are design patterns for MAC policies; the devil is in the details (subjects, objects, mechanisms).
-    \item \textbf{Security level} $=(\text{classification}, \{\text{categories}\})$. $(l_1, c_1) \succeq (l_2, c_2)$ iff $l_1 \geq l_2$ and $c_2 \subseteq c_1$. Dominance is a transitive \textbf{partial order} forming a lattice with top and bottom; some levels are incomparable.
-    \item Subjects have a \textbf{clearance} (maximum level) and a \textbf{current level} it dominates.
-    \item \textbf{BLP} (confidentiality): \textbf{ss-property} (No Read Up), \textbf{*-property} (No Write Down; observe $O_1$ and alter $O_2$ requires $\text{level}(O_2) \succeq \text{level}(O_1)$), \textbf{ds-property} (access must be in the matrix: need-to-know, MAC needs DAC). Read $\Rightarrow$ down, append $\Rightarrow$ up, write $\Rightarrow$ same level.
-    \item \textbf{Basic Security Theorem}: secure initial state $+$ secure transitions $\Rightarrow$ every state is secure. Not sufficient in practice: \textbf{covert channels} (storage, timing) leak information through allowed actions; more sharing means more channels (least common mechanism). Mitigation: isolation, noise; $< 1$ bit/s is hard, so keys go on dedicated hardware.
-    \item \textbf{Declassification}: necessary, under the control of the policy, manual, never inherently safe (Word history, PDF black boxes, blurring).
-    \item BLP limitations: only confidentiality, too low-level, properties insufficient, changes create covert channels, static systems impractical.
-    \item \textbf{BIBA} (integrity, the dual of BLP): \textbf{No Read Down}, \textbf{No Write Up}. Variants: low-water-mark for subjects (label creep), for objects (only detection; replicate and sanitize). Invocation: simple vs.\ controlled.
-    \item \textbf{Sanitization}: lifting low-integrity objects to high integrity; root cause of SQL injection, buffer overflows, XSS. Use \textbf{whitelists, not blacklists} (fail-safe defaults).
-    \item Integrity principles: \textbf{separation of duties}, \textbf{rotation of duties}, \textbf{secure logging}. Integrity can bootstrap confidentiality (PKI) and availability (replication).
-    \item \textbf{Chinese Wall}: origin labels, conflict sets, access history; deny any access allowing a flow between labels of the same conflict set, including \textbf{indirect flows}. Sanitized ``general'' information is un-labelled. An example of \textbf{multilateral security}.
-\end{itemize}

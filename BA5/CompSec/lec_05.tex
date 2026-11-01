@@ -663,19 +663,3 @@ There are other ways to set up a shared secret (or even to directly communicate)
 \begin{remark}
 This is exactly the ``integrity bootstraps confidentiality'' argument of the MAC lecture (PKI): perfect encryption is useless if the adversary can substitute her own key for Bob's. Confidentiality needs the \textbf{integrity / authenticity of the public values}.
 \end{remark}
-
-\section{Summary}
-
-\begin{itemize}
-    \item Cryptography protects data \textbf{in transit} and \textbf{at rest}; it builds confidentiality, integrity, authentication, anonymity. Core problem: Alice talks to Bob over a channel observed by Eve.
-    \item Encryption: $C = E_K(M)$, $M = D_K(C)$. \textbf{Correctness}: $D_K(E_K(M)) = M$ for all $K, M$. \textbf{Security}: hard to invert without $K$; ideally, the only attack is \textbf{brute force} over the key space. Only the key is secret, not the algorithm (open design).
-    \item \textbf{Bits of security}: the best attack costs $2^N$. A large key space is necessary but not sufficient: \textbf{Caesar} ($25$ keys, $4.6$ bits) and \textbf{substitution} ($26!$ keys, $\approx 88$ bits nominal) are both broken by \textbf{frequency analysis}, because they preserve the statistics of the language.
-    \item \textbf{Adversary models}: passive eavesdropper (ciphertext only) $<$ \textbf{KPA} (known $(M, C)$ pairs, realistic due to structured data) $<$ \textbf{CPA} (encryption oracle; breaks substitution in one query). \textbf{Side channels} (timing, power) attack the implementation (DRM, smart cards).
-    \item \textbf{One-Time Pad}: $c = m \oplus k$, $m = c \oplus k$, with $k$ truly random, as long as $m$, used once. \textbf{Perfect secrecy}: $P(M = m \mid C = c) = P(M = m)$, secure even against unbounded adversaries.
-    \item OTP limits: \textbf{key distribution} of message-length keys is impractical; \textbf{key reuse} gives $C_1 \oplus C_2 = M_1 \oplus M_2$ (space trick, dictionary attack); \textbf{no integrity}: bit flipping $C \oplus \Delta \to M \oplus \Delta$ (malleability).
-    \item \textbf{Symmetric crypto}: same key for encryption and decryption; short, reused, secret keys. Block ciphers (AES) vs.\ \textbf{stream ciphers} (ChaCha20).
-    \item \textbf{Stream cipher}: $S = \mathrm{KSG}(K, \mathrm{IV})$, $C = M \oplus S$. Security is \textbf{computational}: $S$ indistinguishable from random without $K$. The \textbf{IV} (public, never repeated under the same key) avoids reusing the same stream. Low diffusion, malleable, fast, low error propagation. Finite state $\Rightarrow$ periodic.
-    \item \textbf{LFSRs}: fast, period $2^L - 1$ and balanced if the polynomial is primitive, but \textbf{linear} (Berlekamp--Massey): only a building block. \textbf{A5/1} (GSM) broken; \textbf{Trivium}, \textbf{Salsa20/ChaCha20} not. \textbf{Never roll your own crypto}: use AES, ChaCha20, SHA-3.
-    \item \textbf{Public-key crypto} solves key distribution. \textbf{Diffie--Hellman}: public $p, g$; $A = g^a$, $B = g^b$; $K = B^a = A^b = g^{ab} \bmod p$. Security from the \textbf{discrete logarithm problem} (easy one way, hard the other). Other: RSA (factoring), ECC, post-quantum (lattices).
-    \item Vanilla DH gives key agreement but \textbf{no authenticity}: vulnerable to \textbf{Man-in-the-Middle}. It must be combined with \textbf{digital signatures} and trusted \textbf{Certificate Authorities}.
-\end{itemize}

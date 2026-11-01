@@ -269,25 +269,3 @@ As a sign of how durable these 1975 principles are, they are routinely reused to
     \item \textbf{Compromise recording}: ideally, one would like to log all internal steps of the algorithm to detect compromise.
 \end{itemize}
 
-\section{Summary}
-
-\begin{quote}
-``Since no one knows how to build a system without flaws, the alternative is to rely on eight design principles, which tend to reduce both the number and the seriousness of any flaws: economy of mechanism, fail-safe defaults, complete mediation, open design, separation of privilege, least privilege, least common mechanism, and psychological acceptability.'' --- Saltzer and Schroeder, 1975
-\end{quote}
-
-\begin{itemize}
-    \item \textbf{Economy of mechanism}: keep the design (and implementation) as simple and small as possible; keep the TCB small.
-    \item \textbf{Fail-safe defaults}: base access on permission (whitelist), not exclusion; on failure, default to the safe state.
-    \item \textbf{Complete mediation}: verify \emph{every} access to \emph{every} object, every time.
-    \item \textbf{Open design}: the design should not need to be secret; only well-defined key material should be.
-    \item \textbf{Separation of privilege}: no single compromised principal should be able to complete a sensitive action alone.
-    \item \textbf{Least privilege}: operate with the minimum privileges necessary, granted as needed and revoked after use.
-    \item \textbf{Least common mechanism}: minimize mechanisms shared between users, to avoid unintended information paths.
-    \item \textbf{Psychological acceptability}: the security mechanism must be easy enough to use that honest users apply it correctly and routinely.
-    \item \textbf{(Extra) Work factor}: weigh the cost of an attack against the attacker's resources.
-    \item \textbf{(Extra) Compromise recording}: when prevention fails, at least reliably detect and record that a compromise occurred.
-\end{itemize}
-
-\begin{remark}
-These principles are guidelines, not proofs. Use them as tools to identify and weigh design trade-offs when building or auditing a security mechanism --- not as a checklist that, once ticked, guarantees security.
-\end{remark}

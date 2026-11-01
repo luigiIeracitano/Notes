@@ -1,0 +1,376 @@
+%! TeX root = master.tex
+% !TEX program = lualatex
+\newpage
+\chapter{Summary (Midterm)}
+\label{ch:summary}
+
+\section{Lecture 1 -- Basics}
+
+\begin{definition}[Computer security]
+Properties of a computer system must hold \textbf{in the presence of a resourced strategic adversary}. Always answer two questions: \textbf{which properties}, and \textbf{against which adversary}?
+\end{definition}
+
+\paragraph{Properties.}
+\begin{itemize}
+    \item \textbf{CIA triad}: \textbf{Confidentiality} (no unauthorized disclosure), \textbf{Integrity} (no unauthorized modification), \textbf{Availability} (no unauthorized denial of service).
+    \item Other properties: \textbf{authenticity}, \textbf{anonymity}, \textbf{isolation}, \textbf{non-repudiation}.
+\end{itemize}
+
+\paragraph{Specifying a system.}
+\begin{itemize}
+    \item \textbf{Assets / objects}: what has value and must be protected. \textbf{Principals / subjects}: who interacts with the system.
+    \item \textbf{Security policy}: high-level description of the properties that must hold, in terms of principals and assets.
+    \item \textbf{Threat model}: resources and capabilities of the adversary (observe, influence, corrupt, \dots). The adversary is \textbf{strategic}: it uses its resources in the best possible way.
+    \item \textbf{Security mechanism}: technical means (software, hardware, maths, procedures, people) ensuring the policy is not violated by an adversary within the threat model.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}p{3cm}p{10.5cm}@{}}
+\toprule
+\textbf{Threat} & The feared event, the adversary's goal (e.g.\ steal money). \\
+\textbf{Threat model} & The adversary's capabilities (e.g.\ can observe the network). \\
+\textbf{Harm} & The bad thing that happens if the threat materializes. \\
+\textbf{Vulnerability} & A specific weakness that can be exploited. \\
+\bottomrule
+\end{tabular}
+\caption{Adversary vocabulary.}
+\end{table}
+
+\paragraph{Composition of mechanisms.}
+\begin{itemize}
+    \item \textbf{Defence in depth} (``OR''): the policy holds as long as \textbf{at least one} mechanism holds.
+    \item \textbf{Weakest link} (``AND''): the policy is violated if \textbf{any one} mechanism fails.
+    \item Adding mechanisms does \textbf{not} automatically increase security. Humans (phishing, weak/reused passwords) are part of the system.
+\end{itemize}
+
+\paragraph{Showing security.}
+\begin{itemize}
+    \item \textbf{Asymmetry}: the attacker needs \textbf{one} way to break \textbf{one} property; the defender must show that \textbf{no} strategy breaks the policy.
+    \item A system is \textbf{secure} if an adversary constrained by a given threat model cannot violate the policy: security is always \textbf{relative to a threat model}, which must \textbf{constrain} the adversary.
+    \item \textbf{Security argument}: rigorous argument that the mechanisms maintain the policy under the threat model.
+    \item \textbf{Security engineering}: (1) specification (architecture, policy, threat model) $\to$ (2) design (mechanisms + argument) $\to$ (3) implementation (conformance, testing).
+\end{itemize}
+
+% =====================================================================
+\section{Lecture 2 -- Principles (Saltzer \& Schroeder)}
+
+Principles are \textbf{not a checklist}: they help weigh trade-offs, and they can be in \textbf{tension} with each other (e.g.\ a central reference monitor follows complete mediation and economy of mechanism, but is a shared mechanism; safer defaults vs.\ usability).
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{3.3cm}p{5.6cm}p{5.6cm}@{}}
+\toprule
+\textbf{Principle} & \textbf{Rule} & \textbf{Typical example / violation} \\
+\midrule
+1. Economy of mechanism & Keep the design small and simple, easy to audit (testing $\neq$ security) & Heartbleed: non-essential feature in a huge codebase \\[3pt]
+2. Fail-safe defaults & Decide on \textbf{permission}, not exclusion (whitelist); on error, deny & MongoDB with no auth on \texttt{0.0.0.0} by default \\[3pt]
+3. Complete mediation & \textbf{Every} access to \textbf{every} object is checked (reference monitor) & ``paid'' cookie checked only at login \\[3pt]
+4. Open design & Design is public, only the \textbf{key} is secret (Kerckhoffs) & Security by obscurity: secret URL (Deep Root), GSM \\[3pt]
+5. Separation of privilege & Several independent conditions for a sensitive action & One employee creates vendor + order + approves payment \\[3pt]
+6. Least privilege & Minimum privileges, granted as needed, discarded after use & Guest accounts, data minimization \\[3pt]
+7. Least common mechanism & Minimize mechanisms shared between users (shared state = information path) & Shared \texttt{/tmp} symlink attack; covert channels \\[3pt]
+8. Psychological acceptability & Easy to use; user's mental model matches the policy & S3 ``Any Authenticated AWS User'' \\[3pt]
+9. Work factor & Compare cost of attack with adversary's resources & Hard to quantify (bribes, bugs) \\[3pt]
+10. Compromise recording & Reliably record compromises (tamper-evident logs) & Does not prevent, logs need integrity, privacy risk \\
+\bottomrule
+\end{tabular}
+\caption{The 8 + 2 design principles.}
+\end{table}
+
+\begin{definition}[Trusted Computing Base (TCB)]
+All components on which the security policy relies. Failure \emph{inside} the TCB may violate the policy; failure \emph{outside} should not. Keep the TCB \textbf{small} (and of \textbf{high integrity}).
+\end{definition}
+
+% =====================================================================
+\section{Lecture 3 -- Access control and DAC}
+
+\paragraph{Basics.}
+\begin{itemize}
+    \item \textbf{Access control}: ensures all accesses of principals on objects are within the policy. First line of defence, at every layer (apps, middleware, OS, hardware).
+    \item \textbf{Authentication} binds the actor to a principal; \textbf{authorization} decides if the principal may perform the action. Both are in the TCB.
+    \item Implement with a central \textbf{reference monitor} (\texttt{isPermitted(\dots)}), never with a ``checks soup''.
+    \item \textbf{DAC}: the \textbf{owner} sets permissions (Linux, Windows, social networks). \textbf{MAC}: a \textbf{central policy} sets them, enforced even against subjects trying to subvert it.
+\end{itemize}
+
+\paragraph{Access control matrix.} Abstract set of triplets (subject, object, rights); empty cell = no permission (fail-safe). Not implemented directly: $O(\text{users} \cdot \text{files})$, sparse, not extensible.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{2.3cm}p{5.6cm}p{5.6cm}@{}}
+\toprule
+ & \textbf{ACL} (column, attached to the object) & \textbf{Capability} (row, attached to the subject) \\
+\midrule
+Easy & Who can access this object? Revoke per object & What can this subject do? Delegate, portable \\
+Hard & All rights of a user, remove a user, delegation & Revocation, prevent transfer, check authenticity (unforgeable) \\
+\bottomrule
+\end{tabular}
+\caption{ACLs and capabilities are mirror images.}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{RBAC}: permissions $\to$ roles $\to$ subjects; \textbf{one active role} at a time. Problems: role explosion, limited expressiveness (relative roles: ``Alice's doctor''), separation of duty hard (two \emph{distinct} doctors).
+    \item \textbf{Groups}: subjects hold the \textbf{union} of permissions of all their groups. \textbf{Negative permissions} must be checked \textbf{first}.
+\end{itemize}
+
+\paragraph{Ambient authority and confused deputy.}
+\begin{itemize}
+    \item \textbf{Ambient authority}: the subject only names the operation and the objects; the authority is implicit (process owner). Usable, but breaks least privilege.
+    \item \textbf{Confused deputy}: a privileged program is tricked into using its authority on behalf of a less privileged requester (compiler writing errors into \texttt{bill}).
+    \item In an answer, identify: (1) the privileged \textbf{deputy}, (2) the \textbf{requester} controlling the request, (3) the action the requester could not do alone.
+    \item Fixes: re-implement access control in the deputy, check the \textbf{requester's} authorization, or use \textbf{capabilities} (designation and authority travel together).
+\end{itemize}
+
+\paragraph{UNIX.}
+\begin{itemize}
+    \item Everything is a file; UID/GID; \texttt{/etc/passwd}, \texttt{/etc/group}; processes run with the user's privileges (\textbf{ambient authority}).
+    \item \textbf{9 bits} \texttt{rwx} for owner/group/other; octal $r=4, w=2, x=1$; special bits suid \texttt{4000}, sgid \texttt{2000}, sticky \texttt{1000}.
+    \item On a \textbf{directory}: \texttt{r} = list, \texttt{w} = create/delete/rename entries, \texttt{x} = traverse. Need \texttt{x} on every directory of the path.
+    \item \textbf{Check order}: owner? $\to$ owner bits; else group? $\to$ group bits; else other bits. Only the \textbf{first matching class} counts (an owner can be denied what the group is allowed). \textbf{root} (UID 0) is never denied and is in the TCB.
+    \item \textbf{suid/sgid}: an \textbf{executable} runs with the privileges of the file's owner/group (\texttt{passwd}: \texttt{-rwsr-xr-x}). Setuid-root programs are in the TCB.
+    \item \textbf{Sticky bit} on a directory: only the owner of a file can delete/rename it (\texttt{/tmp}). \textbf{nobody}: owns no file, belongs to no group, to run untrusted code.
+    \item Use \texttt{sudo}/\texttt{su}, never log in as root (least privilege).
+\end{itemize}
+
+\paragraph{Windows.} Each object has a \textbf{DACL} = list of \textbf{ACEs} (type allow/deny, principal, fine-grained permissions). Each process has an \textbf{access token} (user, all groups recursively, privileges). Checked when a handle is created; \textbf{deny ACEs first}. ``Run as administrator'' for least privilege.
+
+% =====================================================================
+\section{Lecture 4 -- Mandatory Access Control}
+
+\paragraph{Security models.} A model is a \textbf{design pattern} for a property; use known ones. The model does not tell who the subjects/objects are nor which mechanisms implement it: \emph{the devil is in the details}.
+
+\paragraph{Levels and dominance.}
+\begin{itemize}
+    \item Security level $= (\text{classification}, \{\text{categories}\})$; classifications are totally ordered, categories implement need-to-know.
+    \item $(l_1, c_1) \succeq (l_2, c_2) \iff l_1 \geq l_2 \text{ and } c_2 \subseteq c_1$ (\textbf{both} conditions).
+    \item The levels form a \textbf{lattice}: transitive, top and bottom elements, \textbf{partial} order (incomparable levels $\Rightarrow$ no flow in either direction).
+    \item Subjects: \textbf{clearance} (max level) $\succeq$ \textbf{current level}.
+\end{itemize}
+
+\paragraph{Bell--La Padula (confidentiality).} Rights: execute (neither), read (observe), append (alter), write (observe + alter).
+\begin{itemize}
+    \item \textbf{ss-property, No Read Up}: read only if $\text{level}(s) \succeq \text{level}(o)$.
+    \item \textbf{*-property, No Write Down}: observing $O_1$ and altering $O_2$ requires $\text{level}(O_2) \succeq \text{level}(O_1)$. Prevents Trojans from leaking down.
+    \item \textbf{ds-property}: every access must also be in the access control matrix (MAC needs DAC for need-to-know).
+    \item ``\textbf{Read down, write up}''. Blind append up is fine for confidentiality (not for integrity).
+    \item \textbf{Basic Security Theorem}: secure initial state + secure transitions $\Rightarrow$ every state secure (induction). Hides covert channels (1-bit leak through success/failure of an access after a relabel).
+    \item Lowering the current level: allowed in a \textbf{new session} that never read high data; a process that \textbf{already read} high data cannot write down. BLP controls processes, not human memory.
+    \item \textbf{Limitations}: only confidentiality, single-transition low-level model, covert channels, changes of levels create channels but a static system is impractical.
+\end{itemize}
+
+\paragraph{Covert channels.} Any channel allowing flows contrary to the policy, hidden in \textbf{allowed} actions. \textbf{Storage} (shared values, metadata, file existence) or \textbf{timing} (CPU, cache, queues). Linked to \textbf{least common mechanism}. Mitigation: isolation, noise; hard to go below 1 bit/s, OK for documents but not for keys (keys on dedicated hardware).
+\begin{remark}[Not covert channels]
+A write down (forbidden, not covert), an external channel in the clear (phone, café), declassification (run by the policy), encryption of a message written down (still a write down).
+\end{remark}
+
+\paragraph{Declassification.} Lowering/removing a label, under control of the policy, \textbf{manual}, cannot be made inherently safe (Word revision history, black boxes on PDFs, blurring).
+
+\paragraph{BIBA (integrity) -- dual of BLP.}
+\begin{itemize}
+    \item \textbf{Simple integrity, No Read Down}: read only if $\text{level}(o) \succeq \text{level}(s)$ (do not get corrupted by low data).
+    \item \textbf{*-integrity, No Write Up}: write only if $\text{level}(s) \succeq \text{level}(o)$ (do not corrupt high data).
+    \item ``\textbf{Read up, write down}''; information flows only from high to low integrity.
+    \item \textbf{Low-water-mark (subjects)}: reading lowers the subject's level to $\min$; limits network Trojans, but \textbf{label creep}.
+    \item \textbf{Low-water-mark (objects)}: a written object takes the $\min$ level; only \textbf{detection}, not prevention (replicate, sanitize).
+    \item \textbf{Invoke}: simple invocation (only invoke dominated subjects) vs.\ controlled invocation (invoke higher through a well-defined interface, e.g.\ syscall; risk of polluted input).
+    \item \textbf{Sanitization}: lifting low to high integrity; root cause of SQL injection and buffer overflows. \textbf{Whitelist} (positively verify validity), never blacklist (fail-safe defaults).
+    \item Integrity principles: \textbf{separation of duties}, \textbf{rotation of duties}, \textbf{secure (tamper-evident, consistent) logging}.
+    \item \textbf{Integrity bootstraps} confidentiality (PKI: a substituted public key breaks encryption) and availability (verified replicas).
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{BLP} & \textbf{BIBA} \\
+\midrule
+Protects & confidentiality & integrity \\
+Read & no read up & no read down \\
+Write & no write down & no write up \\
+Flow & low $\to$ high & high $\to$ low \\
+Lowering a label & declassification & (lifting = sanitization) \\
+\bottomrule
+\end{tabular}
+\caption{BLP vs.\ BIBA.}
+\end{table}
+
+\paragraph{Chinese Wall (Brewer--Nash).} Conflicts of interest (financial sector). Objects labelled by origin, \textbf{conflict sets} of labels, subjects have an \textbf{access history}. Access allowed only if it creates \textbf{no information flow} between labels of the same conflict set, including \textbf{indirect} flows through shared objects and other subjects. \textbf{Dynamic} model; sanitized (un-labelled) information is accessible to all. Example of \textbf{multilateral} security (BLP/BIBA are multilevel).
+
+% =====================================================================
+\section{Lecture 5 -- Introduction to applied cryptography}
+
+\paragraph{Basics.}
+\begin{itemize}
+    \item Protects data \textbf{in transit} and \textbf{at rest} (Alice = Bob).
+    \item $C = E_K(M)$, $M = D_K(C)$. \textbf{Correctness}: $D_K(E_K(M)) = M$. \textbf{Security}: $E_K$ hard to invert without $K$; ideally brute force is the best attack.
+    \item \textbf{Kerckhoffs / open design}: the adversary knows the algorithm, only the key is secret.
+    \item \textbf{$N$ bits of security}: best attack costs $\approx 2^N$. A scheme is broken if the best attack is much faster than $2^{|K|}$. Large key space is \textbf{necessary, not sufficient}.
+\end{itemize}
+
+\paragraph{Classical ciphers.} Caesar (25 keys, $\approx 4.6$ bits) and substitution ($26! \approx 2^{88.4}$ keys) are both broken by \textbf{frequency analysis}: they preserve the statistics of the language. The adversary's goal may be smaller than the full key (part of the key, ``Yes'' vs.\ ``No'').
+
+\paragraph{Adversary models (from weakest to strongest).}
+\begin{enumerate}
+    \item \textbf{Ciphertext-only} (passive eavesdropper).
+    \item \textbf{Known plaintext (KPA)}: sees $(M, C)$ pairs she did not choose (headers, guesses).
+    \item \textbf{Chosen plaintext (CPA)}: encryption oracle, chooses $M$ and gets $E_K(M)$ (substitution: encrypt the alphabet $\Rightarrow$ full key in 1 query).
+    \item \textbf{Side channels}: measures timing, power of the real implementation (device you own holding someone else's key, DRM). Attacks the implementation, not the maths.
+\end{enumerate}
+
+\paragraph{One-Time Pad.}
+\begin{itemize}
+    \item $c = m \oplus k$, $m = c \oplus k$; key \textbf{truly random}, \textbf{as long as the message}, \textbf{used once}, pre-shared.
+    \item \textbf{Perfect secrecy}: $P(M = m \mid E_K(M) = c) = P(M = m)$; every plaintext is consistent with every ciphertext (exactly one key $k = m \oplus c$). Holds against unbounded adversaries.
+    \item \textbf{Two-time pad}: $C_1 \oplus C_2 = M_1 \oplus M_2$ (key cancels) $\Rightarrow$ dictionary attack recovers messages and key.
+    \item \textbf{Malleable, no integrity}: $C \oplus \Delta$ decrypts to $M \oplus \Delta$ (bit flipping without the key).
+    \item XOR with a public/known value hides nothing.
+\end{itemize}
+
+\paragraph{Symmetric crypto and stream ciphers.}
+\begin{itemize}
+    \item Symmetric key: short, shared, \textbf{reused}, secret. Block ciphers (AES) vs.\ stream ciphers (ChaCha20).
+    \item \textbf{Stream cipher}: $S = \mathrm{KSG}(K, IV)$ pseudo-random, $C = M \oplus S$; IV sent in clear, \textbf{never repeated} with the same key (else two-time pad). \textbf{Computational} (not perfect) security.
+    \item Weaknesses: low diffusion, malleable. Strengths: fast, constant space, no error propagation. Finite state $\Rightarrow$ \textbf{periodic}.
+    \item LFSR: linear, max period $2^L - 1$, balanced, but \textbf{Berlekamp--Massey} recovers the state from $\approx 2L$ bits; A5/1 (GSM) broken; Trivium, Salsa20/ChaCha20 unbroken.
+    \item \textbf{Never roll your own crypto}: use standard, peer-reviewed algorithms.
+\end{itemize}
+
+\paragraph{Diffie--Hellman.}
+\begin{itemize}
+    \item Public $p, g$. Alice: $A = g^a$, Bob: $B = g^b$; shared $K = B^a = A^b = g^{ab} \bmod p$.
+    \item Security: \textbf{Discrete Logarithm Problem} (easy to compute $g^a$, hard to recover $a$). Trapdoor/one-way functions; others: RSA (factoring), ECC, post-quantum (lattices).
+    \item \textbf{Hybrid encryption}: public-key to agree on a key, symmetric crypto for the data.
+    \item Vanilla DH gives key agreement \textbf{without authenticity} $\Rightarrow$ \textbf{MITM}: Eve shares $K_{AE}$ with Alice and $K_{BE}$ with Bob, reads and modifies everything. Fix: \textbf{signatures} + \textbf{CA} vouching for public keys.
+\end{itemize}
+
+% =====================================================================
+\section{Lecture 6 -- Applied cryptography continued}
+
+\paragraph{Public-key encryption and signatures.} Each user has $(SK, PK)$; public keys published in a \textbf{PKI} (whose integrity is guaranteed by CAs).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Public key $PK$} & \textbf{Secret key $SK$} \\
+\midrule
+Encryption (confidentiality) & Encrypt: $C = E_{PK}(M)$ & Decrypt: $D_{SK}(C) = M$ \\
+Signature (authenticity) & Verify: $V_{PK}(M, S)$ & Sign: $S = \mathrm{Sign}_{SK}(M)$ \\
+\bottomrule
+\end{tabular}
+\caption{The restricted operation always uses the secret key. Never decrypt with $PK$.}
+\end{table}
+
+\begin{itemize}
+    \item Signature security: \textbf{unforgeability} (no valid $S$ without $SK$, even after seeing many signatures). Examples: RSA-OAEP (encryption), NIST DSA (signature).
+    \item Asymmetric is slow $\Rightarrow$ \textbf{sign the hash}: send $(M, \mathrm{Sign}_{SK}(h(M)))$; receiver recomputes $h(M)$ and verifies.
+    \item Confidentiality + authenticity: $E_{PK_A^{enc}}(M), \mathrm{Sign}_{SK_B^{sig}}(h(M))$ with \textbf{two key pairs}; encrypt with the \textbf{receiver's} key, sign with the \textbf{sender's} key. Careful: $h(M)$ next to a ciphertext leaks $M$ if $M$ is guessable.
+    \item Signatures give \textbf{sender authenticity}, \textbf{message integrity}, \textbf{non-repudiation} (verifiable by any third party).
+\end{itemize}
+
+\paragraph{Hash functions.} Unkeyed, deterministic, efficient, any length $\to$ fixed length. A hash alone gives no integrity on an insecure channel (Eve recomputes it) and is not encryption.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Property} & \textbf{Given} & \textbf{Must find} & \textbf{Needed for signing $h(M)$?} \\
+\midrule
+Pre-image & $H$ & any $M'$, $h(M') = H$ & no ($M$ sent in clear) \\
+Second pre-image & $M$ & $M' \neq M$, $h(M') = h(M)$ & yes (swap message) \\
+Collision & nothing & any $M \neq M'$, same hash & yes (sign $M$, claim $M'$) \\
+\bottomrule
+\end{tabular}
+\caption{Hash properties. Collisions always \textbf{exist} (pigeonhole); they must be \textbf{hard to find}.}
+\end{table}
+Standard: MD5, SHA-0, SHA-1 insecure; SHA-2 OK; SHA-3 recommended. Uses: signatures, HMAC, passwords, file integrity, commitments, logs, blockchains.
+
+\paragraph{Block ciphers and modes.} Fixed-size blocks (AES: 128 bits), output looks random; a mode chains the blocks.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{1.4cm}p{4.3cm}p{8.2cm}@{}}
+\toprule
+\textbf{Mode} & \textbf{Formula} & \textbf{Key properties} \\
+\midrule
+ECB & $C_i = E_K(M_i)$ & $M_i = M_j \Rightarrow C_i = C_j$: leaks structure; blocks can be reordered. Never use. \\[3pt]
+CBC & $C_0 = IV$, $C_i = E_K(M_i \oplus C_{i-1})$, $M_i = D_K(C_i) \oplus C_{i-1}$ & Sequential encryption, parallel decryption; wrong IV only corrupts $M_1$; error in $C_i$ garbles $M_i$ and flips bits of $M_{i+1}$; IV unique and unpredictable. \\[3pt]
+CTR & $C_i = E_K(\mathrm{Nonce}+i) \oplus M_i$ & Stream cipher from a block cipher; no $D_K$ needed; parallel, random access, no error propagation; \textbf{malleable}; nonce reuse = two-time pad. \\
+\bottomrule
+\end{tabular}
+\caption{Modes of operation.}
+\end{table}
+
+Block ciphers vs.\ stream ciphers: high diffusion and tamper resistance but slower and error propagation (mirror of the stream cipher table; CTR behaves like a stream cipher).
+
+\paragraph{MACs.}
+\begin{itemize}
+    \item $\mathrm{MAC}_K(M)$: \textbf{keyed}, symmetric, short tag; hard to produce a valid $(M, \mathrm{MAC}_K(M))$ for a new $M$ without $K$. Gives \textbf{integrity} and \textbf{authenticity} between the two key holders.
+    \item \textbf{No non-repudiation}: both parties know $K$, and a third party cannot verify.
+    \item Deterministic, not for confidentiality; key cannot be brute-forced. Never ``MAC with a public key''.
+    \item \textbf{CBC-MAC}: CBC with fixed IV, tag = last block $C_n$.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & \textbf{MAC} & \textbf{Signature} \\
+\midrule
+Keys & shared $K$ & $SK$ / $PK$ \\
+Integrity, authenticity & yes & yes \\
+Third-party verifiable, non-repudiation & no & yes \\
+Speed & fast & slow \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Authenticated encryption.} Use two independent keys $K_1$ (Enc), $K_2$ (MAC).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llccc@{}}
+\toprule
+ & \textbf{Sent} & \textbf{Ctxt integ.} & \textbf{Ptxt integ.} & \textbf{No leak} \\
+\midrule
+Encrypt-and-MAC & $\mathrm{Enc}_{K_1}(M), \mathrm{MAC}_{K_2}(M)$ & $\times$ & $\checkmark$ & $\times$ \\
+MAC-then-Encrypt & $\mathrm{Enc}_{K_1}(M \| \mathrm{MAC}_{K_2}(M))$ & $\times$ & $\checkmark$ & $\checkmark$ \\
+\textbf{Encrypt-then-MAC} & $C = \mathrm{Enc}_{K_1}(M), \mathrm{MAC}_{K_2}(C)$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\caption{Encrypt-then-MAC is the recommended composition: verify before decrypting.}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Confidentiality} & \textbf{Integrity / authentication} \\
+\midrule
+Symmetric & stream ciphers, block ciphers + modes & MACs \\
+Asymmetric & public-key encryption & digital signatures \\
+\bottomrule
+\end{tabular}
+\caption{The applied cryptography toolbox.}
+\end{table}
+
+% =====================================================================
+\section{Exam checklist: recurring traps}
+
+\begin{itemize}
+    \item Always state the \textbf{property}, the \textbf{threat model} and the \textbf{mechanism}; link principles and keywords (confused deputy, covert channel) to the concrete scenario instead of just naming them.
+    \item Never ``fix'' an access problem by making a sensitive file world-readable/writable.
+    \item \textbf{Setuid} applies to the \textbf{executable}; notation \texttt{-rwsr-xr-{}-}. Without it, the program runs with the caller's privileges (ambient authority).
+    \item UNIX checks owner $\to$ group $\to$ other, first match only; directory bits govern create/delete.
+    \item Dominance needs \textbf{both} label and category conditions; incomparable levels allow no flow.
+    \item BLP: a process that read high data cannot write down, even after ``lowering its level''. A covert channel uses only \textbf{allowed} actions.
+    \item Encryption $\neq$ integrity (OTP, stream ciphers, CTR are malleable). Hash $\neq$ integrity unless the hash comes through a trusted channel.
+    \item Never decrypt with a public key; signatures use the sender's $SK$, encryption the receiver's $PK$.
+    \item Second pre-image: the adversary is given $M$, not $h(M)$. Collisions always exist.
+    \item IV/nonce: public, but never reused with the same key (stream ciphers, CTR); unpredictable for CBC.
+    \item MAC: symmetric, needs secret $K$, no non-repudiation. Confidentiality + integrity with two keys = $\mathrm{Enc}_{K_1}(m), \mathrm{MAC}_{K_2}(\mathrm{Enc}_{K_1}(m))$.
+    \item DH alone is vulnerable to MITM: needs authentication (signatures + CA).
+\end{itemize}
