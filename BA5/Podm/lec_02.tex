@@ -338,13 +338,3 @@ since $\sum_{t=1}^n \mathbf{1}(A_t = a) = T_a(n)$.
 \begin{remark}[Intuition]
 The learner should pull arms with low (or zero) suboptimality gap, and minimize the expected number of pulls of arms with high suboptimality gap. This is not exactly shocking -- the challenge of the course is devising algorithms that achieve this efficiently, \emph{without} knowing the gaps $\Delta_a$ in advance.
 \end{remark}
-
-\subsection{Summary}
-
-\begin{itemize}
-    \item The stochastic bandit: a player and an environment interact via actions $A_t$ and (instantaneous) rewards $X_t$.
-    \item Different assumptions about the possible environments $\mathcal{E}$ are possible (unstructured vs.\ structured); this assumption is important, because the player needs to figure out everything else by probing, i.e., exploring.
-    \item Regret $R_n(\pi,\nu)$: how much is lost (over horizon $n$) because the environment is not known in advance.
-    \item Regret decomposition: the regret decomposes as a sum, over all arms, of their suboptimality gap $\Delta_a$ times the expected number of times that arm was played, $\mathbb{E}[T_a(n)]$.
-\end{itemize}
-

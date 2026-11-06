@@ -615,13 +615,3 @@ $\mu_1 = 1$, $\mu_2 = 1 - \Delta$, $\mu_3 = \dots = \mu_k = 0$ $\Rightarrow$ $H_
     \item Uniform exploration: the hard comparison between arms $1$ and $2$ only gets $n/k$ samples per arm, so its exponent is $\sim \frac{n\Delta^2}{k}$.
     \item Sequential halving is \textbf{much better than uniform exploration, especially for large $k$}: it devotes more samples to deciding between arms $1$ and $2$, after quickly discarding the obviously bad arms.
 \end{itemize}
-
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{Alternate regret bound for UCB}: $R_n \leq 3\sum_i \Delta_i + 8\sqrt{kn\ln n}$, i.e.\ $O(\sqrt{n})$ up to logarithmic factors, independently of the gaps. Proof: do not use the concentration inequality for arms with small gaps ($\Delta_i < \Delta$, use $\sum_i T_i(n) = n$ instead), use it for the others, then optimize the threshold $\Delta = \sqrt{16k\ln n/n}$. The algorithm is unchanged.
-    \item \textbf{Role of $\delta$ in UCB}: too large $\Rightarrow$ risk of ``committing'' to a wrong arm; too small $\Rightarrow$ over-exploration. UCB keeps the UCBs of all arms nearly equal, and worse arms are played less often.
-    \item \textbf{Asymptotic UCB} (L\&S Chapter 8): unknown $n$, run forever. Index $\hat{\mu}_i(t-1) + \sqrt{8\ln t/T_i(t-1)}$ (i.e.\ $\delta_t = t^{-4}$): confidence intervals grow with time when an arm is not pulled, so the chance of a permanent error goes to zero. Similar regret result and proof as last time: $R_n \leq \sum_{i:\Delta_i>0}\left(4\Delta_i + \frac{32\ln n}{\Delta_i}\right)$, but now we do not need to know $n$. Proof: time-dependent good events $G_t$, round-by-round decomposition, counting argument, $\mathbb{P}(G_t^c) \leq 2t^{-3}$ (summable). Optimal constant: $2/\Delta_i$ (Lai--Robbins).
-    \item \textbf{Thompson Sampling} (L\&S Chapter 36): Bayesian perspective, randomized algorithm. Maintain a posterior per arm (Beta$(\alpha_i, \beta_i)$ for Bernoulli rewards, updated by counting successes and failures), sample from each posterior, play the arm with the largest sample. Exploration comes from the randomness of the samples; similar guarantees as UCB, can be better in practice, no exploration hyperparameter.
-    \item \textbf{Best-arm identification} (L\&S Chapter 33): a pure exploration problem (fixed budget, PAC, or simple regret formulations). Suboptimal arms are pulled more often than in regret minimization. Uniform exploration has error $\leq \sum_i \exp(-n\Delta_i^2/(4k))$; \textbf{sequential halving} halves the active set in each of $\lceil\log_2 k\rceil$ phases and has error $\leq 3\log_2 k\,\exp\big(-n/(16H_2\log_2 k)\big)$, much better when only a few arms are competitive.
-\end{itemize}

@@ -478,13 +478,3 @@ UCB performs similarly to ETC with an optimally tuned $m$, \emph{without} knowin
 \begin{remark}[Comparison of the bounds for $k = 2$]
   For ETC with the optimal $m = \frac{4}{\Delta^2}\ln\frac{n\Delta^2}{4}$ (previous lecture), plugging into $R_n \leq m\Delta + n\Delta\exp(-m\Delta^2/4)$ gives $R_n \lesssim \frac{4}{\Delta}\left(1 + \ln\frac{n\Delta^2}{4}\right)$, also of order $\frac{\ln n}{\Delta}$. UCB achieves the same order, $\frac{16\ln n}{\Delta} + 3\Delta$, but with a parameter $\delta = 1/n^2$ that does not depend on $\Delta$.
 \end{remark}
-
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{Adaptive Explore-then-Commit}: the exploration length becomes a data-dependent stopping time. Explore in round robin until the confidence interval of the empirically best arm separates from all the others ($LCB_{a^*} > UCB_a$ for all $a \neq a^*$), then commit. Gives sublinear regret in practice; $\delta$ must be small enough (decreasing with $n$) to avoid mistaken commitments, but not too small to avoid over-exploration.
-    \item \textbf{Confidence bounds}: for $\sigma$-subgaussian rewards and $n$ samples, $UCB/LCB = \hat{\mu}_n \pm \sigma\sqrt{2\ln(2/\delta)/n}$.
-    \item \textbf{Sequential elimination}: the right extension of ETC to $k > 2$ arms: instead of waiting for the best arm to dominate all others, eliminate any arm whose confidence interval is dominated. Proceeds in phases of random length, with decreasing instantaneous regret.
-    \item \textbf{UCB algorithm}: $A_t = \arg\max_a \hat{\mu}_a(t-1) + \sqrt{2\ln(1/\delta)/T_a(t-1)}$. It quantifies uncertainty with confidence intervals and acts \emph{optimistically in the face of uncertainty}; it has a smooth transition from exploration to exploitation (exploration never stops completely, but fades out).
-    \item \textbf{Regret bound}: for a $1$-subgaussian bandit and $\delta = 1/n^2$, $\mathbb{E}[T_i(n)] \leq 3 + \frac{16\ln n}{\Delta_i^2}$, hence $R_n \leq 3\sum_i\Delta_i + \sum_{i:\Delta_i > 0}\frac{16\ln n}{\Delta_i}$: logarithmic regret without knowing the gaps. Proof technique: good event $G_i$ ($\mu_1$ below its UCB at all times, and arm $i$'s UCB below $\mu_1$ after $u_i$ pulls), $T_i(n) \leq u_i$ on $G_i$, union bound + concentration for $\mathbb{P}(G_i^c)$, and tuning of $u_i$.
-\end{itemize}

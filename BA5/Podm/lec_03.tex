@@ -414,12 +414,3 @@ The bound is relatively loose (due to approximations in the proof) for intermedi
 \includegraphics[width=0.5\linewidth]{images/img_20260930_202641.png}
 \end{center}
 
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{Convergence of random variables}: for sums of i.i.d.\ variables, the law of large numbers and the central limit theorem describe the asymptotic behavior. Markov and Chebyshev give finite-$n$ bounds, but they are too loose ($1/n$).
-    \item \textbf{Tail bound for finite $n$}: the large deviation (Chernoff-type) bound $\mathbb{P}(\hat{\mu} \geq \mu + \epsilon) \leq \exp(-n\epsilon^2/(2\sigma^2))$, valid for subgaussian noise, and the resulting confidence intervals of width $\sqrt{2\sigma^2\ln(2/\delta)/n}$.
-    \item \textbf{Subgaussian distributions}: ``nice'' noise, light tail, ``no big excesses''. It is a strong condition (even the exponential distribution is too heavy). Properties: scaling ($\alpha X$ is $|\alpha|\sigma$-subgaussian) and independent sums (variance parameters add up). Examples: Gaussian, bounded variables.
-    \item \textbf{Explore-then-Commit (ETC)}: explore for a fixed window ($m$ pulls per arm), then exploit forever. Tradeoff between expensive exploration and failed exploitation.
-    \item \textbf{Upper bound on $R_n$ for the $1$-subgaussian bandit}: $R_n \leq m\sum_i\Delta_i + (n - mk)\sum_i\Delta_i\exp(-m\Delta_i^2/4)$; for $k = 2$ and optimally tuned $m$, $R_n \leq \Delta + C\sqrt{n}$. Limitation: tuning $m$ requires knowing $\Delta$.
-\end{itemize}

@@ -519,15 +519,3 @@ In linear bandits, the unknown parameter is $\theta^*$:
     \item All principles of LinUCB and Thompson Sampling carry over! The only change: $\hat{\theta}_t$ is estimated by \textbf{logistic regression} (maximum likelihood) instead of least squares. Since $g$ is increasing, the best arm is still $\arg\max_a a^\top\theta^*$.
     \item Tight regret bounds have only been discovered recently (2020 onwards).
 \end{itemize}
-
-\section{Summary}
-
-\begin{itemize}
-    \item \textbf{Linear bandit model}: arms have known feature vectors $a \in \R^d$, and the reward is a noisy linear function of the features, $X_t = A_t^\top\theta^* + \eta_t$, with $\theta^* \in \R^d$ unknown. Model for recommender systems (item features $a$, user preferences $\theta^*$). The action set $\mathcal{A}_t$ can change over time. The MAB is the special case $a_i = e_i$.
-    \item \textbf{Different information structure}: the unknown is $\theta^* \in \R^d$, and pulling one arm conveys information about the rewards of the other arms. Regret scales as $O(d\sqrt{n})$ (up to logs) rather than $O(\sqrt{kn})$.
-    \item \textbf{Parameter estimation by linear regression}: $\hat{\theta}_t = V_t^{-1}\sum_s A_sX_s$, unbiased (without regulariser), with covariance $V_t^{-1}$. Importance of the regulariser: $V_t = \lambda I + \sum_s A_sA_s^\top$ is always invertible, and the initial confidence set is an isotropic ball.
-    \item \textbf{Uncertainty} in the estimate is quantified by $V_t = \sum_s A_sA_s^\top$: uncertainty intervals become \textbf{uncertainty ellipsoids} $\mathcal{C}_t = \{\theta : \|\theta - \hat{\theta}_{t-1}\|_{V_{t-1}}^2 \leq \beta_t\}$, narrow in well-explored directions.
-    \item \textbf{LinUCB}: extends the optimism in the face of uncertainty principle: $A_t = \arg\max_a \max_{\theta\in\mathcal{C}_t} a^\top\theta = \arg\max_a\big(a^\top\hat{\theta}_{t-1} + \sqrt{\beta_t}\|a\|_{V_{t-1}^{-1}}\big)$. Provable regret guarantee $R_n = O(d\sqrt{n}\log(nL))$; key point: \textbf{independent of $k$}. Analysis: concentration of $\|\hat{\theta}_t - \theta^*\|_{V_t}$ uniformly in $t$ (L\&S Thm 20.5, with $\beta_t = O(\log\frac1\delta + d\log t)$), good event $\theta^* \in \mathcal{C}_t$ $\forall t$, $r_t \leq 2\sqrt{\beta_n}\min(1, \|A_t\|_{V_{t-1}^{-1}})$, elliptic potential lemma, $\delta = 1/n$.
-    \item \textbf{Thompson Sampling} for linear bandits: Gaussian belief $\mathcal{N}(\hat{\theta}_t, V_t^{-1})$, sample $\tilde{\theta}_t$, play $\arg\max_a a^\top\tilde{\theta}_t$; computationally cheaper.
-    \item \textbf{Generalised linear bandits}: $X_t = g(A_t^\top\theta^*) + \eta_t$ (e.g.\ sigmoid for clicks); same principles, with logistic regression for $\hat{\theta}_t$.
-\end{itemize}
